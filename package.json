@@ -12,6 +12,7 @@
     "material-design-icons-iconfont": "^5.0.1",
     "matrix-js-sdk": "^9.0.1",
     "olm": "https://packages.matrix.org/npm/olm/olm-3.1.4.tgz",
+    "raw-loader": "^4.0.2",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",

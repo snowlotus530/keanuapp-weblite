@@ -48,7 +48,7 @@
       <router-view />
     </v-main>
 
-    <v-footer app class="copyright">Powered by Guardian Project</v-footer>
+    <v-footer app class="copyright">Powered by Guardian Project. Version: {{ buildVersion }}</v-footer>
   </v-app>
 </template>
 
@@ -61,10 +61,15 @@ export default {
     RoomList,
   },
   data: () => ({
+    buildVersion: "",
     openDrawer: false,
   }),
   mounted() {
     this.$router.replace("/");
+
+    const version = require("!!raw-loader!./assets/version.txt").default;
+    console.log("Version", version);
+    this.buildVersion = version;
   },
   methods: {
     loggedIn() {
