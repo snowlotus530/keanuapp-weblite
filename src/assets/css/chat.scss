@@ -1,4 +1,6 @@
-$chat-background: #008860;
+@import "@/assets/css/main.scss";
+
+$chat-background: $background;
 $chat-standard-padding: 32px;
 $chat-standard-padding-s: 16px;
 $chat-standard-padding-xs: 8px;

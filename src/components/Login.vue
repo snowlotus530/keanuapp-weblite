@@ -1,30 +1,31 @@
 <template>
-  <div class="d-flex justify-center">
-    <v-card class="ma-8 pa-4" style="min-width: 400px; max-width: 400px" flat>
-      <v-card-title primary-title>
-        <h4>Login</h4>
-      </v-card-title>
+  <div class="d-flex justify-center login-root">
+    <div color="rgba(255,255,255,0.1)">
+      <h4>Login</h4>
       <v-form v-model="isValid">
         <v-text-field
-          prepend-icon="mdi-account"
           v-model="user.username"
           label="Username"
+          color="black"
+          background-color="white"
+          outlined
           :rules="[(v) => !!v || 'Username is required']"
           :error="userErrorMessage != null"
           :error-messages="userErrorMessage"
           required
         ></v-text-field>
         <v-text-field
-          prepend-icon="mdi-lock"
           v-model="user.password"
           label="Password"
+          color="black"
+          background-color="white"
+          outlined
           type="password"
           :rules="[(v) => !!v || 'Password is required']"
           :error="passErrorMessage != null"
           :error-messages="passErrorMessage"
           required
         ></v-text-field>
-        <v-card-actions>
           <v-btn
             :disabled="!isValid || loading"
             primary
@@ -34,9 +35,8 @@
             :loading="loading"
             >Login</v-btn
           >
-        </v-card-actions>
       </v-form>
-    </v-card>
+    </div>
   </div>
 </template>
 
@@ -120,3 +120,7 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+@import "@/assets/css/login.scss";
+</style>
