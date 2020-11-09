@@ -7,12 +7,8 @@
           <v-icon v-text="room.icon"></v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title
-            v-text="room.summary.info.title"
-          ></v-list-item-title>
-          <v-list-item-content
-            >Topic: {{ room.topic }}</v-list-item-content
-          >
+          <v-list-item-title>{{ room.summary.info.title }}</v-list-item-title>
+          <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </v-list-item-group>

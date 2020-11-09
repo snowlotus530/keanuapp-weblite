@@ -1,5 +1,3 @@
-import MatrixService from '../services/matrix.service';
-
 const user = JSON.parse(localStorage.getItem('user'));
 const initialState = user
     ? { status: { loggedIn: true }, user }
@@ -10,7 +8,7 @@ export const auth = {
     state: initialState,
     actions: {
         login({ commit }, user) {
-            return MatrixService.login(user).then(
+            return this._vm.$matrix.login(user).then(
                 user => {
                     commit('loginSuccess', user);
                     return Promise.resolve(user);
@@ -22,7 +20,7 @@ export const auth = {
             );
         },
         logout({ commit }) {
-            MatrixService.logout();
+            this._vm.$matrix.logout();
             commit('logout');
         },
     },
