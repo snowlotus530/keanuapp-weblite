@@ -1,12 +1,12 @@
 <template>
   <v-app>
-    <v-app-bar app dark>
+    <v-app-bar app dark flat color="#008860">
       <v-app-bar-nav-icon @click.stop="openDrawer = !openDrawer">
         <v-icon>menu</v-icon>
       </v-app-bar-nav-icon>
 
       <v-toolbar-title
-        >Keanu{{ room ? " - " + room.name : "" }}</v-toolbar-title
+        >Keanu{{ $matrix.currentRoom ? (" - " + $matrix.currentRoom.summary.info.title) : "" }}</v-toolbar-title
       >
 
       <v-spacer></v-spacer>
@@ -39,8 +39,7 @@
     <v-navigation-drawer app v-model="openDrawer">
       <v-list nav dense>
         <RoomList
-          v-if="$matrixClient != null"
-          v-on:onCurrentRoomChanged="onCurrentRoomChanged"
+          v-if="$matrix.ready"
         />
       </v-list>
     </v-navigation-drawer>
@@ -54,7 +53,6 @@
 </template>
 
 <script>
-import Vue from "vue";
 import RoomList from "./components/RoomList";
 
 export default {
@@ -64,7 +62,6 @@ export default {
   },
   data: () => ({
     openDrawer: false,
-    currentRoom: null,
   }),
   mounted() {
     this.$router.replace("/");
@@ -76,18 +73,11 @@ export default {
     logOut() {
       this.$store.dispatch("auth/logout");
       this.$router.replace("/login");
-      this.$store.commit("setCurrentRoom", null);
-    },
-    onCurrentRoomChanged(room) {
-      this.$store.commit("setCurrentRoom", room);
     },
   },
   computed: {
     currentUser() {
       return this.$store.state.auth.user;
-    },
-    room() {
-      return this.$store.state.currentRoom;
     },
   },
   watch: {
@@ -95,9 +85,10 @@ export default {
       immediate: true,
       handler(ignorednewVal, ignoredoldVal) {
         if (this.loggedIn) {
+          const self = this;
           this.$matrix.getMatrixClient(this.currentUser)
-            .then((matrixClient) => {
-              Vue.prototype.$matrixClient = matrixClient;
+            .then(() => {
+              self.$matrix.initClient();
             })
             .catch((error) => {
               console.log("Error creating client", error);

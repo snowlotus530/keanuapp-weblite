@@ -7,11 +7,11 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        currentRoom: null
+        currentRoomId: null
     },
     mutations: {
-        setCurrentRoom(state, room) {
-            state.currentRoom = room;
+        setCurrentRoomId(state, roomId) {
+            state.currentRoomId = roomId;
         },
     },
     actions: {

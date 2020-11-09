@@ -10,7 +10,7 @@
         <div
           class="messageJoin"
           v-if="
-            event.event.state_key != myAddress &&
+            event.event.state_key != myUserId &&
             event.getContent().membership == 'join' &&
             event.getType() == 'm.room.member'
           "
@@ -22,7 +22,7 @@
         <div
           class="messageJoin"
           v-if="
-            event.event.state_key != myAddress &&
+            event.event.state_key != myUserId &&
             event.getContent().membership == 'leave' &&
             event.getType() == 'm.room.member'
           "
@@ -34,7 +34,7 @@
         <div
           class="messageJoin"
           v-if="
-            event.event.state_key != myAddress &&
+            event.event.state_key != myUserId &&
             event.getContent().membership == 'invite' &&
             event.getType() == 'm.room.member'
           "
@@ -44,7 +44,7 @@
 
         <div
           v-else-if="
-            event.getSender() != myAddress &&
+            event.getSender() != myUserId &&
             event.getType() == 'm.room.message'
           "
         >
@@ -108,81 +108,76 @@ export default {
   }),
 
   computed: {
-    room() {
-      return this.$store.state.currentRoom;
+    myUserId() {
+      return this.$store.state.auth.user.user_id;
     },
     roomId() {
-      return this.room != null ? this.room.roomId : null;
+      return this.$matrix.currentRoomId;
     },
     sendButtonDisabled() {
       return this.currentInput.length == 0;
     },
-    myAddress() {
-      // TODO
-      return "@npex2:neo.keanu.im";
-    },
   },
 
   watch: {
-    room() {
+    roomId() {
       console.log("Chat: Current room changed");
 
       // Clear old events
       this.events = [];
 
       // Remove all old room listeners
-      this.$matrixClient.removeAllListeners("Room.timeline");
-      this.$matrixClient.removeAllListeners("RoomMember.typing");
+      this.$matrix.off("Room.timeline", this.onEvent);
+      this.$matrix.off("RoomMember.typing", this.onUserTyping);
 
       this.contactIsTyping = false;
 
-      if (!this.room) {
+      if (!this.roomId) {
         return; // no room
       }
+      const room = this.$matrix.getRoom(this.roomId);
+      if (!room) {
+        return; // Not found
+      }
 
-      this.room.timeline.forEach((event) => {
+      room.timeline.forEach((event) => {
         this.handleMatrixEvent(event);
       });
 
       // Add event listener for this room
-      this.$matrixClient.on(
-        "Room.timeline",
-        function (event, ignoredroom, ignoredtoStartOfTimeline) {
-          if (event.getRoomId() !== this.roomId) {
-            return; // Not for this room
-          }
-          if (this.handleMatrixEvent(event)) {
-            this.$nextTick(function () {
-              const container = this.$refs.chatContainer;
-              if (container.children.length > 0) {
-                const lastChild =
-                  container.children[container.children.length - 1];
-                console.log("Scroll into view", lastChild);
-                window.requestAnimationFrame(() => {
-                  lastChild.scrollIntoView({
-                    behavior: "smooth",
-                    block: "end",
-                    inline: "nearest",
-                  });
-                });
-              }
-            });
-          }
-        }.bind(this)
-      );
-
-      this.$matrixClient.on(
-        "RoomMember.typing",
-        function (event, member) {
-          if (member.userId == this.contactAddress) {
-            this.contactIsTyping = member.typing;
-          }
-        }.bind(this)
-      );
+      this.$matrix.on("Room.timeline", this.onEvent);
+      this.$matrix.on("RoomMember.typing", this.onUserTyping);
     },
   },
 
   methods: {
+    onEvent(event) {
+      if (event.getRoomId() !== this.roomId) {
+        return; // Not for this room
+      }
+      if (this.handleMatrixEvent(event)) {
+        this.$nextTick(function () {
+          const container = this.$refs.chatContainer;
+          if (container.children.length > 0) {
+            const lastChild = container.children[container.children.length - 1];
+            console.log("Scroll into view", lastChild);
+            window.requestAnimationFrame(() => {
+              lastChild.scrollIntoView({
+                behavior: "smooth",
+                block: "end",
+                inline: "nearest",
+              });
+            });
+          }
+        });
+      }
+    },
+
+    onUserTyping(event) {
+      //TODO
+      console.log("Typing:", event);
+    },
+
     /**
      * Handle a matrix event. Add it to our array if valid type.
      * @returns True if the event was added, false otherwise.
