@@ -128,7 +128,7 @@ $chat-text-size: 0.7pt;
     }
 }
 
-.sender {
+.sender, .status {
     font-family: 'Titillium Web', sans-serif;
     font-weight: 300;
     font-size: 15 * $chat-text-size;
@@ -150,4 +150,13 @@ $chat-text-size: 0.7pt;
     font-size: 15 * $chat-text-size;
     text-align: center;
     color: #1c242a;
+}
+
+.statusEvent {
+    font-family: 'Titillium Web', sans-serif;
+    font-weight: 300;
+    font-size: 15 * $chat-text-size;
+    color: #1c242a;
+    text-align: center;
+    margin: 20px;
 }

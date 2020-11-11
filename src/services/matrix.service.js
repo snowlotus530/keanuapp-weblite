@@ -99,7 +99,8 @@ export default {
                         store: matrixStore,
                         sessionStore: webStorageSessionStore,
                         deviceId: user.device_id,
-                        accessToken: user.access_token
+                        accessToken: user.access_token,
+                        timelineSupport: true
                     }
                     this.matrixClient = sdk.createClient(opts);
                     return this.matrixClient
@@ -147,17 +148,30 @@ export default {
                 },
 
                 onEvent(event) {
-                    if (event.getType() == "m.room.topic") {
-                        const room = this.matrixClient.getRoom(event.getRoomId());
-                        if (room) {
-                            Vue.set(room, "topic", event.getContent().topic);
+                    switch (event.getType()) {
+                        case "m.room.topic": {
+                            const room = this.matrixClient.getRoom(event.getRoomId());
+                            if (room) {
+                                Vue.set(room, "topic", event.getContent().topic);
+                            }
                         }
-                        return;
-                     }
+                        break;
+
+                        case "m.room.avatar": {
+                            const room = this.matrixClient.getRoom(event.getRoomId());
+                            if (room) {
+                                Vue.set(room, "avatar", room.getAvatarUrl(this.matrixClient.getHomeserverUrl(), 80, 80, "scale", true));
+                            }
+                        }
+                        break;
+                    }
                 },
 
                 reloadRooms() {
                     this.rooms = this.matrixClient.getVisibleRooms();
+                    this.rooms.forEach(room => {
+                        Vue.set(room, "avatar", room.getAvatarUrl(this.matrixClient.getHomeserverUrl(), 80, 80, "scale", true));
+                    });
                 },
 
                 setCurrentRoomId(roomId) {

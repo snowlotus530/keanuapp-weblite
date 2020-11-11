@@ -1,11 +1,11 @@
 <template>
-  <v-list flat>
+  <v-list dense>
     <v-subheader>ROOMS</v-subheader>
     <v-list-item-group v-model="currentRoomId" color="primary">
       <v-list-item v-for="room in $matrix.rooms" :key="room.roomId" :value="room.roomId">
-        <v-list-item-icon>
-          <v-icon v-text="room.icon"></v-icon>
-        </v-list-item-icon>
+        <v-list-item-avatar>
+          <v-img :src="room.avatar" />
+        </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title>{{ room.summary.info.title }}</v-list-item-title>
           <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
