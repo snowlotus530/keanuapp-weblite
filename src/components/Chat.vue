@@ -4,8 +4,9 @@
       class="chat-content flex-grow-1 flex-shrink-1"
       ref="chatContainer"
       style="overflow-x: hidden; overflow-y: auto"
+      v-on:scroll="onScroll"
     >
-      <div v-for="(event, index) in events" :key="index">
+      <div v-for="event in events" :key="event.eventId">
         <!-- Contact joined the chat -->
         <div
           class="messageJoin"
@@ -44,12 +45,11 @@
 
         <div
           v-else-if="
-            event.getSender() != myUserId &&
-            event.getType() == 'm.room.message'
+            event.getSender() != myUserId && event.getType() == 'm.room.message'
           "
         >
           <div class="messageIn">
-            <div class="sender">{{ event.getSender() }}</div>
+            <div class="sender">{{ messageEventDisplayName(event) }}</div>
             <div class="bubble">
               <div class="message">{{ event.getContent().body }}</div>
             </div>
@@ -64,10 +64,29 @@
             <div class="bubble">
               <div class="message">{{ event.getContent().body }}</div>
             </div>
+            <div class="status">{{ event.status }}</div>
           </div>
           <div class="time">
             {{ formatTime(event.event.origin_server_ts) }}
           </div>
+        </div>
+
+        <!-- ROOM NAME CHANGED -->
+        <div v-else-if="event.getType() == 'm.room.name'" class="statusEvent">
+          {{ stateEventDisplayName(event) }} changed room name to {{ event.getContent().name }}
+        </div>
+
+        <!-- ROOM TOPIC CHANGED -->
+        <div v-else-if="event.getType() == 'm.room.topic'" class="statusEvent">
+          {{ stateEventDisplayName(event) }} changed topic to {{ event.getContent().topic }}
+        </div>
+
+        <!-- ROOM AVATAR CHANGED -->
+        <div v-else-if="event.getType() == 'm.room.avatar'" class="statusEvent">
+          {{ stateEventDisplayName(event) }} changed the room avatar
+        </div>
+
+        <div v-else class="statusEvent">Event: {{ event.getType() }}
         </div>
       </div>
       <!-- CONTACT IS TYPING -->
@@ -98,14 +117,58 @@
 </template>
 
 <script>
+import { TimelineWindow, EventTimeline } from "matrix-js-sdk";
+
+// from https://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
+function ScrollPosition(node) {
+  this.node = node;
+  this.previousScrollHeightMinusTop = 0;
+  this.readyFor = "up";
+}
+
+ScrollPosition.prototype.restore = function () {
+  if (this.readyFor === "up") {
+    this.node.scrollTop =
+      this.node.scrollHeight - this.previousScrollHeightMinusTop;
+  }
+
+  // 'down' doesn't need to be special cased unless the
+  // content was flowing upwards, which would only happen
+  // if the container is position: absolute, bottom: 0 for
+  // a Facebook messages effect
+};
+
+ScrollPosition.prototype.prepareFor = function (direction) {
+  this.readyFor = direction || "up";
+  this.previousScrollHeightMinusTop =
+    this.node.scrollHeight - this.node.scrollTop;
+};
+
 export default {
   name: "Chat",
 
   data: () => ({
+    room: null,
     events: [],
     currentInput: "",
     contactIsTyping: false,
+    timelineWindow: null,
+    scrollPosition: null,
   }),
+
+  mounted() {
+    const container = this.$refs.chatContainer;
+    this.scrollPosition = new ScrollPosition(container);
+
+    this.$matrix.on("Room.timeline", this.onEvent);
+    this.$matrix.on("RoomMember.typing", this.onUserTyping);
+
+  },
+
+  destroyed() {
+    this.$matrix.off("Room.timeline", this.onEvent);
+    this.$matrix.off("RoomMember.typing", this.onUserTyping);
+  },
 
   computed: {
     myUserId() {
@@ -125,93 +188,80 @@ export default {
 
       // Clear old events
       this.events = [];
-
-      // Remove all old room listeners
-      this.$matrix.off("Room.timeline", this.onEvent);
-      this.$matrix.off("RoomMember.typing", this.onUserTyping);
-
+      this.timelineWindow = null;    
       this.contactIsTyping = false;
 
       if (!this.roomId) {
         return; // no room
       }
-      const room = this.$matrix.getRoom(this.roomId);
-      if (!room) {
+
+      this.room = this.$matrix.getRoom(this.roomId);
+      if (!this.room) {
         return; // Not found
       }
 
-      room.timeline.forEach((event) => {
-        this.handleMatrixEvent(event);
+      this.timelineWindow = new TimelineWindow(
+        this.$matrix.matrixClient,
+        this.room.getUnfilteredTimelineSet(),
+        {}
+      );
+      this.timelineWindow.load(null, 20).then(() => {
+        this.events = this.timelineWindow.getEvents();
+        this.paginateBackIfNeeded();
       });
-
-      // Add event listener for this room
-      this.$matrix.on("Room.timeline", this.onEvent);
-      this.$matrix.on("RoomMember.typing", this.onUserTyping);
     },
   },
 
   methods: {
+    paginateBackIfNeeded() {
+        this.$nextTick(() => {
+          const container = this.$refs.chatContainer;
+          if (container.scrollHeight <= container.clientHeight) {
+            this.handleScrolledToTop();
+          }
+        })
+    },
+    onScroll(ignoredevent) {
+      const container = this.$refs.chatContainer;
+      if (container.scrollTop == 0) {
+        // Scrolled to top
+        this.handleScrolledToTop();
+      } else if (
+        container.scrollHeight - container.scrollTop ==
+        container.clientHeight
+      ) {
+        this.handleScrolledToBottom();
+      }
+    },
     onEvent(event) {
       if (event.getRoomId() !== this.roomId) {
         return; // Not for this room
       }
-      if (this.handleMatrixEvent(event)) {
-        this.$nextTick(function () {
-          const container = this.$refs.chatContainer;
-          if (container.children.length > 0) {
-            const lastChild = container.children[container.children.length - 1];
-            console.log("Scroll into view", lastChild);
-            window.requestAnimationFrame(() => {
-              lastChild.scrollIntoView({
-                behavior: "smooth",
-                block: "end",
-                inline: "nearest",
-              });
-            });
-          }
-        });
-      }
+      this.paginateBackIfNeeded();
     },
 
     onUserTyping(event) {
-      //TODO
+      if (event.getRoomId() !== this.roomId) {
+        return; // Not for this room
+      }
       console.log("Typing:", event);
-    },
-
-    /**
-     * Handle a matrix event. Add it to our array if valid type.
-     * @returns True if the event was added, false otherwise.
-     */
-    handleMatrixEvent(event) {
-      console.log("Type is", event.getType());
-
-      if (event.getType() == "m.room.encryption") {
-        this.$root.matrixClient.setRoomEncryption(
-          event.event.room_id,
-          event.getContent()
-        );
-      }
-
-      const allowedEvents = [
-        "m.room.message",
-        "m.room.member",
-        "m.room.encrypted",
-      ];
-      if (allowedEvents.includes(event.getType())) {
-        console.log("Add event", event);
-        this.events.push(event);
-        return true;
-      } else {
-        console.log("Ignore event", event);
-        return false;
-      }
     },
 
     /**
      * Get a display name given an event.
      */
     stateEventDisplayName(event) {
+      if (this.room) {
+        const member = this.room.getMember(event.getSender());
+        if (member) {
+          return member.name;
+        }
+      }
       return event.getContent().displayname || event.event.state_key;
+    },
+
+    messageEventDisplayName(event) {
+      return this.stateEventDisplayName(event);
     },
 
     sendMessage() {
@@ -222,17 +272,12 @@ export default {
     },
 
     sendMatrixMessage(body) {
-      // Send chat message sent event
-      window.logtag("event", "chat_message_sent", {
-        event_category: "chat",
-      });
-
       var content = {
         body: body,
-        msgtype: "m.notice",
+        msgtype: "m.text",
       };
-      this.$root.matrixClient.sendEvent(
-        this.currentRoomId,
+      this.$matrix.matrixClient.sendEvent(
+        this.roomId,
         "m.room.message",
         content,
         "",
@@ -256,6 +301,33 @@ export default {
         return date.toLocaleTimeString();
       }
       return date.toLocaleString();
+    },
+
+    handleScrolledToTop() {
+      console.log("@top");
+      // const room = this.$matrix.getRoom(this.roomId);
+      if (
+        this.timelineWindow &&
+        this.timelineWindow.canPaginate(EventTimeline.BACKWARDS)
+      ) {
+        this.timelineWindow
+          .paginate(EventTimeline.BACKWARDS, 10, true)
+          .then((success) => {
+            if (success) {
+              this.scrollPosition.prepareFor("up");
+              this.events = this.timelineWindow.getEvents();
+              this.$nextTick(() => {
+                // restore scroll position!
+                console.log("Restore scroll!");
+                this.scrollPosition.restore();
+              });
+            }
+          });
+      }
+    },
+
+    handleScrolledToBottom() {
+      console.log("@bottom");
     },
   },
 };
