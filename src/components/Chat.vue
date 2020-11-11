@@ -50,6 +50,11 @@
         >
           <div class="messageIn">
             <div class="sender">{{ messageEventDisplayName(event) }}</div>
+            <v-avatar class="avatar" size="40" color="grey">
+              <img v-if="messageEventAvatar(event)" :src="messageEventAvatar(event)" />
+              <span v-else class="white--text headline">{{messageEventDisplayName(event).substring(0,1).toUpperCase()}}</span>
+            </v-avatar>
+
             <div class="bubble">
               <div class="message">{{ event.getContent().body }}</div>
             </div>
@@ -262,6 +267,16 @@ export default {
 
     messageEventDisplayName(event) {
       return this.stateEventDisplayName(event);
+    },
+
+    messageEventAvatar(event) {
+      if (this.room) {
+        const member = this.room.getMember(event.getSender());
+        if (member) {
+          return member.getAvatarUrl(this.$matrix.matrixClient.getHomeserverUrl(), 40, 40, "scale", true);
+        }
+      }
+      return null;
     },
 
     sendMessage() {

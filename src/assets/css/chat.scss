@@ -118,6 +118,7 @@ $chat-text-size: 0.7pt;
     margin: 8px;
     margin-right: 30% !important;
     text-align: left;
+    position: relative;
     .bubble {
         background-color: white;
         border-radius: 10px 10px 10px 0;
@@ -125,6 +126,16 @@ $chat-text-size: 0.7pt;
         border-width: 1px !important;
         border-style: solid !important;
         border-color: #cccccc !important;
+    }
+    .avatar {
+        position: absolute;
+        left: -10px;
+        top: 0;
+        border: 2px solid white;
+    }
+    .sender {
+        position: relative;
+        left: 40px;
     }
 }
 
