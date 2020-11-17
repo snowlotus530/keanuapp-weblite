@@ -8,97 +8,53 @@
     >
       <div v-for="event in events" :key="event.eventId">
         <!-- Contact joined the chat -->
-        <div
+        <ContactJoin
           class="messageJoin"
           v-if="
             event.event.state_key != myUserId &&
             event.getContent().membership == 'join' &&
             event.getType() == 'm.room.member'
-          "
-        >
-          {{ stateEventDisplayName(event) }} joined the chat
-        </div>
+          " :room="room" :event="event"
+        />
 
         <!-- Contact left the chat -->
-        <div
+        <ContactLeave
           class="messageJoin"
           v-if="
             event.event.state_key != myUserId &&
             event.getContent().membership == 'leave' &&
             event.getType() == 'm.room.member'
-          "
-        >
-          {{ stateEventDisplayName(event) }} left the chat
-        </div>
+          " :room="room" :event="event"
+        />
 
         <!-- Contact invited to the chat -->
-        <div
+        <ContactInvited
           class="messageJoin"
           v-if="
             event.event.state_key != myUserId &&
             event.getContent().membership == 'invite' &&
             event.getType() == 'm.room.member'
-          "
-        >
-          {{ stateEventDisplayName(event) }} was invited to the chat...
-        </div>
+          " :room="room" :event="event"
+        />
 
-        <div
+        <MessageIncomingText
           v-else-if="
             event.getSender() != myUserId && event.getType() == 'm.room.message'
-          "
-        >
-          <div class="messageIn">
-            <div class="sender">{{ messageEventDisplayName(event) }}</div>
-            <v-avatar class="avatar" size="40" color="grey">
-              <img
-                v-if="messageEventAvatar(event)"
-                :src="messageEventAvatar(event)"
-              />
-              <span v-else class="white--text headline">{{
-                messageEventDisplayName(event).substring(0, 1).toUpperCase()
-              }}</span>
-            </v-avatar>
+          " :room="room" :event="event"
+        />
 
-            <div class="bubble">
-              <div class="message">{{ event.getContent().body }}</div>
-            </div>
-          </div>
-          <div class="time">
-            {{ formatTime(event.event.origin_server_ts) }}
-          </div>
-        </div>
-        <div v-else-if="event.getType() == 'm.room.message'">
-          <div class="messageOut">
-            <div class="sender">{{ "You" }}</div>
-            <div class="bubble">
-              <div class="message">{{ event.getContent().body }}</div>
-            </div>
-            <div class="status">{{ event.status }}</div>
-          </div>
-          <div class="time">
-            {{ formatTime(event.event.origin_server_ts) }}
-          </div>
-        </div>
+        <MessageOutgoingText v-else-if="event.getType() == 'm.room.message'" :room="room" :event="event" />
 
         <!-- ROOM NAME CHANGED -->
-        <div v-else-if="event.getType() == 'm.room.name'" class="statusEvent">
-          {{ stateEventDisplayName(event) }} changed room name to
-          {{ event.getContent().name }}
-        </div>
+        <RoomNameChanged v-else-if="event.getType() == 'm.room.name'" :room="room" :event="event" />
 
         <!-- ROOM TOPIC CHANGED -->
-        <div v-else-if="event.getType() == 'm.room.topic'" class="statusEvent">
-          {{ stateEventDisplayName(event) }} changed topic to
-          {{ event.getContent().topic }}
-        </div>
+        <RoomTopicChanged v-else-if="event.getType() == 'm.room.topic'" :room="room" :event="event" />
 
         <!-- ROOM AVATAR CHANGED -->
-        <div v-else-if="event.getType() == 'm.room.avatar'" class="statusEvent">
-          {{ stateEventDisplayName(event) }} changed the room avatar
-        </div>
+        <RoomAvatarChanged v-else-if="event.getType() == 'm.room.avatar'" :room="room" :event="event" />
 
-        <div v-else class="statusEvent">Event: {{ event.getType() }}</div>
+        <DebugEvent v-else :room="room" :event="event" />
       </div>
     </div>
 
@@ -169,6 +125,15 @@
 
 <script>
 import { TimelineWindow, EventTimeline } from "matrix-js-sdk";
+import MessageIncomingText from './messages/MessageIncomingText';
+import MessageOutgoingText from './messages/MessageOutgoingText';
+import ContactJoin from './messages/ContactJoin.vue';
+import ContactLeave from './messages/ContactLeave.vue';
+import ContactInvited from './messages/ContactInvited.vue';
+import RoomNameChanged from './messages/RoomNameChanged.vue';
+import RoomTopicChanged from './messages/RoomTopicChanged.vue';
+import RoomAvatarChanged from './messages/RoomAvatarChanged.vue';
+import DebugEvent from "./messages/DebugEvent.vue";
 
 // from https://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
 function ScrollPosition(node) {
@@ -200,7 +165,19 @@ ScrollPosition.prototype.prepareFor = function (direction) {
 export default {
   name: "Chat",
 
-  data: () => ({
+  components: {
+    MessageIncomingText,
+    MessageOutgoingText,
+    ContactJoin,
+    ContactLeave,
+    ContactInvited,
+    RoomNameChanged,
+    RoomTopicChanged,
+    RoomAvatarChanged,
+    DebugEvent
+  },
+
+  data() { return {
     room: null,
     events: [],
     currentInput: "",
@@ -212,7 +189,7 @@ export default {
     currentSendOperation: null,
     currentSendProgress: null,
     currentSendError: null,
-  }),
+  }},
 
   mounted() {
     const container = this.$refs.chatContainer;
@@ -311,39 +288,6 @@ export default {
         return; // Not for this room
       }
       console.log("Typing:", event);
-    },
-
-    /**
-     * Get a display name given an event.
-     */
-    stateEventDisplayName(event) {
-      if (this.room) {
-        const member = this.room.getMember(event.getSender());
-        if (member) {
-          return member.name;
-        }
-      }
-      return event.getContent().displayname || event.event.state_key;
-    },
-
-    messageEventDisplayName(event) {
-      return this.stateEventDisplayName(event);
-    },
-
-    messageEventAvatar(event) {
-      if (this.room) {
-        const member = this.room.getMember(event.getSender());
-        if (member) {
-          return member.getAvatarUrl(
-            this.$matrix.matrixClient.getHomeserverUrl(),
-            40,
-            40,
-            "scale",
-            true
-          );
-        }
-      }
-      return null;
     },
 
     sendMessage() {
@@ -540,6 +484,40 @@ export default {
         }
       });
     },
+
+        /**
+     * Get a display name given an event.
+     */
+    stateEventDisplayName(event) {
+      if (this.room) {
+        const member = this.room.getMember(event.getSender());
+        if (member) {
+          return member.name;
+        }
+      }
+      return event.getContent().displayname || event.event.state_key;
+    },
+
+    messageEventDisplayName(event) {
+      return this.stateEventDisplayName(event);
+    },
+
+    messageEventAvatar(event) {
+      if (this.room) {
+        const member = this.room.getMember(event.getSender());
+        if (member) {
+          return member.getAvatarUrl(
+            this.$matrix.matrixClient.getHomeserverUrl(),
+            40,
+            40,
+            "scale",
+            true
+          );
+        }
+      }
+      return null;
+    },
+
   },
 };
 </script>
