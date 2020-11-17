@@ -1,0 +1,35 @@
+<template>
+  <div>
+    <div class="messageIn">
+      <div class="sender">{{ messageEventDisplayName(event) }}</div>
+      <v-avatar class="avatar" size="40" color="grey">
+        <img
+          v-if="messageEventAvatar(event)"
+          :src="messageEventAvatar(event)"
+        />
+        <span v-else class="white--text headline">{{
+          messageEventDisplayName(event).substring(0, 1).toUpperCase()
+        }}</span>
+      </v-avatar>
+
+      <div class="bubble">
+        <div class="message">{{ event.getContent().body }}</div>
+      </div>
+    </div>
+    <div class="time">
+      {{ formatTime(event.event.origin_server_ts) }}
+    </div>
+  </div>
+</template>
+
+<script>
+import messageMixin from "./messageMixin";
+
+export default {
+  mixins: [messageMixin],
+};
+</script>
+
+<style lang="scss">
+@import "@/assets/css/chat.scss";
+</style>
