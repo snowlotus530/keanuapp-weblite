@@ -51,8 +51,13 @@
           <div class="messageIn">
             <div class="sender">{{ messageEventDisplayName(event) }}</div>
             <v-avatar class="avatar" size="40" color="grey">
-              <img v-if="messageEventAvatar(event)" :src="messageEventAvatar(event)" />
-              <span v-else class="white--text headline">{{messageEventDisplayName(event).substring(0,1).toUpperCase()}}</span>
+              <img
+                v-if="messageEventAvatar(event)"
+                :src="messageEventAvatar(event)"
+              />
+              <span v-else class="white--text headline">{{
+                messageEventDisplayName(event).substring(0, 1).toUpperCase()
+              }}</span>
             </v-avatar>
 
             <div class="bubble">
@@ -78,12 +83,14 @@
 
         <!-- ROOM NAME CHANGED -->
         <div v-else-if="event.getType() == 'm.room.name'" class="statusEvent">
-          {{ stateEventDisplayName(event) }} changed room name to {{ event.getContent().name }}
+          {{ stateEventDisplayName(event) }} changed room name to
+          {{ event.getContent().name }}
         </div>
 
         <!-- ROOM TOPIC CHANGED -->
         <div v-else-if="event.getType() == 'm.room.topic'" class="statusEvent">
-          {{ stateEventDisplayName(event) }} changed topic to {{ event.getContent().topic }}
+          {{ stateEventDisplayName(event) }} changed topic to
+          {{ event.getContent().topic }}
         </div>
 
         <!-- ROOM AVATAR CHANGED -->
@@ -91,15 +98,14 @@
           {{ stateEventDisplayName(event) }} changed the room avatar
         </div>
 
-        <div v-else class="statusEvent">Event: {{ event.getType() }}
-        </div>
+        <div v-else class="statusEvent">Event: {{ event.getType() }}</div>
       </div>
-      <!-- CONTACT IS TYPING -->
-      <div v-show="contactIsTyping" class="typing">Someone is typing...</div>
     </div>
 
     <!-- Input area -->
-    <div class="input-area flex-grow-0 flex-shrink-0">
+    <div v-if="room" class="input-area flex-grow-0 flex-shrink-0">
+      <!-- CONTACT IS TYPING -->
+      <div v-show="contactIsTyping" class="typing">Someone is typing...</div>
       <v-textarea
         ref="messageInput"
         full-width
@@ -108,7 +114,22 @@
         class="input-message"
         placeholder="Send message"
         hide-details
-      ></v-textarea>
+        background-color="white"
+      >
+        <template v-slot:prepend>
+          <label icon flat>
+            <v-icon>attachment</v-icon>
+            <input
+              ref="attachment"
+              type="file"
+              name="attachment"
+              @change="pickAttachment($event)"
+              accept="image/*"
+              style="display: none"
+            />
+          </label>
+        </template>
+      </v-textarea>
       <div align-self="end" class="text-right">
         <v-btn
           elevation="0"
@@ -117,6 +138,31 @@
           >Send</v-btn
         >
       </div>
+    </div>
+
+    <div v-if="currentImageInput">
+      <v-dialog v-model="currentImageInput" class="ma-0 pa-0" width="50%">
+        <v-card class="ma-0 pa-0">
+          <v-card-text class="ma-0 pa-0">
+            <v-img
+              :aspect-ratio="1"
+              :src="currentImageInput"
+              contain
+              style="max-height: 50vh"
+            />
+            <div v-if="currentSendError">{{ currentSendError }}</div>
+            <div v-else>{{ currentSendProgress }}</div>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="currentImageInput = null"
+              >Cancel</v-btn
+            >
+            <v-btn color="primary" text @click="sendAttachment">Send</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
   </div>
 </template>
@@ -128,6 +174,7 @@ import { TimelineWindow, EventTimeline } from "matrix-js-sdk";
 function ScrollPosition(node) {
   this.node = node;
   this.previousScrollHeightMinusTop = 0;
+  this.previousScrollTop = 0;
   this.readyFor = "up";
 }
 
@@ -135,18 +182,19 @@ ScrollPosition.prototype.restore = function () {
   if (this.readyFor === "up") {
     this.node.scrollTop =
       this.node.scrollHeight - this.previousScrollHeightMinusTop;
+  } else {
+    this.node.scrollTop = this.previousScrollTop;
   }
-
-  // 'down' doesn't need to be special cased unless the
-  // content was flowing upwards, which would only happen
-  // if the container is position: absolute, bottom: 0 for
-  // a Facebook messages effect
 };
 
 ScrollPosition.prototype.prepareFor = function (direction) {
   this.readyFor = direction || "up";
-  this.previousScrollHeightMinusTop =
-    this.node.scrollHeight - this.node.scrollTop;
+  if (this.readyFor === "up") {
+    this.previousScrollHeightMinusTop =
+      this.node.scrollHeight - this.node.scrollTop;
+  } else {
+    this.previousScrollTop = this.node.scrollTop;
+  }
 };
 
 export default {
@@ -159,6 +207,11 @@ export default {
     contactIsTyping: false,
     timelineWindow: null,
     scrollPosition: null,
+    currentImageInput: null,
+    currentImageInputPath: null,
+    currentSendOperation: null,
+    currentSendProgress: null,
+    currentSendError: null,
   }),
 
   mounted() {
@@ -167,7 +220,6 @@ export default {
 
     this.$matrix.on("Room.timeline", this.onEvent);
     this.$matrix.on("RoomMember.typing", this.onUserTyping);
-
   },
 
   destroyed() {
@@ -193,7 +245,7 @@ export default {
 
       // Clear old events
       this.events = [];
-      this.timelineWindow = null;    
+      this.timelineWindow = null;
       this.contactIsTyping = false;
 
       if (!this.roomId) {
@@ -219,12 +271,12 @@ export default {
 
   methods: {
     paginateBackIfNeeded() {
-        this.$nextTick(() => {
-          const container = this.$refs.chatContainer;
-          if (container.scrollHeight <= container.clientHeight) {
-            this.handleScrolledToTop();
-          }
-        })
+      this.$nextTick(() => {
+        const container = this.$refs.chatContainer;
+        if (container.scrollHeight <= container.clientHeight) {
+          this.handleScrolledToTop();
+        }
+      });
     },
     onScroll(ignoredevent) {
       const container = this.$refs.chatContainer;
@@ -235,7 +287,7 @@ export default {
         container.scrollHeight - container.scrollTop ==
         container.clientHeight
       ) {
-        this.handleScrolledToBottom();
+        this.handleScrolledToBottom(false);
       }
     },
     onEvent(event) {
@@ -243,6 +295,15 @@ export default {
         return; // Not for this room
       }
       this.paginateBackIfNeeded();
+
+      // If we are at bottom, scroll to see new events...
+      const container = this.$refs.chatContainer;
+      if (
+        container.scrollHeight - container.scrollTop ==
+        container.clientHeight
+      ) {
+        this.handleScrolledToBottom(true);
+      }
     },
 
     onUserTyping(event) {
@@ -273,7 +334,13 @@ export default {
       if (this.room) {
         const member = this.room.getMember(event.getSender());
         if (member) {
-          return member.getAvatarUrl(this.$matrix.matrixClient.getHomeserverUrl(), 40, 40, "scale", true);
+          return member.getAvatarUrl(
+            this.$matrix.matrixClient.getHomeserverUrl(),
+            40,
+            40,
+            "scale",
+            true
+          );
         }
       }
       return null;
@@ -283,6 +350,98 @@ export default {
       if (this.currentInput.length > 0) {
         this.sendMatrixMessage(this.currentInput);
         this.currentInput = "";
+      }
+    },
+
+    /**
+     * Show attachment picker to select image
+     */
+    pickAttachment(event) {
+      if (event.target.files && event.target.files[0]) {
+        var reader = new FileReader();
+        reader.onload = (e) => {
+          this.currentImageInput = e.target.result;
+          this.currentImageInputPath = event.target.files[0];
+        };
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    },
+
+    onUploadProgress(p) {
+      if (p.total) {
+        this.currentSendProgress =
+          "Uploaded " + (p.loaded || 0) + " of " + p.total;
+      } else {
+        this.currentSendProgress = "Uploaded " + (p.loaded || 0);
+      }
+    },
+
+    sendAttachment() {
+      if (this.currentImageInputPath) {
+        const opts = {
+          progressHandler: this.onUploadProgress,
+        };
+        this.currentSendOperation = this.$matrix.uploadFile(
+          this.currentImageInputPath,
+          opts
+        );
+        var matrixUri;
+        this.currentSendOperation
+          .then((uri) => {
+            matrixUri = uri;
+            return this.$matrix.matrixClient.sendImageMessage(
+              this.roomId,
+              matrixUri,
+              "",
+              "Image",
+              null
+            );
+          })
+          .then((result) => {
+            console.log("Image sent: ", result);
+          })
+          .catch((err) => {
+            console.log("Image send error: ", err);
+            if (err && err.name == "UnknownDeviceError") {
+              console.log("Unknown devices. Mark as known before retrying.");
+              var setAsKnownPromises = [];
+              for (var user of Object.keys(err.devices)) {
+                const userDevices = err.devices[user];
+                for (var deviceId of Object.keys(userDevices)) {
+                  const deviceInfo = userDevices[deviceId];
+                  if (!deviceInfo.known) {
+                    setAsKnownPromises.push(
+                      this.$matrix.matrixClient.setDeviceKnown(
+                        user,
+                        deviceId,
+                        true
+                      )
+                    );
+                  }
+                }
+              }
+              Promise.all(setAsKnownPromises)
+                .then(() => {
+                  // All devices now marked as "known", try to resend
+                  return this.$matrix.matrixClient.sendImageMessage(
+                    this.roomId,
+                    matrixUri,
+                    "",
+                    "Image",
+                    null
+                  );
+                })
+                .then((result) => {
+                  console.log("Image sent: ", result);
+                })
+                .catch((err) => {
+                  // Still error, abort
+                  this.currentSendError = err.toLocaleString();
+                });
+            } else {
+              this.currentSendError = err.toLocaleString();
+            }
+          });
       }
     },
 
@@ -320,7 +479,6 @@ export default {
 
     handleScrolledToTop() {
       console.log("@top");
-      // const room = this.$matrix.getRoom(this.roomId);
       if (
         this.timelineWindow &&
         this.timelineWindow.canPaginate(EventTimeline.BACKWARDS)
@@ -341,8 +499,46 @@ export default {
       }
     },
 
-    handleScrolledToBottom() {
+    handleScrolledToBottom(scrollToEnd) {
       console.log("@bottom");
+      if (
+        this.timelineWindow &&
+        this.timelineWindow.canPaginate(EventTimeline.FORWARDS)
+      ) {
+        this.timelineWindow
+          .paginate(EventTimeline.FORWARDS, 10, true)
+          .then((success) => {
+            if (success) {
+              this.scrollPosition.prepareFor("down");
+              this.events = this.timelineWindow.getEvents();
+              this.$nextTick(() => {
+                // restore scroll position!
+                console.log("Restore scroll!");
+                this.scrollPosition.restore();
+                if (scrollToEnd) {
+                  this.smoothScrollToEnd();
+                }
+              });
+            }
+          });
+      }
+    },
+
+    smoothScrollToEnd() {
+      this.$nextTick(function () {
+        const container = this.$refs.chatContainer;
+        if (container.children.length > 0) {
+          const lastChild = container.children[container.children.length - 1];
+          console.log("Scroll into view", lastChild);
+          window.requestAnimationFrame(() => {
+            lastChild.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+              inline: "nearest",
+            });
+          });
+        }
+      });
     },
   },
 };

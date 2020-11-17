@@ -61,6 +61,10 @@ $chat-text-size: 0.7pt;
         margin: 0;
         padding-left: $chat-standard-padding-s;
         padding-right: $chat-standard-padding-s;
+        .currentImage {
+            width: 6 * $chat-standard-padding-s;
+            height: 6 * $chat-standard-padding-s;
+        }
     }
 
     .input-message {
@@ -72,7 +76,7 @@ $chat-text-size: 0.7pt;
         padding: 0 10px 0 10px;
         margin: $chat-standard-padding-xs 0 0 0;
         color: #999999;
-        background-color: #ffffff;
+        //background-color: #ffffff;
         overflow: hidden;
         border: 1px solid #cccccc;
         border-radius: 0;
@@ -87,6 +91,9 @@ $chat-text-size: 0.7pt;
         }
         textarea {
             line-height: 1.1rem;
+        }
+        .v-input__prepend-outer {
+            margin-top: 0px;
         }
     }
 }

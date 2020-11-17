@@ -195,7 +195,11 @@ export default {
                     if (this.matrixClient) {
                         this.matrixClient.off(event, handler);
                     }
-                }
+                },
+
+                uploadFile(file, opts) {
+                    return this.matrixClient.uploadContent(file, opts);
+                },
             }
         })
 
