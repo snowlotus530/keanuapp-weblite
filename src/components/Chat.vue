@@ -7,54 +7,10 @@
       v-on:scroll="onScroll"
     >
       <div v-for="event in events" :key="event.eventId">
-        <!-- Contact joined the chat -->
-        <ContactJoin
-          class="messageJoin"
-          v-if="
-            event.event.state_key != myUserId &&
-            event.getContent().membership == 'join' &&
-            event.getType() == 'm.room.member'
-          " :room="room" :event="event"
-        />
-
-        <!-- Contact left the chat -->
-        <ContactLeave
-          class="messageJoin"
-          v-if="
-            event.event.state_key != myUserId &&
-            event.getContent().membership == 'leave' &&
-            event.getType() == 'm.room.member'
-          " :room="room" :event="event"
-        />
-
-        <!-- Contact invited to the chat -->
-        <ContactInvited
-          class="messageJoin"
-          v-if="
-            event.event.state_key != myUserId &&
-            event.getContent().membership == 'invite' &&
-            event.getType() == 'm.room.member'
-          " :room="room" :event="event"
-        />
-
-        <MessageIncomingText
-          v-else-if="
-            event.getSender() != myUserId && event.getType() == 'm.room.message'
-          " :room="room" :event="event"
-        />
-
-        <MessageOutgoingText v-else-if="event.getType() == 'm.room.message'" :room="room" :event="event" />
-
-        <!-- ROOM NAME CHANGED -->
-        <RoomNameChanged v-else-if="event.getType() == 'm.room.name'" :room="room" :event="event" />
-
-        <!-- ROOM TOPIC CHANGED -->
-        <RoomTopicChanged v-else-if="event.getType() == 'm.room.topic'" :room="room" :event="event" />
-
-        <!-- ROOM AVATAR CHANGED -->
-        <RoomAvatarChanged v-else-if="event.getType() == 'm.room.avatar'" :room="room" :event="event" />
-
-        <DebugEvent v-else :room="room" :event="event" />
+        <component
+          :is="componentForEvent(event)"
+          :room="room"
+          :event="event" />
       </div>
     </div>
 
@@ -134,6 +90,8 @@ import RoomNameChanged from './messages/RoomNameChanged.vue';
 import RoomTopicChanged from './messages/RoomTopicChanged.vue';
 import RoomAvatarChanged from './messages/RoomAvatarChanged.vue';
 import DebugEvent from "./messages/DebugEvent.vue";
+import MessageOutgoingImage from "./messages/MessageOutgoingImage.vue";
+import MessageIncomingImage from "./messages/MessageIncomingImage.vue";
 
 // from https://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
 function ScrollPosition(node) {
@@ -174,7 +132,9 @@ export default {
     RoomNameChanged,
     RoomTopicChanged,
     RoomAvatarChanged,
-    DebugEvent
+    DebugEvent,
+    MessageOutgoingImage,
+    MessageIncomingImage
   },
 
   data() { return {
@@ -247,6 +207,45 @@ export default {
   },
 
   methods: {
+    componentForEvent(event) {
+      switch (event.getType()) {
+        case 'm.room.member':
+          if (event.event.state_key != this.myUserId) {
+            if (event.getContent().membership == 'join') {
+              return ContactJoin;
+            } else if (event.getContent().membership == 'leave') {
+              return ContactLeave;
+            } else if (event.getContent().membership == 'invite') {
+              return ContactInvited;
+            }
+          }
+          break;
+
+        case 'm.room.message':
+          if (event.getSender() != this.myUserId) {
+            if (event.getContent().msgtype == 'm.image') {
+              return MessageIncomingImage;
+            }
+            return MessageIncomingText;
+          } else {
+            if (event.getContent().msgtype == 'm.image') {
+              return MessageOutgoingImage;
+            }
+            return MessageOutgoingText;
+          }
+
+        case 'm.room.name':
+          return RoomNameChanged;
+
+        case 'm.room.topic':
+          return RoomTopicChanged;
+
+        case 'm.room.avatar':
+          return RoomAvatarChanged;
+      }
+      return DebugEvent;
+    },
+
     paginateBackIfNeeded() {
       this.$nextTick(() => {
         const container = this.$refs.chatContainer;
@@ -405,22 +404,6 @@ export default {
       );
     },
 
-    formatTime(time) {
-      const date = new Date();
-      date.setTime(time);
-
-      const today = new Date();
-      if (
-        date.getDate() == today.getDate() &&
-        date.getMonth() == today.getMonth() &&
-        date.getFullYear() == today.getFullYear()
-      ) {
-        // For today, skip the date part
-        return date.toLocaleTimeString();
-      }
-      return date.toLocaleString();
-    },
-
     handleScrolledToTop() {
       console.log("@top");
       if (
@@ -484,40 +467,6 @@ export default {
         }
       });
     },
-
-        /**
-     * Get a display name given an event.
-     */
-    stateEventDisplayName(event) {
-      if (this.room) {
-        const member = this.room.getMember(event.getSender());
-        if (member) {
-          return member.name;
-        }
-      }
-      return event.getContent().displayname || event.event.state_key;
-    },
-
-    messageEventDisplayName(event) {
-      return this.stateEventDisplayName(event);
-    },
-
-    messageEventAvatar(event) {
-      if (this.room) {
-        const member = this.room.getMember(event.getSender());
-        if (member) {
-          return member.getAvatarUrl(
-            this.$matrix.matrixClient.getHomeserverUrl(),
-            40,
-            40,
-            "scale",
-            true
-          );
-        }
-      }
-      return null;
-    },
-
   },
 };
 </script>
