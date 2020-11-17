@@ -1,13 +1,6 @@
 <template>
   <!-- Contact joined the chat -->
-  <div
-    class="messageJoin"
-    v-if="
-      event.event.state_key != myUserId &&
-      event.getContent().membership == 'join' &&
-      event.getType() == 'm.room.member'
-    "
-  >
+  <div class="messageJoin">
     {{ stateEventDisplayName(event) }} joined the chat
   </div>
 </template>
