@@ -15,6 +15,16 @@ const routes = [
     path: '/login',
     component: Login
   },
+  {
+    path: '/join/:room?',
+    redirect: from => {
+      const room = from.hash;
+      if (room) {
+        return { name: 'Chat', params: { joinRoom: room }};
+      }
+      return '/';
+    }
+  },
 ]
 
 const router = new VueRouter({
