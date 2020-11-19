@@ -25,6 +25,7 @@ export default {
 
   watch: {
     currentRoomId() {
+      this.$emit("close");
       this.$matrix.setCurrentRoomId(this.currentRoomId);
     },
   },
