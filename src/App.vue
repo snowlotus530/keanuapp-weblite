@@ -40,6 +40,7 @@
       <v-list nav dense>
         <RoomList
           v-if="$matrix.ready"
+          @close="openDrawer = false"
         />
       </v-list>
     </v-navigation-drawer>
