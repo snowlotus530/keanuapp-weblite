@@ -7,10 +7,7 @@
       v-on:scroll="onScroll"
     >
       <div v-for="event in events" :key="event.getId()">
-        <component
-          :is="componentForEvent(event)"
-          :room="room"
-          :event="event" />
+        <component :is="componentForEvent(event)" :room="room" :event="event" />
       </div>
     </div>
 
@@ -81,14 +78,14 @@
 
 <script>
 import { TimelineWindow, EventTimeline } from "matrix-js-sdk";
-import MessageIncomingText from './messages/MessageIncomingText';
-import MessageOutgoingText from './messages/MessageOutgoingText';
-import ContactJoin from './messages/ContactJoin.vue';
-import ContactLeave from './messages/ContactLeave.vue';
-import ContactInvited from './messages/ContactInvited.vue';
-import RoomNameChanged from './messages/RoomNameChanged.vue';
-import RoomTopicChanged from './messages/RoomTopicChanged.vue';
-import RoomAvatarChanged from './messages/RoomAvatarChanged.vue';
+import MessageIncomingText from "./messages/MessageIncomingText";
+import MessageOutgoingText from "./messages/MessageOutgoingText";
+import ContactJoin from "./messages/ContactJoin.vue";
+import ContactLeave from "./messages/ContactLeave.vue";
+import ContactInvited from "./messages/ContactInvited.vue";
+import RoomNameChanged from "./messages/RoomNameChanged.vue";
+import RoomTopicChanged from "./messages/RoomTopicChanged.vue";
+import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import MessageOutgoingImage from "./messages/MessageOutgoingImage.vue";
 import MessageIncomingImage from "./messages/MessageIncomingImage.vue";
@@ -134,22 +131,25 @@ export default {
     RoomAvatarChanged,
     DebugEvent,
     MessageOutgoingImage,
-    MessageIncomingImage
+    MessageIncomingImage,
   },
 
-  data() { return {
-    room: null,
-    events: [],
-    currentInput: "",
-    contactIsTyping: false,
-    timelineWindow: null,
-    scrollPosition: null,
-    currentImageInput: null,
-    currentImageInputPath: null,
-    currentSendOperation: null,
-    currentSendProgress: null,
-    currentSendError: null,
-  }},
+  data() {
+    return {
+      room: null,
+      events: [],
+      currentInput: "",
+      contactIsTyping: false,
+      timelineWindow: null,
+      scrollPosition: null,
+      currentImageInput: null,
+      currentImageInputPath: null,
+      currentSendOperation: null,
+      currentSendProgress: null,
+      currentSendError: null,
+      joinRoom: null,
+    };
+  },
 
   mounted() {
     const container = this.$refs.chatContainer;
@@ -157,11 +157,21 @@ export default {
 
     this.$matrix.on("Room.timeline", this.onEvent);
     this.$matrix.on("RoomMember.typing", this.onUserTyping);
+    this.$matrix.on("Matrix.initialized", this.onInitialized);
+
+    if (this.$route.params && this.$route.params.joinRoom) {
+      this.joinRoom = this.$route.params.joinRoom;
+    }
+
+    if (this.$matrix.matrixClientReady) {
+      this.onInitialized(this.$matrix.matrixClient);
+    }
   },
 
   destroyed() {
     this.$matrix.off("Room.timeline", this.onEvent);
     this.$matrix.off("RoomMember.typing", this.onUserTyping);
+    this.$matrix.off("Matrix.initialized", this.onInitialized);
   },
 
   computed: {
@@ -207,40 +217,55 @@ export default {
   },
 
   methods: {
+    onInitialized(matrixClient) {
+      if (this.joinRoom) {
+        const roomId = this.joinRoom;
+        this.joinRoom = null;
+        matrixClient
+          .joinRoom(roomId)
+          .then((room) => {
+            this.$matrix.setCurrentRoomId(room.roomId);
+          })
+          .catch((err) => {
+            // TODO - handle error
+            console.log("Failed to join room", err);
+          });
+      }
+    },
     componentForEvent(event) {
       switch (event.getType()) {
-        case 'm.room.member':
+        case "m.room.member":
           if (event.event.state_key != this.myUserId) {
-            if (event.getContent().membership == 'join') {
+            if (event.getContent().membership == "join") {
               return ContactJoin;
-            } else if (event.getContent().membership == 'leave') {
+            } else if (event.getContent().membership == "leave") {
               return ContactLeave;
-            } else if (event.getContent().membership == 'invite') {
+            } else if (event.getContent().membership == "invite") {
               return ContactInvited;
             }
           }
           break;
 
-        case 'm.room.message':
+        case "m.room.message":
           if (event.getSender() != this.myUserId) {
-            if (event.getContent().msgtype == 'm.image') {
+            if (event.getContent().msgtype == "m.image") {
               return MessageIncomingImage;
             }
             return MessageIncomingText;
           } else {
-            if (event.getContent().msgtype == 'm.image') {
+            if (event.getContent().msgtype == "m.image") {
               return MessageOutgoingImage;
             }
             return MessageOutgoingText;
           }
 
-        case 'm.room.name':
+        case "m.room.name":
           return RoomNameChanged;
 
-        case 'm.room.topic':
+        case "m.room.topic":
           return RoomTopicChanged;
 
-        case 'm.room.avatar':
+        case "m.room.avatar":
           return RoomAvatarChanged;
       }
       return DebugEvent;

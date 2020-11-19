@@ -21,6 +21,7 @@ export default {
             data() {
                 return {
                     matrixClient: null,
+                    matrixClientReady: false,
                     rooms: [],
                 }
             },
@@ -73,6 +74,7 @@ export default {
                         this.removeMatrixClientListeners(this.matrixClient);
                         this.matrixClient.stopClient();
                         this.matrixClient = null;
+                        this.matrixClientReady = false;
                         localStorage.removeItem('user');
                     }
                     this.$store.commit("setCurrentRoomId", null);
@@ -80,6 +82,8 @@ export default {
 
                 initClient() {
                     this.reloadRooms();
+                    this.matrixClientReady = true;
+                    this.matrixClient.emit('Matrix.initialized', this.matrixClient);
                 },
 
                 async getMatrixClient(user) {
@@ -179,10 +183,10 @@ export default {
                 },
 
                 getRoom(roomId) {
-                    if (this.matrixClient) {
-                        return this.matrixClient.getRoom(roomId);
-                    }
-                    return null;
+                    // if (this.matrixClient) {
+                    //     return this.matrixClient.getRoom(roomId);
+                    // }
+                    return this.rooms.find(room => room.roomId == roomId);
                 },
 
                 on(event, handler) {

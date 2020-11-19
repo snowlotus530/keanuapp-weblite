@@ -39,9 +39,7 @@ class Util {
                 .then(response => {
                     return new Promise((resolve, ignoredReject) => {
                         var aesjs = require('aes-js');
-                        //var JSONWebKey = require( 'json-web-key' );
                         var base64Url = require('json-web-key/lib/base64url');
-                        //var tou8 = require('buffer-to-uint8array');
                         var key = base64Url.decode(file.key.k);
                         var iv = base64Url.decode(file.iv);
                         var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv));
@@ -52,7 +50,7 @@ class Util {
                     });
                 })
                 .then(bytes => {
-                    resolve(URL.createObjectURL(new Blob([bytes.buffer], { type: 'image/png' })));
+                    resolve(URL.createObjectURL(new Blob([bytes.buffer], { type: file.mimetype })));
                 })
                 .catch(err => {
                     console.log("Download error: ", err);
