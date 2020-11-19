@@ -116,6 +116,10 @@ $chat-text-size: 0.7pt;
         border-radius: 10px 10px 0 10px;
         padding: 8px;
     }
+    .bubble.image-bubble {
+        padding: 0px;
+        overflow: hidden;
+    }
     .message {
         color: white;
     }
@@ -133,6 +137,10 @@ $chat-text-size: 0.7pt;
         border-width: 1px !important;
         border-style: solid !important;
         border-color: #cccccc !important;
+    }
+    .bubble.image-bubble {
+        padding: 0px;
+        overflow: hidden;
     }
     .avatar {
         position: absolute;

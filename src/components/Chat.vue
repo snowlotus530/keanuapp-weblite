@@ -6,7 +6,7 @@
       style="overflow-x: hidden; overflow-y: auto"
       v-on:scroll="onScroll"
     >
-      <div v-for="event in events" :key="event.eventId">
+      <div v-for="event in events" :key="event.getId()">
         <component
           :is="componentForEvent(event)"
           :room="room"
