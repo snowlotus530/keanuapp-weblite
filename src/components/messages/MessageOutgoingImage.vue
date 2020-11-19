@@ -2,8 +2,8 @@
   <div>
     <div class="messageOut">
       <div class="sender">{{ "You" }}</div>
-      <div class="bubble">
-        <v-img :aspect-ratio="16/9" ref="image" :src="src" contain />
+      <div class="bubble image-bubble">
+        <v-img :aspect-ratio="16/9" ref="image" :src="src" cover />
       </div>
       <div class="status">{{ event.status }}</div>
     </div>
@@ -27,6 +27,13 @@ export default {
     const width = this.$refs.image.$el.clientWidth;
     const height = (width * 9) / 16;
     this.src = this.$matrix.matrixClient.mxcUrlToHttp(this.event.getContent().url, width, height, 'scale', false);
+  },
+  beforeDestroy() {
+    if (this.src) {
+      const objectUrl = this.src;
+      this.src = null;
+      URL.revokeObjectURL(objectUrl);
+    }
   }
 };
 </script>

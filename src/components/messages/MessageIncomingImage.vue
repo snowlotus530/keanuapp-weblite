@@ -2,6 +2,9 @@
   <div>
     <div class="messageIn">
       <div class="sender">{{ messageEventDisplayName(event) }}</div>
+      <div class="bubble image-bubble">
+        <v-img :aspect-ratio="16 / 9" ref="image" :src="src" cover />
+      </div>
       <v-avatar class="avatar" size="40" color="grey">
         <img
           v-if="messageEventAvatar(event)"
@@ -11,10 +14,6 @@
           messageEventDisplayName(event).substring(0, 1).toUpperCase()
         }}</span>
       </v-avatar>
-
-      <div class="bubble">
-        <v-img :aspect-ratio="16 / 9" ref="image" :src="src" contain />
-      </div>
     </div>
     <div class="time">
       {{ formatTime(event.event.origin_server_ts) }}
@@ -24,6 +23,8 @@
 
 <script>
 import messageMixin from "./messageMixin";
+//import axios from 'axios';
+import util from "../../plugins/utils";
 
 export default {
   mixins: [messageMixin],
@@ -33,23 +34,23 @@ export default {
     };
   },
   mounted() {
-    // const width = this.$refs.image.$el.clientWidth;
-    // const height = (width * 9) / 16;
-    const content = this.event.getContent();
-    if (
-      content &&
-      content.info &&
-      content.info.thumbnail_file &&
-      content.info.thumbnail_file.url
-    ) {
-      this.src = this.$matrix.matrixClient.mxcUrlToHttp(
-        content.info.thumbnail_file.url,
-        content.info.w,
-        content.info.h,
-        "scale",
-        true
-      );
-      console.log("SRC set to: ", this.src);
+    console.log("Mounted with event:", JSON.stringify(this.event.getContent()));
+    const width = this.$refs.image.$el.clientWidth;
+    const height = (width * 9) / 16;
+    util
+      .getThumbnail(this.$matrix.matrixClient, this.event, width, height)
+      .then((url) => {
+        this.src = url;
+      })
+      .catch((err) => {
+        console.log("Failed to fetch thumbnail: ", err);
+      });
+  },
+  beforeDestroy() {
+    if (this.src) {
+      const objectUrl = this.src;
+      this.src = null;
+      URL.revokeObjectURL(objectUrl);
     }
   },
 };
