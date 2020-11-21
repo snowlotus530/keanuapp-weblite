@@ -65,10 +65,10 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="currentImageInput = null"
+            <v-btn color="primary" text @click="cancelSendAttachment"
               >Cancel</v-btn
             >
-            <v-btn color="primary" text @click="sendAttachment">Send</v-btn>
+            <v-btn color="primary" text @click="sendAttachment" :disabled="currentSendOperation != null">Send</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -89,6 +89,7 @@ import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import MessageOutgoingImage from "./messages/MessageOutgoingImage.vue";
 import MessageIncomingImage from "./messages/MessageIncomingImage.vue";
+import util from "../plugins/utils";
 
 // from https://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
 function ScrollPosition(node) {
@@ -211,7 +212,9 @@ export default {
       );
       this.timelineWindow.load(null, 20).then(() => {
         this.events = this.timelineWindow.getEvents();
-        this.paginateBackIfNeeded();
+        this.$nextTick(() => {
+          this.paginateBackIfNeeded();
+        });
       });
     },
   },
@@ -316,7 +319,13 @@ export default {
 
     sendMessage() {
       if (this.currentInput.length > 0) {
-        this.sendMatrixMessage(this.currentInput);
+        util.sendTextMessage(this.$matrix.matrixClient, this.roomId, this.currentInput)
+        .then(() => {
+          console.log("Sent message");
+        })
+        .catch(err => {
+          console.log("Failed to send:", err);
+        })
         this.currentInput = "";
       }
     },
@@ -346,87 +355,27 @@ export default {
 
     sendAttachment() {
       if (this.currentImageInputPath) {
-        const opts = {
-          progressHandler: this.onUploadProgress,
-        };
-        this.currentSendOperation = this.$matrix.uploadFile(
-          this.currentImageInputPath,
-          opts
-        );
-        var matrixUri;
+        this.currentSendProgress = 0;
+        this.currentSendOperation = util.sendEncyptedImage(this.$matrix.matrixClient, this.roomId, this.currentImageInputPath, this.onUploadProgress);
         this.currentSendOperation
-          .then((uri) => {
-            matrixUri = uri;
-            return this.$matrix.matrixClient.sendImageMessage(
-              this.roomId,
-              matrixUri,
-              "",
-              "Image",
-              null
-            );
-          })
-          .then((result) => {
-            console.log("Image sent: ", result);
-          })
-          .catch((err) => {
-            console.log("Image send error: ", err);
-            if (err && err.name == "UnknownDeviceError") {
-              console.log("Unknown devices. Mark as known before retrying.");
-              var setAsKnownPromises = [];
-              for (var user of Object.keys(err.devices)) {
-                const userDevices = err.devices[user];
-                for (var deviceId of Object.keys(userDevices)) {
-                  const deviceInfo = userDevices[deviceId];
-                  if (!deviceInfo.known) {
-                    setAsKnownPromises.push(
-                      this.$matrix.matrixClient.setDeviceKnown(
-                        user,
-                        deviceId,
-                        true
-                      )
-                    );
-                  }
-                }
-              }
-              Promise.all(setAsKnownPromises)
-                .then(() => {
-                  // All devices now marked as "known", try to resend
-                  return this.$matrix.matrixClient.sendImageMessage(
-                    this.roomId,
-                    matrixUri,
-                    "",
-                    "Image",
-                    null
-                  );
-                })
-                .then((result) => {
-                  console.log("Image sent: ", result);
-                })
-                .catch((err) => {
-                  // Still error, abort
-                  this.currentSendError = err.toLocaleString();
-                });
-            } else {
-              this.currentSendError = err.toLocaleString();
-            }
-          });
+        .then(() => {
+          this.currentSendOperation = null;
+          this.currentImageInput = null;
+          this.currentSendProgress = 0;
+        })
+        .catch(err => {
+          this.currentSendError = err.toLocaleString();
+          this.currentSendOperation = null;
+          this.currentSendProgress = 0;
+        });
       }
     },
 
-    sendMatrixMessage(body) {
-      var content = {
-        body: body,
-        msgtype: "m.text",
-      };
-      this.$matrix.matrixClient.sendEvent(
-        this.roomId,
-        "m.room.message",
-        content,
-        "",
-        (err, ignoredres) => {
-          console.log(err);
-        }
-      );
+    cancelSendAttachment() {
+      if (this.currentSendOperation) {
+        this.currentSendOperation.reject("Canceled");
+      }
+      this.currentImageInput = null;
     },
 
     handleScrolledToTop() {

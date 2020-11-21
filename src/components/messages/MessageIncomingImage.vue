@@ -23,7 +23,6 @@
 
 <script>
 import messageMixin from "./messageMixin";
-//import axios from 'axios';
 import util from "../../plugins/utils";
 
 export default {
@@ -34,7 +33,7 @@ export default {
     };
   },
   mounted() {
-    console.log("Mounted with event:", JSON.stringify(this.event.getContent()));
+    //console.log("Mounted with event:", JSON.stringify(this.event.getContent()));
     const width = this.$refs.image.$el.clientWidth;
     const height = (width * 9) / 16;
     util
