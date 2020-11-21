@@ -15,6 +15,7 @@
 
 <script>
 import messageMixin from "./messageMixin";
+import util from "../../plugins/utils";
 
 export default {
   mixins: [messageMixin],
@@ -26,7 +27,14 @@ export default {
   mounted() {
     const width = this.$refs.image.$el.clientWidth;
     const height = (width * 9) / 16;
-    this.src = this.$matrix.matrixClient.mxcUrlToHttp(this.event.getContent().url, width, height, 'scale', false);
+    util
+      .getThumbnail(this.$matrix.matrixClient, this.event, width, height)
+      .then((url) => {
+        this.src = url;
+      })
+      .catch((err) => {
+        console.log("Failed to fetch thumbnail: ", err);
+      });
   },
   beforeDestroy() {
     if (this.src) {
@@ -34,7 +42,7 @@ export default {
       this.src = null;
       URL.revokeObjectURL(objectUrl);
     }
-  }
+  },
 };
 </script>
 

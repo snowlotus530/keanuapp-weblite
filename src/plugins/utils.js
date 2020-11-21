@@ -1,9 +1,18 @@
 import axios from 'axios';
+import * as ContentHelpers from "matrix-js-sdk/lib/content-helpers";
+var sha256 = require('js-sha256').sha256;
+var aesjs = require('aes-js');
+var base64Url = require('json-web-key/lib/base64url');
 
 class Util {
     getThumbnail(matrixClient, event, ignoredw, ignoredh) {
         return new Promise((resolve, reject) => {
             const content = event.getContent();
+            if (content.url != null) {
+                // Unencrypted, just return!
+                resolve(matrixClient.mxcUrlToHttp(content.url));
+                return;
+            }
             var url = null;
             var file = null;
             if (
@@ -38,13 +47,20 @@ class Util {
             axios.get(url, { responseType: 'arraybuffer' })
                 .then(response => {
                     return new Promise((resolve, ignoredReject) => {
-                        var aesjs = require('aes-js');
-                        var base64Url = require('json-web-key/lib/base64url');
                         var key = base64Url.decode(file.key.k);
                         var iv = base64Url.decode(file.iv);
                         var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv));
 
                         const data = new Uint8Array(response.data);
+
+                        // Calculate sha256 and compare hashes
+                        var hash = new Uint8Array(sha256.create().update(data).arrayBuffer());
+                        const originalHash = base64Url.decode(file.hashes.sha256);
+                        if (Buffer.compare(Buffer.from(hash), Buffer.from(originalHash.buffer)) != 0) {
+                            reject("Hashes don't match!");
+                            return;
+                        }
+
                         var decryptedBytes = aesCtr.decrypt(data);
                         resolve(decryptedBytes);
                     });
@@ -56,6 +72,130 @@ class Util {
                     console.log("Download error: ", err);
                     reject(err);
                 });
+        });
+    }
+
+    sendTextMessage(matrixClient, roomId, text) {
+        return this.sendMessage(matrixClient, roomId, ContentHelpers.makeTextMessage(text));
+    }
+
+    sendMessage(matrixClient, roomId, content) {
+        return new Promise((resolve, reject) => {
+            matrixClient.sendMessage(roomId, content, undefined, undefined)
+                .then((result) => {
+                    console.log("Message sent: ", result);
+                    resolve(true);
+                })
+                .catch(err => {
+                    console.log("Image send error: ", err);
+                    if (err && err.name == "UnknownDeviceError") {
+                        console.log("Unknown devices. Mark as known before retrying.");
+                        var setAsKnownPromises = [];
+                        for (var user of Object.keys(err.devices)) {
+                            const userDevices = err.devices[user];
+                            for (var deviceId of Object.keys(userDevices)) {
+                                const deviceInfo = userDevices[deviceId];
+                                if (!deviceInfo.known) {
+                                    setAsKnownPromises.push(
+                                        matrixClient.setDeviceKnown(
+                                            user,
+                                            deviceId,
+                                            true
+                                        )
+                                    );
+                                }
+                            }
+                        }
+                        Promise.all(setAsKnownPromises)
+                            .then(() => {
+                                // All devices now marked as "known", try to resend
+                                matrixClient.resendEvent(err.event)
+                                    .then((result) => {
+                                        console.log("Message sent: ", result);
+                                        resolve(true);
+                                    })
+                                    .catch((err) => {
+                                        // Still error, abort
+                                        reject(err.toLocaleString());
+                                    });
+                            });
+                    }
+                    else {
+                        reject(err.toLocaleString());
+                    }
+                });
+        });
+    }
+
+    sendEncyptedImage(matrixClient, roomId, file, onUploadProgress) {
+        return new Promise((resolve, reject) => {
+            var reader = new FileReader();
+            reader.onload = (e) => {
+                const fileContents = e.target.result;
+                const crypto = require('crypto');
+                let key = crypto.randomBytes(256 / 8);
+                let iv = Buffer.concat([crypto.randomBytes(8),Buffer.alloc(8)]); // Initialization vector.
+
+                // Encrypt
+                var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv));
+                const data = new Uint8Array(fileContents);
+                var encryptedBytes = aesCtr.encrypt(data);
+
+                // Calculate sha256
+                var hash = new Uint8Array(sha256.create().update(encryptedBytes).arrayBuffer());
+
+                const jwk = {
+                    kty: 'oct',
+                    key_opts: ['encrypt', 'decrypt'],
+                    alg: 'A256CTR',
+                    k: base64Url.encode(key),
+                    ext: true
+                };
+
+                const encryptedFile = {
+                    mimetype: file.type,
+                    key: jwk,
+                    iv: Buffer.from(iv).toString('base64').replace( /=/g, '' ),
+                    hashes: { sha256: Buffer.from(hash).toString('base64').replace( /=/g, '' )},
+                    v: 'v2'
+                };
+                console.log("Encrypted file:", encryptedFile);
+
+                const info = {
+                    mimetype: file.type,
+                    size: file.size
+                };
+                
+
+                const opts = {
+                    type: file.type,
+                    name: 'Image',
+                    progressHandler: onUploadProgress,
+                };
+
+                const messageContent = {
+                    body: 'Image',
+                    file: encryptedFile,
+                    info: info,
+                    msgtype: 'm.image'                    
+                }
+
+                matrixClient.uploadContent(encryptedBytes, opts)
+                    .then((uri) => {
+                        encryptedFile.url = uri;
+                        return this.sendMessage(matrixClient, roomId, messageContent)
+                    })
+                    .then(result => {
+                        resolve(result);
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
+            }
+            reader.onerror = (err) => {
+                reject(err);
+            }
+            reader.readAsArrayBuffer(file);
         });
     }
 }
