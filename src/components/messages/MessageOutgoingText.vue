@@ -3,7 +3,9 @@
     <div class="messageOut">
       <div class="sender">{{ "You" }}</div>
       <div class="bubble">
-        <div class="message">{{ event.getContent().body }}</div>
+        <div class="message">{{ event.getContent().body }}
+          <span class="edit-marker" v-if="event.replacingEventId()">(edited)</span>
+        </div>
         <QuickReactions :event="event" :reactions="reactions" />
       </div>
       <div class="status">{{ event.status }}</div>
