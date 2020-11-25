@@ -50,7 +50,7 @@ export default {
           return this.$matrix.matrixClient.joinRoom(this.roomId);
         })
         .then((room) => {
-          this.$matrix.setCurrentRoomId(room.roomId);
+          this.$matrix.setCurrentRoom(room);
           this.loading = false;
           this.loadingMessage = null;
           this.$router.replace({ name: "Chat" });
