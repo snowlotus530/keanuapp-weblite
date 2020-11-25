@@ -16,14 +16,9 @@ const routes = [
     component: Login
   },
   {
-    path: '/join/:room?',
-    redirect: from => {
-      const room = from.hash;
-      if (room) {
-        return { name: 'Chat', params: { joinRoom: room }};
-      }
-      return '/';
-    }
+    path: '/join/',
+    component: () => import('../components/Join.vue'),
+    props: true
   },
 ]
 
@@ -33,7 +28,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const publicPages = ['/login'];
-  const authRequired = !publicPages.includes(to.path);
+  const authRequired = !publicPages.includes(to.path) && !to.path.startsWith('/join/');
   const loggedIn = localStorage.getItem('user');
 
   // trying to access a restricted page + not logged in

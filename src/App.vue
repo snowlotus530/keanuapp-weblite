@@ -66,8 +66,7 @@ export default {
     openDrawer: false,
   }),
   mounted() {
-    this.$router.replace("/");
-
+    //this.$router.replace("/");
     const version = require("!!raw-loader!./assets/version.txt").default;
     console.log("Version", version);
     this.buildVersion = version;
@@ -90,11 +89,10 @@ export default {
     currentUser: {
       immediate: true,
       handler(ignorednewVal, ignoredoldVal) {
-        if (this.loggedIn) {
-          const self = this;
+        if (this.loggedIn()) {
           this.$matrix.getMatrixClient(this.currentUser)
             .then(() => {
-              self.$matrix.initClient();
+              console.log("Matrix client ready");
             })
             .catch((error) => {
               console.log("Error creating client", error);
