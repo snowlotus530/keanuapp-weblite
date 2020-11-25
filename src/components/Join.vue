@@ -38,38 +38,29 @@ export default {
     handleJoin() {
       this.loading = true;
       this.loadingMessage = "Logging in...";
+      var clientPromise;
       if (this.currentUser) {
-        this.$matrix
-          .getMatrixClient(this.currentUser)
-          .then((ignoreduser) => {
-            this.loadingMessage = "Joining room...";
-            return this.$matrix.matrixClient.joinRoom(this.roomId);
-          })
-          .then((room) => {
-            this.$matrix.setCurrentRoomId(room.roomId);
-            this.loading = false;
-            this.loadingMessage = null;
-            this.$router.replace({ name: "Chat" });
-          })
-          .catch((err) => {
-            // TODO - handle error
-            console.log("Failed to join room", err);
-            this.loading = false;
-            this.loadingMessage = err.toString();
-          });
+        clientPromise = this.$matrix.getMatrixClient(this.currentUser);
       } else {
-        this.$store.dispatch("auth/login", this.guestUser).then(
-          () => {
-            this.loading = false;
-            this.loadingMessage = null;
-            this.$router.replace({ name: "Chat" });
-          },
-          (error) => {
-            this.loading = false;
-            this.loadingMessage = error.toString();
-          }
-        );
+        clientPromise = this.$store.dispatch("auth/login", this.guestUser);
       }
+      return clientPromise
+        .then((ignoreduser) => {
+          this.loadingMessage = "Joining room...";
+          return this.$matrix.matrixClient.joinRoom(this.roomId);
+        })
+        .then((room) => {
+          this.$matrix.setCurrentRoomId(room.roomId);
+          this.loading = false;
+          this.loadingMessage = null;
+          this.$router.replace({ name: "Chat" });
+        })
+        .catch((err) => {
+          // TODO - handle error
+          console.log("Failed to join room", err);
+          this.loading = false;
+          this.loadingMessage = err.toString();
+        });
     },
   },
 };

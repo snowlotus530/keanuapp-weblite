@@ -7,7 +7,29 @@
       v-on:scroll="onScroll"
     >
       <div v-for="event in events" :key="event.getId()">
-        <component :is="componentForEvent(event)" :room="room" :event="event" />
+        <v-hover v-slot="{ hover }" v-if="!event.isRelation()">
+          <div style="position: relative">
+            <component
+              :is="componentForEvent(event)"
+              :room="room"
+              :event="event"
+              :reactions="
+                timelineWindow._timelineSet.getRelationsForEvent(
+                  event.getId(),
+                  'm.annotation',
+                  'm.reaction'
+                )
+              "
+              v-on:send-quick-reaction="sendQuickReaction"
+            />
+            <message-operations
+              v-if="hover"
+              v-on:addreaction="addReaction"
+              :event="event"
+              :incoming="event.getSender() != $matrix.currentUserId"
+            />
+          </div>
+        </v-hover>
       </div>
     </div>
 
@@ -68,9 +90,21 @@
             <v-btn color="primary" text @click="cancelSendAttachment"
               >Cancel</v-btn
             >
-            <v-btn color="primary" text @click="sendAttachment" :disabled="currentSendOperation != null">Send</v-btn>
+            <v-btn
+              color="primary"
+              text
+              @click="sendAttachment"
+              :disabled="currentSendOperation != null"
+              >Send</v-btn
+            >
           </v-card-actions>
         </v-card>
+      </v-dialog>
+    </div>
+
+    <div>
+      <v-dialog v-model="showEmojiPicker" class="ma-0 pa-0" width="50%">
+        <VEmojiPicker style="width: 100%" @select="emojiSelected" />
       </v-dialog>
     </div>
   </div>
@@ -90,6 +124,7 @@ import DebugEvent from "./messages/DebugEvent.vue";
 import MessageOutgoingImage from "./messages/MessageOutgoingImage.vue";
 import MessageIncomingImage from "./messages/MessageIncomingImage.vue";
 import util from "../plugins/utils";
+import MessageOperations from "./messages/MessageOperations.vue";
 
 // from https://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
 function ScrollPosition(node) {
@@ -133,6 +168,7 @@ export default {
     DebugEvent,
     MessageOutgoingImage,
     MessageIncomingImage,
+    MessageOperations,
   },
 
   data() {
@@ -148,37 +184,24 @@ export default {
       currentSendOperation: null,
       currentSendProgress: null,
       currentSendError: null,
-      joinRoom: null,
+      showEmojiPicker: false,
+      selectedEvent: null,
     };
   },
 
   mounted() {
     const container = this.$refs.chatContainer;
     this.scrollPosition = new ScrollPosition(container);
-
     this.$matrix.on("Room.timeline", this.onEvent);
     this.$matrix.on("RoomMember.typing", this.onUserTyping);
-    this.$matrix.on("Matrix.initialized", this.onInitialized);
-
-    if (this.$route.params && this.$route.params.joinRoom) {
-      this.joinRoom = this.$route.params.joinRoom;
-    }
-
-    if (this.$matrix.matrixClientReady) {
-      this.onInitialized(this.$matrix.matrixClient);
-    }
   },
 
   destroyed() {
     this.$matrix.off("Room.timeline", this.onEvent);
     this.$matrix.off("RoomMember.typing", this.onUserTyping);
-    this.$matrix.off("Matrix.initialized", this.onInitialized);
   },
 
   computed: {
-    myUserId() {
-      return this.$store.state.auth.user.user_id;
-    },
     roomId() {
       return this.$matrix.currentRoomId;
     },
@@ -188,69 +211,55 @@ export default {
   },
 
   watch: {
-    roomId() {
-      console.log("Chat: Current room changed");
+    roomId: {
+      handler(ignoredNewVal, ignoredOldVal) {
+        console.log("Chat: Current room changed");
 
-      // Clear old events
-      this.events = [];
-      this.timelineWindow = null;
-      this.contactIsTyping = false;
+        // Clear old events
+        this.events = [];
+        this.timelineWindow = null;
+        this.contactIsTyping = false;
 
-      if (!this.roomId) {
-        return; // no room
-      }
+        if (!this.roomId) {
+          return; // no room
+        }
 
-      this.room = this.$matrix.getRoom(this.roomId);
-      if (!this.room) {
-        return; // Not found
-      }
+        this.room = this.$matrix.getRoom(this.roomId);
+        if (!this.room) {
+          return; // Not found
+        }
 
-      this.timelineWindow = new TimelineWindow(
-        this.$matrix.matrixClient,
-        this.room.getUnfilteredTimelineSet(),
-        {}
-      );
-      this.timelineWindow.load(null, 20).then(() => {
-        this.events = this.timelineWindow.getEvents();
-        this.$nextTick(() => {
-          this.paginateBackIfNeeded();
+        this.timelineWindow = new TimelineWindow(
+          this.$matrix.matrixClient,
+          this.room.getUnfilteredTimelineSet(),
+          {}
+        );
+        this.timelineWindow.load(null, 20).then(() => {
+          this.events = this.timelineWindow.getEvents();
+          this.$nextTick(() => {
+            this.paginateBackIfNeeded();
+          });
         });
-      });
+      },
+      immediate: true,
     },
   },
 
   methods: {
-    onInitialized(matrixClient) {
-      if (this.joinRoom) {
-        const roomId = this.joinRoom;
-        this.joinRoom = null;
-        matrixClient
-          .joinRoom(roomId)
-          .then((room) => {
-            this.$matrix.setCurrentRoomId(room.roomId);
-          })
-          .catch((err) => {
-            // TODO - handle error
-            console.log("Failed to join room", err);
-          });
-      }
-    },
     componentForEvent(event) {
       switch (event.getType()) {
         case "m.room.member":
-          if (event.event.state_key != this.myUserId) {
-            if (event.getContent().membership == "join") {
-              return ContactJoin;
-            } else if (event.getContent().membership == "leave") {
-              return ContactLeave;
-            } else if (event.getContent().membership == "invite") {
-              return ContactInvited;
-            }
+          if (event.getContent().membership == "join") {
+            return ContactJoin;
+          } else if (event.getContent().membership == "leave") {
+            return ContactLeave;
+          } else if (event.getContent().membership == "invite") {
+            return ContactInvited;
           }
-          break;
+        break;
 
         case "m.room.message":
-          if (event.getSender() != this.myUserId) {
+          if (event.getSender() != this.$matrix.currentUserId) {
             if (event.getContent().msgtype == "m.image") {
               return MessageIncomingImage;
             }
@@ -319,13 +328,18 @@ export default {
 
     sendMessage() {
       if (this.currentInput.length > 0) {
-        util.sendTextMessage(this.$matrix.matrixClient, this.roomId, this.currentInput)
-        .then(() => {
-          console.log("Sent message");
-        })
-        .catch(err => {
-          console.log("Failed to send:", err);
-        })
+        util
+          .sendTextMessage(
+            this.$matrix.matrixClient,
+            this.roomId,
+            this.currentInput
+          )
+          .then(() => {
+            console.log("Sent message");
+          })
+          .catch((err) => {
+            console.log("Failed to send:", err);
+          });
         this.currentInput = "";
       }
     },
@@ -356,18 +370,23 @@ export default {
     sendAttachment() {
       if (this.currentImageInputPath) {
         this.currentSendProgress = 0;
-        this.currentSendOperation = util.sendEncyptedImage(this.$matrix.matrixClient, this.roomId, this.currentImageInputPath, this.onUploadProgress);
+        this.currentSendOperation = util.sendImage(
+          this.$matrix.matrixClient,
+          this.roomId,
+          this.currentImageInputPath,
+          this.onUploadProgress
+        );
         this.currentSendOperation
-        .then(() => {
-          this.currentSendOperation = null;
-          this.currentImageInput = null;
-          this.currentSendProgress = 0;
-        })
-        .catch(err => {
-          this.currentSendError = err.toLocaleString();
-          this.currentSendOperation = null;
-          this.currentSendProgress = 0;
-        });
+          .then(() => {
+            this.currentSendOperation = null;
+            this.currentImageInput = null;
+            this.currentSendProgress = 0;
+          })
+          .catch((err) => {
+            this.currentSendError = err.toLocaleString();
+            this.currentSendOperation = null;
+            this.currentSendProgress = 0;
+          });
       }
     },
 
@@ -441,6 +460,39 @@ export default {
         }
       });
     },
+
+    addReaction(e) {
+      const event = e.event;
+      // Store the event we are reacting to, so that we know where to
+      // send when the picker closes.
+      this.selectedEvent = event;
+      this.showEmojiPicker = true;
+    },
+
+    emojiSelected(e) {
+      this.showEmojiPicker = false;
+      if (this.selectedEvent) {
+        const event = this.selectedEvent;
+        this.selectedEvent = null;
+        this.sendQuickReaction({reaction:e.data, event: event});
+      }
+    },
+
+    sendQuickReaction(e) {
+      util
+          .sendQuickReaction(
+            this.$matrix.matrixClient,
+            this.roomId,
+            e.reaction,
+            e.event
+          )
+          .then(() => {
+            console.log("Quick reaction message");
+          })
+          .catch((err) => {
+            console.log("Failed to send quick reaction:", err);
+          });
+    }
   },
 };
 </script>

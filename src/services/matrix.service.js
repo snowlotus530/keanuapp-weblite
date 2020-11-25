@@ -38,6 +38,11 @@ export default {
                     return this.$store.state.auth.user;
                 },
 
+                currentUserId() {
+                    const user = this.currentUser || {}
+                    return user.user_id;
+                },
+
                 currentRoomId() {
                     return this.$store.state.currentRoomId;
                 },

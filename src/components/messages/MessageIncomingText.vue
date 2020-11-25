@@ -14,6 +14,7 @@
 
       <div class="bubble">
         <div class="message">{{ event.getContent().body }}</div>
+        <QuickReactions :event="event" :reactions="reactions" />
       </div>
     </div>
     <div class="time">

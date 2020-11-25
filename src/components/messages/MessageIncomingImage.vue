@@ -4,6 +4,7 @@
       <div class="sender">{{ messageEventDisplayName(event) }}</div>
       <div class="bubble image-bubble">
         <v-img :aspect-ratio="16 / 9" ref="image" :src="src" cover />
+        <QuickReactions :event="event" :reactions="reactions" />
       </div>
       <v-avatar class="avatar" size="40" color="grey">
         <img

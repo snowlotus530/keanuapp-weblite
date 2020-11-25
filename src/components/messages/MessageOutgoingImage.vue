@@ -4,6 +4,7 @@
       <div class="sender">{{ "You" }}</div>
       <div class="bubble image-bubble">
         <v-img :aspect-ratio="16/9" ref="image" :src="src" cover />
+        <QuickReactions :event="event" :reactions="reactions" />
       </div>
       <div class="status">{{ event.status }}</div>
     </div>
