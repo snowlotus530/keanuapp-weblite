@@ -7,7 +7,7 @@
       v-on:scroll="onScroll"
     >
       <div v-for="event in events" :key="event.getId()">
-        <v-hover v-slot="{ hover }" v-if="!event.isRelation()">
+        <v-hover v-slot="{ hover }" v-if="!event.isRelation() && !event.isRedacted() && !event.isRedaction()">
           <div style="position: relative">
             <component
               :is="componentForEvent(event)"
