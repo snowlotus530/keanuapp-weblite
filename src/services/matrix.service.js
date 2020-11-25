@@ -176,12 +176,14 @@ export default {
                 addMatrixClientListeners(client) {
                     if (client) {
                         client.on("event", this.onEvent);
+                        client.on("Room", this.onRoom);
                     }
                 },
 
                 removeMatrixClientListeners(client) {
                     if (client) {
                         client.off("event", this.onEvent);
+                        client.off("Room", this.onRoom);
                     }
                 },
 
@@ -205,6 +207,10 @@ export default {
                     }
                 },
 
+                onRoom(ignoredroom) {
+                    this.reloadRooms();
+                },
+
                 reloadRooms() {
                     this.rooms = this.matrixClient.getVisibleRooms();
                     this.rooms.forEach(room => {
@@ -212,15 +218,25 @@ export default {
                     });
                 },
 
+                setCurrentRoom(room) {
+                    // If we don't know about this room yet (e.g. we just joined)
+                    // add it to our list.
+                    if (!this.getRoom(room.roomId)) {
+                        this.rooms.push(room);
+                    }
+                    this.setCurrentRoomId(room.roomId);
+                },
+
                 setCurrentRoomId(roomId) {
                     this.$store.commit("setCurrentRoomId", roomId);
                 },
 
                 getRoom(roomId) {
-                    // if (this.matrixClient) {
-                    //     return this.matrixClient.getRoom(roomId);
-                    // }
-                    return this.rooms.find(room => room.roomId == roomId);
+                    var room = this.rooms.find(room => room.roomId == roomId);
+                    if (!room && this.matrixClient) {
+                        room = this.matrixClient.getRoom(roomId);
+                    }
+                    return room;
                 },
 
                 on(event, handler) {
