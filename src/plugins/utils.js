@@ -76,12 +76,23 @@ class Util {
     }
 
     sendTextMessage(matrixClient, roomId, text) {
-        return this.sendMessage(matrixClient, roomId, ContentHelpers.makeTextMessage(text));
+        return this.sendMessage(matrixClient, roomId, "m.room.message", ContentHelpers.makeTextMessage(text));
     }
 
-    sendMessage(matrixClient, roomId, content) {
+    sendQuickReaction(matrixClient, roomId, emoji, event) {
+        const content = {
+            'm.relates_to': {
+                key: emoji,
+                rel_type: 'm.annotation',
+                event_id: event.getId()
+            }
+          };
+        return this.sendMessage(matrixClient, roomId, "m.reaction", content);
+    }
+
+    sendMessage(matrixClient, roomId, eventType, content) {
         return new Promise((resolve, reject) => {
-            matrixClient.sendMessage(roomId, content, undefined, undefined)
+            matrixClient.sendEvent(roomId, eventType, content, undefined, undefined)
                 .then((result) => {
                     console.log("Message sent: ", result);
                     resolve(true);
@@ -127,22 +138,57 @@ class Util {
         });
     }
 
-    sendEncyptedImage(matrixClient, roomId, file, onUploadProgress) {
+    sendImage(matrixClient, roomId, file, onUploadProgress) {
         return new Promise((resolve, reject) => {
             var reader = new FileReader();
             reader.onload = (e) => {
                 const fileContents = e.target.result;
+                var data = new Uint8Array(fileContents);
+
+                const info = {
+                    mimetype: file.type,
+                    size: file.size
+                };
+                
+                const opts = {
+                    type: file.type,
+                    name: 'Image',
+                    progressHandler: onUploadProgress,
+                    onlyContentUri: false
+                };
+
+                if (!matrixClient.isRoomEncrypted(roomId)) {
+                    // Not encrypted.
+                    matrixClient.uploadContent(data, opts)
+                    .then((response) => {
+                        const messageContent = {
+                            body: 'Image',
+                            url: response.content_uri,
+                            info: info,
+                            msgtype: 'm.image'                    
+                        }
+                        return this.sendMessage(matrixClient, roomId, "m.room.message", messageContent)
+                    })
+                    .then(result => {
+                        resolve(result);
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
+                    return; // Don't fall through
+                }
+
                 const crypto = require('crypto');
                 let key = crypto.randomBytes(256 / 8);
                 let iv = Buffer.concat([crypto.randomBytes(8),Buffer.alloc(8)]); // Initialization vector.
 
                 // Encrypt
                 var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv));
-                const data = new Uint8Array(fileContents);
                 var encryptedBytes = aesCtr.encrypt(data);
+                data = encryptedBytes;
 
                 // Calculate sha256
-                var hash = new Uint8Array(sha256.create().update(encryptedBytes).arrayBuffer());
+                var hash = new Uint8Array(sha256.create().update(data).arrayBuffer());
 
                 const jwk = {
                     kty: 'oct',
@@ -159,20 +205,7 @@ class Util {
                     hashes: { sha256: Buffer.from(hash).toString('base64').replace( /=/g, '' )},
                     v: 'v2'
                 };
-                console.log("Encrypted file:", encryptedFile);
-
-                const info = {
-                    mimetype: file.type,
-                    size: file.size
-                };
                 
-
-                const opts = {
-                    type: file.type,
-                    name: 'Image',
-                    progressHandler: onUploadProgress,
-                };
-
                 const messageContent = {
                     body: 'Image',
                     file: encryptedFile,
@@ -180,10 +213,10 @@ class Util {
                     msgtype: 'm.image'                    
                 }
 
-                matrixClient.uploadContent(encryptedBytes, opts)
-                    .then((uri) => {
-                        encryptedFile.url = uri;
-                        return this.sendMessage(matrixClient, roomId, messageContent)
+                matrixClient.uploadContent(data, opts)
+                    .then((response) => {
+                        encryptedFile.url = response.content_uri;
+                        return this.sendMessage(matrixClient, roomId, "m.room.message", messageContent)
                     })
                     .then(result => {
                         resolve(result);

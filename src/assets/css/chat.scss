@@ -186,3 +186,34 @@ $chat-text-size: 0.7pt;
     text-align: center;
     margin: 20px;
 }
+
+.messageOperations {
+    position: absolute;
+    bottom: 10px;
+    &.incoming {
+        left: -20px;
+    }
+    &.outgoing {
+        right: 20px;
+    }
+}
+
+.quick-reaction-container {
+    .quick-reaction {
+        border: 1px solid #e2e2e2;
+        border-radius: 9px;
+        margin: 0px 2px;
+        padding: 2px;
+        &:hover {
+            border: 1px solid #888888;
+            background-color: #e2e2e2;
+        }
+        .quick-reaction-count {
+            color: #888888;
+            font-size: 0.7rem;
+        }
+    }
+    .sent {
+        background-color: palegreen;
+    }
+}

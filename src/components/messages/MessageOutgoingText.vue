@@ -4,6 +4,7 @@
       <div class="sender">{{ "You" }}</div>
       <div class="bubble">
         <div class="message">{{ event.getContent().body }}</div>
+        <QuickReactions :event="event" :reactions="reactions" />
       </div>
       <div class="status">{{ event.status }}</div>
     </div>
@@ -20,7 +21,6 @@ export default {
   mixins: [messageMixin],
 };
 </script>
-
 <style lang="scss">
 @import "@/assets/css/chat.scss";
 </style>

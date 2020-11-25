@@ -1,4 +1,9 @@
+import QuickReactions from './QuickReactions.vue';
+
 export default {
+  components: {
+    QuickReactions
+  },
   props: {
     room: {
       type: Object,
@@ -12,6 +17,12 @@ export default {
         return {}
       }
     },
+    reactions: {
+      type: Object,
+      default: function () {
+        return null
+      }
+    }
   },
   computed: {
   },
@@ -20,6 +31,9 @@ export default {
      * Get a display name given an event.
      */
     stateEventDisplayName(event) {
+      if (event.getSender() == this.$matrix.currentUserId) {
+        return "You";
+      }
       if (this.room) {
         const member = this.room.getMember(event.getSender());
         if (member) {
@@ -64,5 +78,5 @@ export default {
       }
       return date.toLocaleString();
     },
-  }
+  },
 }
