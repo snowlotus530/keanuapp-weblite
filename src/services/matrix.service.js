@@ -31,7 +31,7 @@ export default {
 
             computed: {
                 ready() {
-                    return this.matrixClient != null;
+                    return this.matrixClient != null && this.matrixClientReady;
                 },
 
                 currentUser() {
@@ -41,31 +41,39 @@ export default {
                 currentRoomId() {
                     return this.$store.state.currentRoomId;
                 },
-                
+
                 currentRoom() {
                     return this.getRoom(this.currentRoomId);
                 },
-              
+
             },
 
             methods: {
                 login(user) {
                     const tempMatrixClient = sdk.createClient(user.server);
-                    var retUser;
-                    return tempMatrixClient
-                        .login("m.login.password", { user: user.username, password: user.password, type: "m.login.password" })
-                        .then((response) => {
-                            localStorage.setItem('user', JSON.stringify(response));
-                            return response;
-                        })
+                    var promiseLogin;
+
+                    if (user.is_guest) {
+                        promiseLogin = tempMatrixClient
+                            .registerGuest({}, undefined)
+                            .then((response) => {
+                                console.log("Response", response);
+                                response.is_guest = true;
+                                localStorage.setItem('user', JSON.stringify(response));
+                                return response;
+                            })
+                    } else {
+                        promiseLogin = tempMatrixClient
+                            .login("m.login.password", { user: user.username, password: user.password, type: "m.login.password" })
+                            .then((response) => {
+                                localStorage.setItem('user', JSON.stringify(response));
+                                return response;
+                            })
+                    }
+
+                    return promiseLogin
                         .then(user => {
-                            retUser = user;
                             return this.getMatrixClient(user);
-                        })
-                        .then(() => {
-                            // Ready to use! Start by loading rooms.
-                            this.initClient();
-                            return retUser;
                         })
                 },
 
@@ -87,6 +95,18 @@ export default {
                 },
 
                 async getMatrixClient(user) {
+                    if (this.matrixClientReady) {
+                        return new Promise((resolve,ignoredreject) => {
+                            resolve(user);
+                        })
+                    } else if (this.matrixClient) {
+                        return new Promise((resolve,ignoredreject) => {
+                            this.matrixClient.once('Matrix.initialized', (ignoredclient) => {
+                                resolve(user);
+                            });
+                        })
+                    }
+
                     const matrixStore = new sdk.MemoryStore(window.localStorage);
                     const webStorageSessionStore = new sdk.WebStorageSessionStore(
                         window.localStorage
@@ -104,9 +124,13 @@ export default {
                         sessionStore: webStorageSessionStore,
                         deviceId: user.device_id,
                         accessToken: user.access_token,
-                        timelineSupport: true
+                        timelineSupport: true,
+                        unstableClientRelationAggregation: true
                     }
                     this.matrixClient = sdk.createClient(opts);
+                    if (user.is_guest) {
+                        this.matrixClient.setGuest(true);
+                    }
                     return this.matrixClient
                         .initCrypto()
                         .then(() => {
@@ -136,7 +160,12 @@ export default {
                                     )
                                 });
                             }
-                        });
+                        })
+                        .then(() => {
+                            // Ready to use! Start by loading rooms.
+                            this.initClient();
+                            return user;
+                        })
                 },
 
                 addMatrixClientListeners(client) {
@@ -159,7 +188,7 @@ export default {
                                 Vue.set(room, "topic", event.getContent().topic);
                             }
                         }
-                        break;
+                            break;
 
                         case "m.room.avatar": {
                             const room = this.matrixClient.getRoom(event.getRoomId());
@@ -167,7 +196,7 @@ export default {
                                 Vue.set(room, "avatar", room.getAvatarUrl(this.matrixClient.getHomeserverUrl(), 80, 80, "scale", true));
                             }
                         }
-                        break;
+                            break;
                     }
                 },
 
