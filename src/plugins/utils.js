@@ -5,6 +5,39 @@ var aesjs = require('aes-js');
 var base64Url = require('json-web-key/lib/base64url');
 
 class Util {
+    getAttachment(matrixClient, event) {
+        return new Promise((resolve, reject) => {
+            const content = event.getContent();
+            if (content.url != null) {
+                // Unencrypted, just return!
+                resolve(matrixClient.mxcUrlToHttp(content.url));
+                return;
+            }
+            var url = null;
+            var file = null;
+            if (content.file && content.file.url) {
+                file = content.file;
+                url = matrixClient.mxcUrlToHttp(file.url);
+            }
+
+            if (url == null) {
+                reject("No url found!");
+            }
+
+            axios.get(url, { responseType: 'arraybuffer' })
+                .then(response => {
+                    return this.decryptIfNeeded(file, response);
+                })
+                .then(bytes => {
+                    resolve(URL.createObjectURL(new Blob([bytes.buffer], { type: file.mimetype })));
+                })
+                .catch(err => {
+                    console.log("Download error: ", err);
+                    reject(err);
+                });
+        });
+    }
+
     getThumbnail(matrixClient, event, ignoredw, ignoredh) {
         return new Promise((resolve, reject) => {
             const content = event.getContent();
@@ -46,24 +79,7 @@ class Util {
             }
             axios.get(url, { responseType: 'arraybuffer' })
                 .then(response => {
-                    return new Promise((resolve, ignoredReject) => {
-                        var key = base64Url.decode(file.key.k);
-                        var iv = base64Url.decode(file.iv);
-                        var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv));
-
-                        const data = new Uint8Array(response.data);
-
-                        // Calculate sha256 and compare hashes
-                        var hash = new Uint8Array(sha256.create().update(data).arrayBuffer());
-                        const originalHash = base64Url.decode(file.hashes.sha256);
-                        if (Buffer.compare(Buffer.from(hash), Buffer.from(originalHash.buffer)) != 0) {
-                            reject("Hashes don't match!");
-                            return;
-                        }
-
-                        var decryptedBytes = aesCtr.decrypt(data);
-                        resolve(decryptedBytes);
-                    });
+                    return this.decryptIfNeeded(file, response);
                 })
                 .then(bytes => {
                     resolve(URL.createObjectURL(new Blob([bytes.buffer], { type: file.mimetype })));
@@ -72,6 +88,27 @@ class Util {
                     console.log("Download error: ", err);
                     reject(err);
                 });
+        });
+    }
+
+    decryptIfNeeded(file, response) {
+        return new Promise((resolve, reject) => {
+            var key = base64Url.decode(file.key.k);
+            var iv = base64Url.decode(file.iv);
+            var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv));
+
+            const data = new Uint8Array(response.data);
+
+            // Calculate sha256 and compare hashes
+            var hash = new Uint8Array(sha256.create().update(data).arrayBuffer());
+            const originalHash = base64Url.decode(file.hashes.sha256);
+            if (Buffer.compare(Buffer.from(hash), Buffer.from(originalHash.buffer)) != 0) {
+                reject("Hashes don't match!");
+                return;
+            }
+
+            var decryptedBytes = aesCtr.decrypt(data);
+            resolve(decryptedBytes);
         });
     }
 
@@ -86,7 +123,7 @@ class Util {
                 rel_type: 'm.annotation',
                 event_id: event.getId()
             }
-          };
+        };
         return this.sendMessage(matrixClient, roomId, "m.reaction", content);
     }
 
@@ -149,38 +186,54 @@ class Util {
                     mimetype: file.type,
                     size: file.size
                 };
-                
+
+                var description = file.name;
+                var msgtype = 'm.image';
+                if (file.type.startsWith("audio/")) {
+                    msgtype = 'm.audio';
+                } else if (file.type.startsWith("video/")) {
+                    msgtype = 'm.video';
+                } else if (file.type.startsWith("application/pdf")) {
+                    msgtype = 'm.file';
+                }
+
                 const opts = {
                     type: file.type,
-                    name: 'Image',
+                    name: description,
                     progressHandler: onUploadProgress,
                     onlyContentUri: false
                 };
 
+                var messageContent = {
+                    body: description,
+                    info: info,
+                    msgtype: msgtype
+                }
+
+                // Set filename for files
+                if (msgtype == 'm.file') {
+                    messageContent.filename = file.name;
+                }
+
                 if (!matrixClient.isRoomEncrypted(roomId)) {
                     // Not encrypted.
                     matrixClient.uploadContent(data, opts)
-                    .then((response) => {
-                        const messageContent = {
-                            body: 'Image',
-                            url: response.content_uri,
-                            info: info,
-                            msgtype: 'm.image'                    
-                        }
-                        return this.sendMessage(matrixClient, roomId, "m.room.message", messageContent)
-                    })
-                    .then(result => {
-                        resolve(result);
-                    })
-                    .catch(err => {
-                        reject(err);
-                    });
+                        .then((response) => {
+                            messageContent.url = response.content_uri;
+                            return this.sendMessage(matrixClient, roomId, "m.room.message", messageContent)
+                        })
+                        .then(result => {
+                            resolve(result);
+                        })
+                        .catch(err => {
+                            reject(err);
+                        });
                     return; // Don't fall through
                 }
 
                 const crypto = require('crypto');
                 let key = crypto.randomBytes(256 / 8);
-                let iv = Buffer.concat([crypto.randomBytes(8),Buffer.alloc(8)]); // Initialization vector.
+                let iv = Buffer.concat([crypto.randomBytes(8), Buffer.alloc(8)]); // Initialization vector.
 
                 // Encrypt
                 var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv));
@@ -201,17 +254,12 @@ class Util {
                 const encryptedFile = {
                     mimetype: file.type,
                     key: jwk,
-                    iv: Buffer.from(iv).toString('base64').replace( /=/g, '' ),
-                    hashes: { sha256: Buffer.from(hash).toString('base64').replace( /=/g, '' )},
+                    iv: Buffer.from(iv).toString('base64').replace(/=/g, ''),
+                    hashes: { sha256: Buffer.from(hash).toString('base64').replace(/=/g, '') },
                     v: 'v2'
                 };
-                
-                const messageContent = {
-                    body: 'Image',
-                    file: encryptedFile,
-                    info: info,
-                    msgtype: 'm.image'                    
-                }
+
+                messageContent.file = encryptedFile;
 
                 matrixClient.uploadContent(data, opts)
                     .then((response) => {

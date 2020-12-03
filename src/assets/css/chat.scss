@@ -167,6 +167,7 @@ $chat-text-size: 0.7pt;
     font-weight: 400;
     font-size: 22 * $chat-text-size;
     color: #000000;
+    overflow-wrap: break-word;
     .edit-marker {
         font-size: 0.8rem;
         color: #888888;
