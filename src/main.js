@@ -7,11 +7,9 @@ import matrix from './services/matrix.service'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import VEmojiPicker from 'v-emoji-picker';
-import VueMobileEvent from 'vue-mobile-event';
 
 Vue.config.productionTip = false
 
-Vue.use(VueMobileEvent);
 Vue.use(VEmojiPicker);
 Vue.use(matrix, {store: store});
 

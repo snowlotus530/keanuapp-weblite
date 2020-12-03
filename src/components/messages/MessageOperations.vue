@@ -1,6 +1,6 @@
 <template>
   <div :class="{'messageOperations':true,'incoming':incoming,'outgoing':!incoming}">
-    <v-btn icon v-event:tap.self="(e) => { addReaction() }" class="ma-0 pa-0">
+    <v-btn icon @click.stop="addReaction" class="ma-0 pa-0">
       <v-icon>mood</v-icon>
     </v-btn>
   </div>
@@ -26,9 +26,10 @@ export default {
       }
     },
   },
-
+  
   methods: {
     addReaction() {
+      this.$emit("close");
       this.$emit("addreaction", {event:this.event});
     }
   }
