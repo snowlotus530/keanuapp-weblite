@@ -4,15 +4,20 @@
       class="chat-content flex-grow-1 flex-shrink-1"
       ref="chatContainer"
       style="overflow-x: hidden; overflow-y: auto"
-      v-on:scroll="onScroll"
+      v-on:sscroll="onScroll"
     >
       <div v-for="event in events" :key="event.getId()">
-        <div v-event:tap.self="(e) => { touchTap(event); } " v-event:longTap="(e) => { touchLongTap(event); } " v-if="!event.isRelation() && !event.isRedacted() && !event.isRedaction()">
-          <div style="position:relative;user-select:none">
+        <div v-if="!event.isRelation() && !event.isRedacted() && !event.isRedaction()">
+          <div style="position:relative;user-select:none"
+          v-on:touchstart="(e) => { touchStart(e, event) }" 
+          v-on:touchend="touchEnd" 
+          v-on:touchcancel="touchCancel"
+          v-on:touchmove="touchMove"
+          >
             <component
               :is="componentForEvent(event)"
               :room="room"
-              :event="event"              
+              :event="event" 
               :reactions="
                 timelineWindow._timelineSet.getRelationsForEvent(
                   event.getId(),
@@ -23,6 +28,7 @@
               v-on:send-quick-reaction="sendQuickReaction"
             />
             <message-operations
+              v-on:close="showContextMenu = false"
               v-if="selectedEvent == event && showContextMenu"
               v-on:addreaction="addReaction"
               :event="event"
@@ -102,7 +108,7 @@
       </v-dialog>
     </div>
 
-    <div>
+    <div v-if="showEmojiPicker">
       <v-dialog v-model="showEmojiPicker" class="ma-0 pa-0" width="50%">
         <VEmojiPicker style="width: 100%" @select="emojiSelected" />
       </v-dialog>
@@ -251,16 +257,48 @@ export default {
   },
 
   methods: {
-    touchTap(ignoredEvent) {
-      if (this.selectedEvent && this.showContextMenu) {
-        // If anything is selected, unselect
-        this.selectedEvent = null;
+    touchX(event) {
+      if(event.type.indexOf('mouse') !== -1){
+        return event.clientX;
+      }
+      return event.touches[0].clientX;
+    },
+    touchY(event) {
+      if(event.type.indexOf('mouse') !== -1){
+        return event.clientY;
+      }
+      return event.touches[0].clientY;
+    },
+    touchStart(e, event) {
+      console.log("TouchStart");
+      if (this.selectedEvent != event) {
         this.showContextMenu = false;
       }
-    },
-
-    touchLongTap(event) {
       this.selectedEvent = event;
+      this.touchStartX = this.touchX(e);
+      this.touchStartY = this.touchY(e);
+      this.touchTimer = setTimeout(this.touchTimerElapsed, 500);
+    },
+    touchEnd() {
+      console.log("TouchEnd");
+      this.touchTimer && clearTimeout(this.touchTimer);
+    },
+    touchCancel() {
+      console.log("TouchCancel");
+      this.touchTimer && clearTimeout(this.touchTimer);
+    },
+    touchMove(e) {
+      this.touchCurrentX = this.touchX(e);
+      this.touchCurrentY = this.touchY(e);
+      var tapTolerance = 4;
+      var touchMoved = Math.abs(this.touchStartX - this.touchCurrentX) > tapTolerance ||
+                    Math.abs(this.touchStartY - this.touchCurrentY) > tapTolerance;
+      if(touchMoved){
+        this.touchTimer && clearTimeout(this.touchTimer);
+      }
+    },
+    touchTimerElapsed() {
+      console.log('timer');
       this.showContextMenu = true;
     },
 
@@ -319,13 +357,14 @@ export default {
         // Scrolled to top
         this.handleScrolledToTop();
       } else if (
-        container.scrollHeight - container.scrollTop ==
+        container.scrollHeight - container.scrollTop.toFixed(0) ==
         container.clientHeight
       ) {
         this.handleScrolledToBottom(false);
       }
     },
     onEvent(event) {
+      console.log("OnEvent", event);
       if (event.getRoomId() !== this.roomId) {
         return; // Not for this room
       }
@@ -333,11 +372,15 @@ export default {
 
       // If we are at bottom, scroll to see new events...
       const container = this.$refs.chatContainer;
+      var scrollToSeeNew = (event.getSender() == this.$matrix.currentUserId); // When we sent, scroll
       if (
-        container.scrollHeight - container.scrollTop ==
+        container.scrollHeight - container.scrollTop.toFixed(0) ==
         container.clientHeight
       ) {
-        this.handleScrolledToBottom(true);
+        scrollToSeeNew = true;
+      }
+      if (event.forwardLooking) {
+        this.handleScrolledToBottom(scrollToSeeNew);
       }
     },
 
