@@ -1,6 +1,6 @@
 <template>
   <div :class="{'messageOperations':true,'incoming':incoming,'outgoing':!incoming}">
-    <v-btn icon @click="addReaction" class="ma-0 pa-0">
+    <v-btn icon v-event:tap.self="(e) => { addReaction() }" class="ma-0 pa-0">
       <v-icon>mood</v-icon>
     </v-btn>
   </div>

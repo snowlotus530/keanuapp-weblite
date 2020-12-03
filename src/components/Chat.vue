@@ -7,12 +7,12 @@
       v-on:scroll="onScroll"
     >
       <div v-for="event in events" :key="event.getId()">
-        <v-hover v-slot="{ hover }" v-if="!event.isRelation() && !event.isRedacted() && !event.isRedaction()">
-          <div style="position: relative">
+        <div v-event:tap.self="(e) => { touchTap(event); } " v-event:longTap="(e) => { touchLongTap(event); } " v-if="!event.isRelation() && !event.isRedacted() && !event.isRedaction()">
+          <div style="position:relative;user-select:none">
             <component
               :is="componentForEvent(event)"
               :room="room"
-              :event="event"
+              :event="event"              
               :reactions="
                 timelineWindow._timelineSet.getRelationsForEvent(
                   event.getId(),
@@ -23,13 +23,13 @@
               v-on:send-quick-reaction="sendQuickReaction"
             />
             <message-operations
-              v-if="hover"
+              v-if="selectedEvent == event && showContextMenu"
               v-on:addreaction="addReaction"
               :event="event"
               :incoming="event.getSender() != $matrix.currentUserId"
             />
           </div>
-        </v-hover>
+        </div>
       </div>
     </div>
 
@@ -55,7 +55,7 @@
               type="file"
               name="attachment"
               @change="pickAttachment($event)"
-              accept="image/*"
+              accept="image/*|audio/*|video/*|application/pdf"
               style="display: none"
             />
           </label>
@@ -113,7 +113,11 @@
 <script>
 import { TimelineWindow, EventTimeline } from "matrix-js-sdk";
 import MessageIncomingText from "./messages/MessageIncomingText";
+import MessageIncomingImage from "./messages/MessageIncomingImage.vue";
+import MessageIncomingAudio from "./messages/MessageIncomingAudio.vue";
 import MessageOutgoingText from "./messages/MessageOutgoingText";
+import MessageOutgoingImage from "./messages/MessageOutgoingImage.vue";
+import MessageOutgoingAudio from "./messages/MessageOutgoingAudio.vue";
 import ContactJoin from "./messages/ContactJoin.vue";
 import ContactLeave from "./messages/ContactLeave.vue";
 import ContactInvited from "./messages/ContactInvited.vue";
@@ -121,8 +125,6 @@ import RoomNameChanged from "./messages/RoomNameChanged.vue";
 import RoomTopicChanged from "./messages/RoomTopicChanged.vue";
 import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
-import MessageOutgoingImage from "./messages/MessageOutgoingImage.vue";
-import MessageIncomingImage from "./messages/MessageIncomingImage.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
 
@@ -158,7 +160,11 @@ export default {
 
   components: {
     MessageIncomingText,
+    MessageIncomingImage,
+    MessageIncomingAudio,
     MessageOutgoingText,
+    MessageOutgoingImage,
+    MessageOutgoingAudio,
     ContactJoin,
     ContactLeave,
     ContactInvited,
@@ -166,8 +172,6 @@ export default {
     RoomTopicChanged,
     RoomAvatarChanged,
     DebugEvent,
-    MessageOutgoingImage,
-    MessageIncomingImage,
     MessageOperations,
   },
 
@@ -186,6 +190,7 @@ export default {
       currentSendError: null,
       showEmojiPicker: false,
       selectedEvent: null,
+      showContextMenu: false
     };
   },
 
@@ -246,6 +251,19 @@ export default {
   },
 
   methods: {
+    touchTap(ignoredEvent) {
+      if (this.selectedEvent && this.showContextMenu) {
+        // If anything is selected, unselect
+        this.selectedEvent = null;
+        this.showContextMenu = false;
+      }
+    },
+
+    touchLongTap(event) {
+      this.selectedEvent = event;
+      this.showContextMenu = true;
+    },
+
     componentForEvent(event) {
       switch (event.getType()) {
         case "m.room.member":
@@ -262,11 +280,15 @@ export default {
           if (event.getSender() != this.$matrix.currentUserId) {
             if (event.getContent().msgtype == "m.image") {
               return MessageIncomingImage;
+            } else if (event.getContent().msgtype == "m.audio") {
+              return MessageIncomingAudio;
             }
             return MessageIncomingText;
           } else {
             if (event.getContent().msgtype == "m.image") {
               return MessageOutgoingImage;
+            } else if (event.getContent().msgtype == "m.audio") {
+              return MessageOutgoingAudio;
             }
             return MessageOutgoingText;
           }
@@ -394,7 +416,10 @@ export default {
       if (this.currentSendOperation) {
         this.currentSendOperation.reject("Canceled");
       }
+      this.currentSendOperation = null;
       this.currentImageInput = null;
+      this.currentSendProgress = 0;
+      this.currentSendError = null;
     },
 
     handleScrolledToTop() {
