@@ -13,8 +13,10 @@
           :error="userErrorMessage != null"
           :error-messages="userErrorMessage"
           required
+          v-on:keyup.enter="$refs.password.focus()"
         ></v-text-field>
         <v-text-field
+          ref="password"
           v-model="user.password"
           label="Password"
           color="black"
@@ -25,6 +27,7 @@
           :error="passErrorMessage != null"
           :error-messages="passErrorMessage"
           required
+          v-on:keyup.enter="() => { if (isValid && !loading) { handleLogin() }}"
         ></v-text-field>
           <v-btn
             :disabled="!isValid || loading"
