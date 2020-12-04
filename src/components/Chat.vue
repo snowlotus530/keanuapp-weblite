@@ -7,17 +7,26 @@
       v-on:sscroll="onScroll"
     >
       <div v-for="event in events" :key="event.getId()">
-        <div v-if="!event.isRelation() && !event.isRedacted() && !event.isRedaction()">
-          <div style="position:relative;user-select:none"
-          v-on:touchstart="(e) => { touchStart(e, event) }" 
-          v-on:touchend="touchEnd" 
-          v-on:touchcancel="touchCancel"
-          v-on:touchmove="touchMove"
+        <div
+          v-if="
+            !event.isRelation() && !event.isRedacted() && !event.isRedaction()
+          "
+        >
+          <div
+            style="position: relative; user-select: none"
+            v-on:touchstart="
+              (e) => {
+                touchStart(e, event);
+              }
+            "
+            v-on:touchend="touchEnd"
+            v-on:touchcancel="touchCancel"
+            v-on:touchmove="touchMove"
           >
             <component
               :is="componentForEvent(event)"
               :room="room"
-              :event="event" 
+              :event="event"
               :reactions="
                 timelineWindow._timelineSet.getRelationsForEvent(
                   event.getId(),
@@ -37,6 +46,12 @@
           </div>
         </div>
       </div>
+
+      <!-- Handle resizes, e.g. when soft keyboard is shown/hidden -->
+      <resize-observer
+        ref="chatContainerResizer"
+        @notify="handleChatContainerResize"
+      />
     </div>
 
     <!-- Input area -->
@@ -196,7 +211,13 @@ export default {
       currentSendError: null,
       showEmojiPicker: false,
       selectedEvent: null,
-      showContextMenu: false
+      showContextMenu: false,
+      /**
+       * Current chat container size. We need to keep track of this so that if and when
+       * a soft keyboard is shown/hidden we can restore the scroll position correctly.
+       * If we don't, the keyboard will simply overflow the message we are answering to etc.
+       */
+      chatContainerSize: 0,
     };
   },
 
@@ -205,6 +226,8 @@ export default {
     this.scrollPosition = new ScrollPosition(container);
     this.$matrix.on("Room.timeline", this.onEvent);
     this.$matrix.on("RoomMember.typing", this.onUserTyping);
+    this.chatContainerSize = this.$refs.chatContainerResizer.$el.clientHeight;
+    console.log("resize initial height: ", this.chatContainerSize);
   },
 
   destroyed() {
@@ -258,13 +281,13 @@ export default {
 
   methods: {
     touchX(event) {
-      if(event.type.indexOf('mouse') !== -1){
+      if (event.type.indexOf("mouse") !== -1) {
         return event.clientX;
       }
       return event.touches[0].clientX;
     },
     touchY(event) {
-      if(event.type.indexOf('mouse') !== -1){
+      if (event.type.indexOf("mouse") !== -1) {
         return event.clientY;
       }
       return event.touches[0].clientY;
@@ -291,15 +314,36 @@ export default {
       this.touchCurrentX = this.touchX(e);
       this.touchCurrentY = this.touchY(e);
       var tapTolerance = 4;
-      var touchMoved = Math.abs(this.touchStartX - this.touchCurrentX) > tapTolerance ||
-                    Math.abs(this.touchStartY - this.touchCurrentY) > tapTolerance;
-      if(touchMoved){
+      var touchMoved =
+        Math.abs(this.touchStartX - this.touchCurrentX) > tapTolerance ||
+        Math.abs(this.touchStartY - this.touchCurrentY) > tapTolerance;
+      if (touchMoved) {
         this.touchTimer && clearTimeout(this.touchTimer);
       }
     },
+
+    /**
+     * Triggered when out "long tap" timer hits.
+     */
     touchTimerElapsed() {
-      console.log('timer');
       this.showContextMenu = true;
+    },
+
+    /**
+     * If chat container is shrunk (probably because soft keyboard is shown) adjust
+     * the scroll position so that e.g. if we were looking at the last message when
+     * moving focus to the input field, we would still see the last message. Otherwise
+     * if would be hidden behind the keyboard.
+     */
+    handleChatContainerResize({ width, height }) {
+      console.log("resized", width, height);
+      const delta = height - this.chatContainerSize;
+      this.chatContainerSize = height;
+      console.log("resized delta " + delta);
+      const container = this.$refs.chatContainer;
+      if (delta < 0) {
+        container.scrollTop -= delta;
+      }
     },
 
     componentForEvent(event) {
@@ -312,7 +356,7 @@ export default {
           } else if (event.getContent().membership == "invite") {
             return ContactInvited;
           }
-        break;
+          break;
 
         case "m.room.message":
           if (event.getSender() != this.$matrix.currentUserId) {
@@ -372,7 +416,7 @@ export default {
 
       // If we are at bottom, scroll to see new events...
       const container = this.$refs.chatContainer;
-      var scrollToSeeNew = (event.getSender() == this.$matrix.currentUserId); // When we sent, scroll
+      var scrollToSeeNew = event.getSender() == this.$matrix.currentUserId; // When we sent, scroll
       if (
         container.scrollHeight - container.scrollTop.toFixed(0) ==
         container.clientHeight
@@ -542,25 +586,25 @@ export default {
       if (this.selectedEvent) {
         const event = this.selectedEvent;
         this.selectedEvent = null;
-        this.sendQuickReaction({reaction:e.data, event: event});
+        this.sendQuickReaction({ reaction: e.data, event: event });
       }
     },
 
     sendQuickReaction(e) {
       util
-          .sendQuickReaction(
-            this.$matrix.matrixClient,
-            this.roomId,
-            e.reaction,
-            e.event
-          )
-          .then(() => {
-            console.log("Quick reaction message");
-          })
-          .catch((err) => {
-            console.log("Failed to send quick reaction:", err);
-          });
-    }
+        .sendQuickReaction(
+          this.$matrix.matrixClient,
+          this.roomId,
+          e.reaction,
+          e.event
+        )
+        .then(() => {
+          console.log("Quick reaction message");
+        })
+        .catch((err) => {
+          console.log("Failed to send quick reaction:", err);
+        });
+    },
   },
 };
 </script>

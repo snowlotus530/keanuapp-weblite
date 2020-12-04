@@ -7,9 +7,12 @@ import matrix from './services/matrix.service'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import VEmojiPicker from 'v-emoji-picker';
+import VueResize from 'vue-resize';
+import 'vue-resize/dist/vue-resize.css';
 
 Vue.config.productionTip = false
 
+Vue.use(VueResize);
 Vue.use(VEmojiPicker);
 Vue.use(matrix, {store: store});
 
