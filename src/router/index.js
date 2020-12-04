@@ -12,6 +12,12 @@ const routes = [
     component: Chat
   },
   {
+    path: '/info',
+    name: 'RoomInfo',
+    component: () => import('../components/RoomInfo.vue'),
+    props: true,
+  },
+  {
     path: '/login',
     component: Login
   },
