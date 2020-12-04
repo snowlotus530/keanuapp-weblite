@@ -57,49 +57,55 @@ $chat-text-size: 0.7pt;
     }
 
     .input-area {
-        background-color: #cccccc;
+        background-color: #e2e2e2;
         margin: 0;
         padding-left: $chat-standard-padding-s;
         padding-right: $chat-standard-padding-s;
-        .currentImage {
-            width: 6 * $chat-standard-padding-s;
-            height: 6 * $chat-standard-padding-s;
-        }
     }
 
-    .input-message {
-        font-family: 'Titillium Web', sans-serif;
-        font-weight: 300;
-        font-size: 15 * $chat-text-size;
-        font-style: italic;
-        height: 3 * $chat-standard-padding-s;
-        padding: 0 10px 0 10px;
-        margin: $chat-standard-padding-xs 0 0 0;
-        color: #999999;
-        //background-color: #ffffff;
-        overflow: hidden;
-        border: 1px solid #cccccc;
-        border-radius: 0;
-        .v-input__slot {
-            /* Remove text underline */
-            color: transparent !important;
+    .input-area-outer {
+        background-color: #e2e2e2;
+        margin: 0;
+        padding-left: 2 * $chat-standard-padding-s;
+        padding-right: 2 * $chat-standard-padding-s;
+        padding-top: 0px;
+        .typing {
+            font-family: 'Titillium Web', sans-serif;
+            font-weight: 300;
+            font-size: 12 * $chat-text-size;
+            color: #1c242a;
+            text-align: center;
+            min-height: 20px;
         }
-        .v-text-field__slot {
+        .input-area-inner {
+            background-color: white;
+            border-radius: $chat-standard-padding-s;
+        }
+        .input-area-button {
+            margin: 0;
             padding: 0;
-            max-height: 3 * $chat-standard-padding-s;
-            height: 3 * $chat-standard-padding-s;
+            min-width: 48px;
+            min-height: 48px;
         }
-        textarea {
-            line-height: 1.1rem;
-        }
-        .v-input__prepend-outer {
-            margin-top: 0px;
+        .input-area-text {
+            max-height: 30vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 0 0 0 0px;
+            margin: 6px 0;
+            font-family: 'Titillium Web', sans-serif;
+            font-weight: 300;
+            font-size: 18 * $chat-text-size;
+            .v-input__slot {
+                /* Remove text underline */
+                color: transparent !important;
+                min-height: 20px;
+            }
         }
     }
 }
 
-.messageJoin,
-.typing {
+.messageJoin {
     font-family: 'Titillium Web', sans-serif;
     font-weight: 300;
     font-size: 15 * $chat-text-size;

@@ -55,22 +55,19 @@
     </div>
 
     <!-- Input area -->
-    <div v-if="room" class="input-area flex-grow-0 flex-shrink-0">
-      <!-- CONTACT IS TYPING -->
-      <div v-show="contactIsTyping" class="typing">Someone is typing...</div>
-      <v-textarea
-        ref="messageInput"
-        full-width
-        v-model="currentInput"
-        no-resize
-        class="input-message"
-        placeholder="Send message"
-        hide-details
-        background-color="white"
-      >
-        <template v-slot:prepend>
-          <label icon flat>
-            <v-icon>attachment</v-icon>
+    <v-container v-if="room" fluid class="input-area-outer">
+      <v-row class="ma-0 pa-0">
+        <!-- CONTACT IS TYPING -->
+        <div class="typing">
+          {{ contactIsTyping ? "Someone is typing..." : "" }}
+        </div>
+      </v-row>
+      <v-row class="input-area-inner">
+        <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
+          <label icon flat ref="attachmentLabel">
+            <v-btn icon @click="$refs.attachment.click()">
+              <v-icon>attachment</v-icon>
+            </v-btn>
             <input
               ref="attachment"
               type="file"
@@ -80,17 +77,32 @@
               style="display: none"
             />
           </label>
-        </template>
-      </v-textarea>
-      <div align-self="end" class="text-right">
-        <v-btn
-          elevation="0"
-          @click.stop="sendMessage"
-          :disabled="sendButtonDisabled"
-          >Send</v-btn
-        >
-      </div>
-    </div>
+        </v-col>
+
+        <v-col class="flex-grow-1 flex-shrink-1 ma-0 pa-0">
+          <v-textarea
+            height="undefined"
+            ref="messageInput"
+            full-width
+            auto-grow
+            rows="1"
+            v-model="currentInput"
+            no-resize
+            class="input-area-text"
+            placeholder="Send message"
+            hide-details
+            background-color="white"
+            v-on:keydown.enter.prevent="() => { sendMessage() }"
+          />
+        </v-col>
+
+        <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
+          <v-btn icon @click.stop="sendMessage" :disabled="sendButtonDisabled">
+            <v-icon>send</v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
 
     <div v-if="currentImageInput">
       <v-dialog v-model="currentImageInput" class="ma-0 pa-0" width="50%">
@@ -227,7 +239,6 @@ export default {
     this.$matrix.on("Room.timeline", this.onEvent);
     this.$matrix.on("RoomMember.typing", this.onUserTyping);
     this.chatContainerSize = this.$refs.chatContainerResizer.$el.clientHeight;
-    console.log("resize initial height: ", this.chatContainerSize);
   },
 
   destroyed() {
@@ -335,11 +346,9 @@ export default {
      * moving focus to the input field, we would still see the last message. Otherwise
      * if would be hidden behind the keyboard.
      */
-    handleChatContainerResize({ width, height }) {
-      console.log("resized", width, height);
+    handleChatContainerResize({ ignoredWidth, height }) {
       const delta = height - this.chatContainerSize;
       this.chatContainerSize = height;
-      console.log("resized delta " + delta);
       const container = this.$refs.chatContainer;
       if (delta < 0) {
         container.scrollTop -= delta;
