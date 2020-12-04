@@ -20,6 +20,51 @@ $chat-text-size: 0.7pt;
     background-color: $chat-background;
     overflow: hidden;
 
+    .chat-header {
+        margin: 0;
+        padding: 0;
+        background-color: #e2e2e2;
+        .chat-header-row {
+            margin: 0;
+            padding: 4px 10px;
+            align-items: center;
+        }
+        .members-icon {
+            margin-bottom: 0;
+        }
+        .chat-header-members {
+            position: relative;
+        }
+        .num-members {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            font-family: 'Titillium Web', sans-serif;
+            font-weight: 400;
+            font-size: 11 * $chat-text-size;
+            color: black;
+        }
+        .room-name {
+            font-family: 'Titillium Web', sans-serif;
+            font-weight: 700;
+            font-size: 18 * $chat-text-size;
+            color: black;
+        }
+        .v-btn.leave-button {
+            font-family: 'Titillium Web', sans-serif;
+            font-weight: 400;
+            font-size: 14 * $chat-text-size;
+            color: white;
+            background-color: #cc0000 !important;
+            border: none;
+            border-radius: 4px;
+            height: $chat-standard-padding;
+            margin-top: $chat-standard-padding-xs;
+            margin-bottom: $chat-standard-padding-xs;
+        }
+    }
+
     .chat-content {
         margin: 0;
         padding-top: $chat-standard-padding-s;
@@ -41,19 +86,6 @@ $chat-text-size: 0.7pt;
         &::-webkit-scrollbar-thumb:hover {
             background: #4d4d4d;
         }
-    }
-
-    .v-btn {
-        font-family: 'Titillium Web', sans-serif;
-        font-weight: 400;
-        font-size: 17 * $chat-text-size;
-        color: white;
-        background-color: #00eea0 !important;
-        border: none;
-        border-radius: 0;
-        height: $chat-standard-padding;
-        margin-top: $chat-standard-padding-xs;
-        margin-bottom: $chat-standard-padding-xs;
     }
 
     .input-area {
@@ -85,7 +117,6 @@ $chat-text-size: 0.7pt;
             margin: 0;
             padding: 0;
             min-width: 48px;
-            min-height: 48px;
         }
         .input-area-text {
             max-height: 30vh;

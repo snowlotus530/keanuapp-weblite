@@ -68,7 +68,7 @@ export default {
   },
   created() {
     if (this.loggedIn) {
-      this.$router.push("/profile");
+      this.$router.replace({name: "Chat"});
     }
   },
   watch: {

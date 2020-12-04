@@ -1,5 +1,6 @@
 <template>
   <div class="chat-root fill-height d-flex flex-column" ma-0 pa-0>
+    <ChatHeader class="chat-header flex-grow-1 flex-shrink-1" />
     <div
       class="chat-content flex-grow-1 flex-shrink-1"
       ref="chatContainer"
@@ -160,6 +161,7 @@ import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
+import ChatHeader from "./ChatHeader";
 
 // from https://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
 function ScrollPosition(node) {
@@ -192,6 +194,7 @@ export default {
   name: "Chat",
 
   components: {
+    ChatHeader,
     MessageIncomingText,
     MessageIncomingImage,
     MessageIncomingAudio,
@@ -304,7 +307,6 @@ export default {
       return event.touches[0].clientY;
     },
     touchStart(e, event) {
-      console.log("TouchStart");
       if (this.selectedEvent != event) {
         this.showContextMenu = false;
       }
@@ -314,11 +316,9 @@ export default {
       this.touchTimer = setTimeout(this.touchTimerElapsed, 500);
     },
     touchEnd() {
-      console.log("TouchEnd");
       this.touchTimer && clearTimeout(this.touchTimer);
     },
     touchCancel() {
-      console.log("TouchCancel");
       this.touchTimer && clearTimeout(this.touchTimer);
     },
     touchMove(e) {
