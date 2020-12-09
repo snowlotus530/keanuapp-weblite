@@ -213,7 +213,6 @@ export default {
 
   data() {
     return {
-      room: null,
       events: [],
       currentInput: "",
       contactIsTyping: false,
@@ -250,8 +249,14 @@ export default {
   },
 
   computed: {
+    room() {
+      return this.$matrix.currentRoom;
+    },
     roomId() {
-      return this.$matrix.currentRoomId;
+      if (!this.room) {
+        return null;
+      }
+      return this.room.roomId;
     },
     sendButtonDisabled() {
       return this.currentInput.length == 0;
@@ -259,22 +264,17 @@ export default {
   },
 
   watch: {
-    roomId: {
-      handler(ignoredNewVal, ignoredOldVal) {
+    room: {
+      handler(room, ignoredOldVal) {
         console.log("Chat: Current room changed");
 
         // Clear old events
         this.events = [];
         this.timelineWindow = null;
         this.contactIsTyping = false;
-
-        if (!this.roomId) {
+        
+        if (!room) {
           return; // no room
-        }
-
-        this.room = this.$matrix.getRoom(this.roomId);
-        if (!this.room) {
-          return; // Not found
         }
 
         this.timelineWindow = new TimelineWindow(
