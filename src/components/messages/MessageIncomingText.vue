@@ -1,8 +1,6 @@
 <template>
-  <div>
-    <div class="messageIn">
-      <div class="sender">{{ messageEventDisplayName(event) }}</div>
-      <v-avatar class="avatar" size="40" color="grey">
+  <div class="messageIn">
+      <v-avatar class="avatar" size="32" color="#ededed">
         <img
           v-if="messageEventAvatar(event)"
           :src="messageEventAvatar(event)"
@@ -18,7 +16,7 @@
         </div>
         <QuickReactions :event="event" :reactions="reactions" />
       </div>
-    </div>
+      <div class="sender">{{ messageEventDisplayName(event) }}</div>
     <div class="time">
       {{ formatTime(event.event.origin_server_ts) }}
     </div>

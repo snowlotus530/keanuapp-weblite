@@ -60,7 +60,7 @@
       <v-row class="ma-0 pa-0">
         <!-- CONTACT IS TYPING -->
         <div class="typing">
-          {{ contactIsTyping ? "Someone is typing..." : "" }}
+          {{ typingMembersString }}
         </div>
       </v-row>
       <v-row class="input-area-inner">
@@ -215,7 +215,7 @@ export default {
     return {
       events: [],
       currentInput: "",
-      contactIsTyping: false,
+      typingMembers: [],
       timelineWindow: null,
       scrollPosition: null,
       currentImageInput: null,
@@ -261,6 +261,16 @@ export default {
     sendButtonDisabled() {
       return this.currentInput.length == 0;
     },
+    typingMembersString() {
+      const count = this.typingMembers.length;
+      if (count > 1) {
+        return "" + count + " members are typing";
+      } else if (count > 0) {
+        return this.typingMembers[0].name + " is typing";
+      } else {
+        return "";
+      }
+    }
   },
 
   watch: {
@@ -271,7 +281,7 @@ export default {
         // Clear old events
         this.events = [];
         this.timelineWindow = null;
-        this.contactIsTyping = false;
+        this.typingMembers = [];
         
         if (!room) {
           return; // no room
@@ -437,11 +447,21 @@ export default {
       }
     },
 
-    onUserTyping(event) {
-      if (event.getRoomId() !== this.roomId) {
+    onUserTyping(event, member) {
+      if (member.roomId !== this.roomId) {
         return; // Not for this room
       }
-      console.log("Typing:", event);
+      if (member.typing) {
+        if (!this.typingMembers.includes(member)) {
+          this.typingMembers.push(member);
+        }
+      } else {
+        const index = this.typingMembers.indexOf(member);
+        if (index > -1) {
+          this.typingMembers.splice(index, 1);   
+        }
+      }
+      console.log("Typing: ", this.typingMembers);
     },
 
     sendMessage() {

@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <div class="messageIn">
-      <div class="sender">{{ messageEventDisplayName(event) }}</div>
+  <div class="messageIn">
       <div class="bubble image-bubble">
         <v-img :aspect-ratio="16 / 9" ref="image" :src="src" cover />
         <QuickReactions :event="event" :reactions="reactions" />
@@ -15,7 +13,7 @@
           messageEventDisplayName(event).substring(0, 1).toUpperCase()
         }}</span>
       </v-avatar>
-    </div>
+      <div class="sender">{{ messageEventDisplayName(event) }}</div>
     <div class="time">
       {{ formatTime(event.event.origin_server_ts) }}
     </div>
