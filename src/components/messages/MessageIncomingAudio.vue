@@ -1,12 +1,10 @@
 <template>
-  <div>
-    <div class="messageIn">
-      <div class="sender">{{ messageEventDisplayName(event) }}</div>
+  <div class="messageIn">
       <div class="audio-bubble">
         <audio controls :src="src">Audio file</audio>
         <QuickReactions :event="event" :reactions="reactions" />
       </div>
-      <v-avatar class="avatar" size="40" color="grey">
+      <v-avatar class="avatar" size="32" color="#ededed">
         <img
           v-if="messageEventAvatar(event)"
           :src="messageEventAvatar(event)"
@@ -15,7 +13,7 @@
           messageEventDisplayName(event).substring(0, 1).toUpperCase()
         }}</span>
       </v-avatar>
-    </div>
+      <div class="sender">{{ messageEventDisplayName(event) }}</div>
     <div class="time">
       {{ formatTime(event.event.origin_server_ts) }}
     </div>

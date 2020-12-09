@@ -1,18 +1,16 @@
 <template>
-  <div>
-    <div class="messageOut">
-      <div class="sender">{{ "You" }}</div>
+  <div class="messageOut">
       <div class="bubble">
         <div class="message">{{ event.getContent().body }}
           <span class="edit-marker" v-if="event.replacingEventId()">(edited)</span>
         </div>
         <QuickReactions :event="event" :reactions="reactions" />
       </div>
-      <div class="status">{{ event.status }}</div>
-    </div>
+      <!-- <div class="sender">{{ "You" }}</div> -->
     <div class="time">
       {{ formatTime(event.event.origin_server_ts) }}
     </div>
+      <div class="status">{{ event.status }}</div>
   </div>
 </template>
 

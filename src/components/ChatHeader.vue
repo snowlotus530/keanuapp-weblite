@@ -4,7 +4,7 @@
       <v-col
         class="chat-header-members text-center flex-grow-0 flex-shrink-1 ma-0 pa-0"
       >
-        <v-avatar>
+        <v-avatar size="40">
           <v-img :src="room.avatar" />
         </v-avatar>
       </v-col>

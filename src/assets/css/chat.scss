@@ -140,7 +140,7 @@ $chat-text-size: 0.7pt;
     margin-left: 30% !important;
     text-align: right;
     .bubble {
-        background-color: #00eea0;
+        background-color: #88eec0;
         border-radius: 10px 10px 0 10px;
         padding: 8px;
     }
@@ -148,8 +148,23 @@ $chat-text-size: 0.7pt;
         padding: 0px;
         overflow: hidden;
     }
-    .message {
-        color: white;
+    .sender {
+        font-family: 'Titillium Web', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 10 * $chat-text-size;
+        color: rgba(#000000, 0.6);
+        display: inline-block;
+        margin-left: 40px;
+        margin-right: 8px;
+    }
+    .time {
+        font-family: 'Titillium Web', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 10 * $chat-text-size;
+        color: rgba(#000000, 0.6);
+        display: inline-block;
     }
 }
 
@@ -159,12 +174,16 @@ $chat-text-size: 0.7pt;
     text-align: left;
     position: relative;
     .bubble {
-        background-color: white;
-        border-radius: 10px 10px 10px 0;
+        background-color: #eeeeee;
+        border-radius: 0px 10px 10px 10px;
         padding: 8px;
         border-width: 1px !important;
         border-style: solid !important;
-        border-color: #cccccc !important;
+        border-color: #eeeeee !important;
+        margin-left: 40px;
+    }
+    .audio-bubble {
+        margin-left: 40px;
     }
     .bubble.image-bubble {
         padding: 0px;
@@ -177,8 +196,22 @@ $chat-text-size: 0.7pt;
         border: 2px solid white;
     }
     .sender {
-        position: relative;
-        left: 40px;
+        font-family: 'Titillium Web', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 10 * $chat-text-size;
+        color: rgba(#000000, 0.6);
+        display: inline-block;
+        margin-left: 40px;
+        margin-right: 8px;
+    }
+    .time {
+        font-family: 'Titillium Web', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 10 * $chat-text-size;
+        color: rgba(#000000, 0.6);
+        display: inline-block;
     }
 }
 
@@ -193,7 +226,7 @@ $chat-text-size: 0.7pt;
 .message {
     font-family: 'Titillium Web', sans-serif;
     font-weight: 400;
-    font-size: 22 * $chat-text-size;
+    font-size: 14 * $chat-text-size;
     color: #000000;
     overflow-wrap: break-word;
     .edit-marker {
@@ -207,8 +240,8 @@ $chat-text-size: 0.7pt;
     font-weight: 300;
     font-style: italic;
     font-size: 15 * $chat-text-size;
-    text-align: center;
     color: #1c242a;
+    display: inline-block;
 }
 
 .statusEvent {
