@@ -1,20 +1,20 @@
 <template>
-  <v-container fluid>
+  <v-container fluid v-if="room">
     <v-row class="chat-header-row">
       <v-col
         class="chat-header-members text-center flex-grow-0 flex-shrink-1 ma-0 pa-0"
       >
-        <v-btn icon class="members-icon" @click.stop="showRoomInfo">
-          <v-icon>people</v-icon>
-        </v-btn>
-        <div class="num-members">{{ memberCount }}</div>
+        <v-avatar>
+          <v-img :src="room.avatar" />
+        </v-avatar>
       </v-col>
 
       <v-col class="flex-grow-1 flex-shrink-1 ma-0 pa-0">
-        <div class="room-name" v-if="room">{{ room.summary.info.title }}</div>
+        <div class="room-name" @click.stop="showRoomInfo">{{ room.summary.info.title }}</div>
+        <div class="num-members">{{ memberCount }}{{ memberCount > 1 ? " members" : " member" }}</div>
       </v-col>
       <v-col class="text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
-        <v-btn class="leave-button">Leave</v-btn>
+        <v-btn text class="leave-button" @click.stop="leaveRoom">Leave</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -46,7 +46,11 @@ export default {
   watch: {
     room: {
       handler(newVal, ignoredOldVal) {
-        this.memberCount = newVal.getJoinedMemberCount();
+        if (newVal) {
+          this.memberCount = newVal.getJoinedMemberCount();
+        } else {
+          this.memberCount = null;
+        }
       },
     },
   },
@@ -68,6 +72,20 @@ export default {
     showRoomInfo() {
       this.$router.push({ name: "RoomInfo" });
     },
+
+    leaveRoom() {
+      //this.$matrix.matrixClient.forget(this.room.roomId, true, undefined)
+      const roomId = this.room.roomId;
+      this.$matrix.matrixClient.leave(roomId, undefined)
+      .then(() => {
+        console.log("Left room");
+        this.$matrix.matrixClient.store.removeRoom(roomId);
+        this.$matrix.setCurrentRoomId(null);
+      })
+      .catch(err => {
+        console.log("Error leaving", err);
+      });
+    }
   },
 };
 </script>
