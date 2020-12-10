@@ -1,5 +1,6 @@
 global.Olm = require("olm");
 import sdk from "matrix-js-sdk";
+//import util from "../plugins/utils";
 
 const LocalStorageCryptoStore = require("matrix-js-sdk/lib/crypto/store/localStorage-crypto-store")
     .LocalStorageCryptoStore;
@@ -59,6 +60,7 @@ export default {
                     var promiseLogin;
 
                     if (user.is_guest) {
+                        //const randomUsername = util.randomUser();
                         promiseLogin = tempMatrixClient
                             .registerGuest({}, undefined)
                             .then((response) => {

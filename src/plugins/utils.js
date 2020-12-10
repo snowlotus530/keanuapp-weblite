@@ -279,6 +279,26 @@ class Util {
             reader.readAsArrayBuffer(file);
         });
     }
+
+    /** Generate a random user name */
+    randomUser() {
+        return this.randomString(
+            12,
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        );
+    }
+
+    // From here: https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+    randomString(length, characters) {
+        var result = "";
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(
+                Math.floor(Math.random() * charactersLength)
+            );
+        }
+        return result;
+    }
 }
 export default new Util();
 
