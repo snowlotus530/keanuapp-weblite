@@ -5,8 +5,13 @@
       class="chat-content flex-grow-1 flex-shrink-1"
       ref="chatContainer"
       style="overflow-x: hidden; overflow-y: auto"
-      v-on:sscroll="onScroll"
+      v-on:scroll="onScroll"
     >
+      <!-- Handle resizes, e.g. when soft keyboard is shown/hidden -->
+      <resize-observer
+        ref="chatContainerResizer"
+        @notify="handleChatContainerResize"
+      />
       <div v-for="event in events" :key="event.getId()">
         <div
           v-if="
@@ -47,12 +52,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Handle resizes, e.g. when soft keyboard is shown/hidden -->
-      <resize-observer
-        ref="chatContainerResizer"
-        @notify="handleChatContainerResize"
-      />
     </div>
 
     <!-- Input area -->
