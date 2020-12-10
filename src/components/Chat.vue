@@ -66,14 +66,14 @@
       <v-row class="input-area-inner align-center">
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
           <label icon flat ref="attachmentLabel">
-            <v-btn icon large color="black" @click="$refs.attachment.click()">
+            <v-btn icon large color="black" @click="showAttachmentPicker">
               <v-icon x-large>add_circle_outline</v-icon>
             </v-btn>
             <input
               ref="attachment"
               type="file"
               name="attachment"
-              @change="pickAttachment($event)"
+              @change="handlePickedAttachment($event)"
               accept="image/*|audio/*|video/*|application/pdf"
               style="display: none"
             />
@@ -141,6 +141,21 @@
         <VEmojiPicker style="width: 100%" @select="emojiSelected" />
       </v-dialog>
     </div>
+
+    <!-- "NOT ALLOWED FOR GUEST ACCOUNTS" dialog -->
+      <v-dialog v-model="showNotAllowedForGuests" class="ma-0 pa-0" width="50%">
+        <v-card>
+          <v-card-title>You are logged in as a guest</v-card-title>
+          <v-card-text>
+            <div>Unfortunately guests are not allowed to upload files.</div>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="showNotAllowedForGuests = false">Ok</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
   </div>
 </template>
 
@@ -232,6 +247,9 @@ export default {
        * If we don't, the keyboard will simply overflow the message we are answering to etc.
        */
       chatContainerSize: 0,
+
+      /** Shows a dialog with info about an operation being disallowed for guests */
+      showNotAllowedForGuests: false,
     };
   },
 
@@ -427,7 +445,7 @@ export default {
       }
     },
     onEvent(event) {
-      console.log("OnEvent", event);
+      console.log("OnEvent", JSON.stringify(event));
       if (event.getRoomId() !== this.roomId) {
         return; // Not for this room
       }
@@ -483,9 +501,22 @@ export default {
     },
 
     /**
-     * Show attachment picker to select image
+     * Show attachment picker to select file
      */
-    pickAttachment(event) {
+    showAttachmentPicker() {
+      // Guests not currently allowed to send attachments (=actually upload them)
+      // See https://matrix.org/docs/spec/client_server/r0.2.0#guest-access
+      if (this.$matrix.currentUser && this.$matrix.currentUser.is_guest) {
+        this.showNotAllowedForGuests = true;
+        return;
+      }
+      this.$refs.attachment.click()
+    },
+
+    /**
+     * Handle picked attachment
+     */
+    handlePickedAttachment(event) {
       if (event.target.files && event.target.files[0]) {
         var reader = new FileReader();
         reader.onload = (e) => {
