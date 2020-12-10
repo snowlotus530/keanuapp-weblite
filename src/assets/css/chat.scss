@@ -36,12 +36,6 @@ $chat-text-size: 0.7pt;
             font-size: 12 * $chat-text-size;
             color: black;
         }
-        .room-name {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            font-size: 21 * $chat-text-size;
-            color: black;
-        }
         .v-btn.leave-button {
             font-family: 'Titillium Web', sans-serif;
             font-weight: 700;
@@ -283,4 +277,11 @@ $chat-text-size: 0.7pt;
     .sent {
         background-color: palegreen;
     }
+}
+
+.room-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 21 * $chat-text-size;
+    color: black;
 }
