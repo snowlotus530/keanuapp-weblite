@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div v-if="room">
     <v-container fluid>
-      <v-row class="chat-header-row">
+      <v-row class="chat-header-row align-center">
 
         <v-col class="text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
           <v-btn icon @click.stop="$router.go(-1)">
@@ -24,10 +24,11 @@
         </v-col> -->
       </v-row>
     </v-container>
-  
-      <h3>Work in progress!</h3>
 
-        <div v-for="member in room.getJoinedMembers()" :key="member.userId">
+    <v-card class="members ma-3">
+      <v-card-title>Members<v-spacer></v-spacer><div>{{ room.getJoinedMemberCount() }}</div></v-card-title>
+      <v-card-text>
+        <div class="member ma-2" v-for="member in room.getJoinedMembers()" :key="member.userId">
                 <v-avatar class="avatar" size="40" color="grey">
         <img
           v-if="memberAvatar(member)"
@@ -37,8 +38,28 @@
           member.name.substring(0, 1).toUpperCase()
         }}</span>
       </v-avatar>
-          {{ member.name }}
+          {{ member.user ? member.user.displayName : member.name }}{{ (member.userId == $matrix.currentUserId) ? " (you)" : "" }}
+          <v-btn color="black" v-if="member.userId == $matrix.currentUserId" text absolute right @click.stop="showEditDialog = true">edit</v-btn>
         </div>
+      </v-card-text>
+    </v-card>
+
+      <!-- EDIT dialog -->
+      <v-dialog v-model="showEditDialog" class="ma-0 pa-0" width="50%">
+        <v-card>
+          <v-card-title>Display name</v-card-title>
+          <v-card-text>
+            <v-text-field v-model="displayName" />
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="showEditDialog = false">Cancel</v-btn>
+            <v-btn color="primary" text @click="$matrix.matrixClient.setDisplayName(displayName);showEditDialog = false">Ok</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
   </div>
 </template>
 
@@ -47,12 +68,17 @@ export default {
   name: "RoomInfo",
   data() {
     return {
-      memberCount: null
+      memberCount: null,
+      showEditDialog: false,
+      user: null,
+      displayName: "",
     }
   },
   mounted() {
     this.$matrix.on("Room.timeline", this.onEvent);
     this.updateMemberCount();
+    this.user = this.$matrix.matrixClient.getUser(this.$matrix.currentUserId);
+    this.displayName = this.user.displayName;
   },
 
   destroyed() {
