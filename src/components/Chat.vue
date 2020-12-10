@@ -63,11 +63,11 @@
           {{ typingMembersString }}
         </div>
       </v-row>
-      <v-row class="input-area-inner">
+      <v-row class="input-area-inner align-center">
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
           <label icon flat ref="attachmentLabel">
-            <v-btn icon @click="$refs.attachment.click()">
-              <v-icon>attachment</v-icon>
+            <v-btn icon large color="black" @click="$refs.attachment.click()">
+              <v-icon x-large>add_circle_outline</v-icon>
             </v-btn>
             <input
               ref="attachment"
@@ -98,8 +98,8 @@
         </v-col>
 
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
-          <v-btn icon @click.stop="sendMessage" :disabled="sendButtonDisabled">
-            <v-icon>send</v-icon>
+          <v-btn fab small elevation="0" color="black" @click.stop="sendMessage" :disabled="sendButtonDisabled">
+            <v-icon color="white">arrow_upward</v-icon>
           </v-btn>
         </v-col>
       </v-row>

@@ -87,7 +87,7 @@ $chat-text-size: 0.7pt;
     }
 
     .input-area-outer {
-        background-color: #e2e2e2;
+        background-color: #ffffff;
         margin: 0;
         padding-left: 2 * $chat-standard-padding-s;
         padding-right: 2 * $chat-standard-padding-s;
@@ -102,7 +102,8 @@ $chat-text-size: 0.7pt;
         }
         .input-area-inner {
             background-color: white;
-            border-radius: $chat-standard-padding-s;
+            border: 1px solid #d4d4d4;
+            border-radius: 32px;
         }
         .input-area-button {
             margin: 0;
