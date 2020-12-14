@@ -44,6 +44,16 @@
       </v-card-text>
     </v-card>
 
+    <v-card class="account ma-3">
+      <v-card-title>Your account</v-card-title>
+      <v-card-text>
+        <div v-if="$matrix.currentUser.is_guest">
+          <div>You don't have a Keanu account, yet ;)</div>
+          <v-btn dark block @click.stop="upgradeAccount">Login</v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
+
       <!-- EDIT dialog -->
       <v-dialog v-model="showEditDialog" class="ma-0 pa-0" width="50%">
         <v-card>
@@ -130,6 +140,16 @@ export default {
       }
       return null;
     },
+
+    upgradeAccount() {
+      this.$matrix.upgradeGuestAccount()
+      .then(() => {
+        console.log("Done");
+      })
+      .catch(err => {
+        console.log("ERROR", err);
+      })
+    }
   },
 };
 </script>

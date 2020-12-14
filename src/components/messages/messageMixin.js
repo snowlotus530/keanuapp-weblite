@@ -27,6 +27,10 @@ export default {
   computed: {
   },
   methods: {
+    showContextMenu() {
+      this.$emit("context-menu", this.event);
+    },
+
     /**
      * Get a display name given an event.
      */

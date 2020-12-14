@@ -6,17 +6,32 @@
       ref="chatContainer"
       style="overflow-x: hidden; overflow-y: auto"
       v-on:scroll="onScroll"
+      @click.prevent="closeContextMenuIfOpen"
     >
+      <div class="message-operations-strut">
+      <message-operations
+        :style="opStyle"
+              v-on:close="showContextMenu = false"
+              v-if="selectedEvent && showContextMenu"
+              v-on:addreaction="addReaction"
+              v-on:edit="edit(selectedEvent)"
+              :event="selectedEvent"
+              :incoming="selectedEvent.getSender() != $matrix.currentUserId"
+            />
+    </div>
+
       <!-- Handle resizes, e.g. when soft keyboard is shown/hidden -->
       <resize-observer
         ref="chatContainerResizer"
         @notify="handleChatContainerResize"
       />
+
       <div v-for="event in events" :key="event.getId()">
         <div
           v-if="
             !event.isRelation() && !event.isRedacted() && !event.isRedaction()
           "
+          :ref="event.getId()"
         >
           <div
             style="position: relative; user-select: none"
@@ -41,14 +56,15 @@
                 )
               "
               v-on:send-quick-reaction="sendQuickReaction"
+              v-on:context-menu="showContextMenuForEvent($event)"
             />
-            <message-operations
+            <!-- <message-operations
               v-on:close="showContextMenu = false"
               v-if="selectedEvent == event && showContextMenu"
               v-on:addreaction="addReaction"
               :event="event"
               :incoming="event.getSender() != $matrix.currentUserId"
-            />
+            /> -->
           </div>
         </div>
       </div>
@@ -239,6 +255,7 @@ export default {
       currentSendError: null,
       showEmojiPicker: false,
       selectedEvent: null,
+      editedEvent: null,
       showContextMenu: false,
       /**
        * Current chat container size. We need to keep track of this so that if and when
@@ -287,7 +304,18 @@ export default {
       } else {
         return "";
       }
+    },
+    opStyle() {
+      // Calculate where to show the context menu.
+      //
+      const ref = this.selectedEvent && this.$refs[this.selectedEvent.getId()];
+      if (ref && ref[0]) {
+        const offset = ref[0].offsetTop - this.scrollPosition.node.offsetTop;
+        return "top:" + offset + "px";
+      }
+      return "top:0px";
     }
+
   },
 
   watch: {
@@ -459,7 +487,7 @@ export default {
       ) {
         scrollToSeeNew = true;
       }
-      if (event.forwardLooking) {
+      if (event.forwardLooking && !event.isRelation()) {
         this.handleScrolledToBottom(scrollToSeeNew);
       }
     },
@@ -483,6 +511,13 @@ export default {
 
     sendMessage() {
       if (this.currentInput.length > 0) {
+        // Is this an edit?
+        if (this.editedEvent) {
+          console.log("Edit");
+        }
+        
+        this.editedEvent = null; //TODO - Is this a good place to reset this?
+
         util
           .sendTextMessage(
             this.$matrix.matrixClient,
@@ -640,6 +675,11 @@ export default {
       this.showEmojiPicker = true;
     },
 
+    edit(event) {
+      this.editedEvent = event;
+      this.currentInput = event.getContent().body;
+    },
+
     emojiSelected(e) {
       this.showEmojiPicker = false;
       if (this.selectedEvent) {
@@ -664,6 +704,22 @@ export default {
           console.log("Failed to send quick reaction:", err);
         });
     },
+
+    showContextMenuForEvent(event) {
+      const ref = this.$refs[event.getId()];
+      if (ref) {
+        console.log("Got the ref", ref);
+      }
+      this.selectedEvent = event;
+      this.showContextMenu = true;
+    },
+
+    closeContextMenuIfOpen(e) {
+      if (this.showContextMenu) {
+        this.showContextMenu = false;
+        e.preventDefault();
+      }
+    }
   },
 };
 </script>

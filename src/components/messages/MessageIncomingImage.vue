@@ -1,19 +1,19 @@
 <template>
   <div class="messageIn">
-      <div class="bubble image-bubble">
-        <v-img :aspect-ratio="16 / 9" ref="image" :src="src" cover />
-        <QuickReactions :event="event" :reactions="reactions" />
-      </div>
-      <v-avatar class="avatar" size="40" color="grey">
-        <img
-          v-if="messageEventAvatar(event)"
-          :src="messageEventAvatar(event)"
-        />
-        <span v-else class="white--text headline">{{
-          messageEventDisplayName(event).substring(0, 1).toUpperCase()
-        }}</span>
-      </v-avatar>
-      <div class="sender">{{ messageEventDisplayName(event) }}</div>
+    <div class="bubble image-bubble">
+      <v-img :aspect-ratio="16 / 9" ref="image" :src="src" cover />
+      <QuickReactions :event="event" :reactions="reactions" />
+    </div>
+    <v-btn icon class="op-button" @click.stop="showContextMenu"
+      ><v-icon>more_vert</v-icon></v-btn
+    >
+    <v-avatar class="avatar" size="32" color="#ededed">
+      <img v-if="messageEventAvatar(event)" :src="messageEventAvatar(event)" />
+      <span v-else class="white--text headline">{{
+        messageEventDisplayName(event).substring(0, 1).toUpperCase()
+      }}</span>
+    </v-avatar>
+    <div class="sender">{{ messageEventDisplayName(event) }}</div>
     <div class="time">
       {{ formatTime(event.event.origin_server_ts) }}
     </div>
