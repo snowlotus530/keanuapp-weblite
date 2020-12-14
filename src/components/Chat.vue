@@ -511,18 +511,12 @@ export default {
 
     sendMessage() {
       if (this.currentInput.length > 0) {
-        // Is this an edit?
-        if (this.editedEvent) {
-          console.log("Edit");
-        }
-        
-        this.editedEvent = null; //TODO - Is this a good place to reset this?
-
         util
           .sendTextMessage(
             this.$matrix.matrixClient,
             this.roomId,
-            this.currentInput
+            this.currentInput,
+            this.editedEvent
           )
           .then(() => {
             console.log("Sent message");
@@ -531,6 +525,7 @@ export default {
             console.log("Failed to send:", err);
           });
         this.currentInput = "";
+        this.editedEvent = null; //TODO - Is this a good place to reset this?
       }
     },
 
@@ -678,6 +673,7 @@ export default {
     edit(event) {
       this.editedEvent = event;
       this.currentInput = event.getContent().body;
+      this.$refs.messageInput.focus();
     },
 
     emojiSelected(e) {

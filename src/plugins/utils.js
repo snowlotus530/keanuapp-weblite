@@ -113,8 +113,19 @@ class Util {
         });
     }
 
-    sendTextMessage(matrixClient, roomId, text) {
-        return this.sendMessage(matrixClient, roomId, "m.room.message", ContentHelpers.makeTextMessage(text));
+    sendTextMessage(matrixClient, roomId, text, editedEvent) {
+        var content = ContentHelpers.makeTextMessage(text);
+        if (editedEvent) {
+            content['m.relates_to'] = {
+                rel_type: 'm.replace',
+                event_id: editedEvent.getId()
+            }
+            content['m.new_content'] = {
+                body: content.body,
+                msgtype: content.msgtype
+            }
+        }
+        return this.sendMessage(matrixClient, roomId, "m.room.message", content);
     }
 
     sendQuickReaction(matrixClient, roomId, emoji, event) {
