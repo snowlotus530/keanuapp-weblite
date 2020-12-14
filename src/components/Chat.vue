@@ -81,7 +81,7 @@
       <v-row class="input-area-inner align-center">
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
           <label icon flat ref="attachmentLabel">
-            <v-btn icon large color="black" @click="showAttachmentPicker">
+            <v-btn icon large color="black" @click="showAttachmentPicker" :disabled="attachButtonDisabled">
               <v-icon x-large>add_circle_outline</v-icon>
             </v-btn>
             <input
@@ -112,9 +112,14 @@
           />
         </v-col>
 
+        <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1" v-if="editedEvent">
+          <v-btn fab small elevation="0" color="black" @click.stop="cancelEdit">
+            <v-icon color="white">cancel</v-icon>
+          </v-btn>
+        </v-col>
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
           <v-btn fab small elevation="0" color="black" @click.stop="sendMessage" :disabled="sendButtonDisabled">
-            <v-icon color="white">arrow_upward</v-icon>
+            <v-icon color="white">{{ editedEvent ? 'save' : 'arrow_upward' }}</v-icon>
           </v-btn>
         </v-col>
       </v-row>
@@ -291,6 +296,9 @@ export default {
         return null;
       }
       return this.room.roomId;
+    },
+    attachButtonDisabled() {
+      return this.editedEvent || this.currentInput.length > 0;
     },
     sendButtonDisabled() {
       return this.currentInput.length == 0;
@@ -674,6 +682,11 @@ export default {
       this.editedEvent = event;
       this.currentInput = event.getContent().body;
       this.$refs.messageInput.focus();
+    },
+
+    cancelEdit() {
+      this.currentInput = "";
+      this.editedEvent = null;
     },
 
     emojiSelected(e) {
