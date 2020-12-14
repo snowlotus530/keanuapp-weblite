@@ -76,6 +76,7 @@ class Util {
 
             if (url == null) {
                 reject("No url found!");
+                return;
             }
             axios.get(url, { responseType: 'arraybuffer' })
                 .then(response => {
@@ -285,6 +286,16 @@ class Util {
         return this.randomString(
             12,
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        );
+    }
+
+    /**
+     * Generate random 12 char password
+     */
+    randomPass() {
+        return this.randomString(
+            12,
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#_-*+"
         );
     }
 
