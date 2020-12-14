@@ -1,6 +1,6 @@
 global.Olm = require("olm");
 import sdk from "matrix-js-sdk";
-//import util from "../plugins/utils";
+import util from "../plugins/utils";
 
 const LocalStorageCryptoStore = require("matrix-js-sdk/lib/crypto/store/localStorage-crypto-store")
     .LocalStorageCryptoStore;
@@ -60,7 +60,6 @@ export default {
                     var promiseLogin;
 
                     if (user.is_guest) {
-                        //const randomUsername = util.randomUser();
                         promiseLogin = tempMatrixClient
                             .registerGuest({}, undefined)
                             .then((response) => {
@@ -95,6 +94,29 @@ export default {
                     this.$store.commit("setCurrentRoomId", null);
                 },
 
+                /**
+                 * Upgrade a guest account into a "normal" account. For now, use random user and pass...
+                 */
+                upgradeGuestAccount() {
+                    if (!this.matrixClient || !this.currentUser || !this.currentUser.is_guest) {
+                        return Promise.reject("Invalid params");
+                    }
+                    const randomUsername = util.randomUser();
+                    const randomPassword = util.randomPass();
+                    const data = {
+                        username:randomUsername,
+                        password:randomPassword,
+                        guest_access_token:this.currentUser.access_token
+                    };
+                    return this.matrixClient.registerRequest(data, undefined, undefined)
+                        .then((response) => {
+                            console.log("Response", response);
+                            response.is_guest = false;
+                            localStorage.setItem('user', JSON.stringify(response));
+                            return response;
+                        });
+                },
+
                 initClient() {
                     this.reloadRooms();
                     this.matrixClientReady = true;
@@ -102,12 +124,15 @@ export default {
                 },
 
                 async getMatrixClient(user) {
+                    if (user === undefined) {
+                        user = this.$store.state.auth.user;
+                    }
                     if (this.matrixClientReady) {
-                        return new Promise((resolve,ignoredreject) => {
+                        return new Promise((resolve, ignoredreject) => {
                             resolve(user);
                         })
                     } else if (this.matrixClient) {
-                        return new Promise((resolve,ignoredreject) => {
+                        return new Promise((resolve, ignoredreject) => {
                             this.matrixClient.once('Matrix.initialized', (ignoredclient) => {
                                 resolve(user);
                             });
@@ -234,7 +259,12 @@ export default {
                 },
 
                 getRoom(roomId) {
-                    var room = this.rooms.find(room => room.roomId == roomId);
+                    var room = this.rooms.find(room => {
+                        if (roomId.startsWith("#")) {
+                            return room.getCanonicalAlias() == roomId;
+                        }
+                        return room.roomId == roomId;
+                    });
                     if (!room && this.matrixClient) {
                         room = this.matrixClient.getRoom(roomId);
                     }

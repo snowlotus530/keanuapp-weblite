@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex justify-center login-root">
-    <div color="rgba(255,255,255,0.1)">
+    <div v-if="!waiting">
       <h4>Join room</h4>
       <div>You have been invited to the room {{ roomId }}</div>
 
@@ -24,10 +24,31 @@ export default {
       guestUser: new User("https://neo.keanu.im", "", "", true),
       loading: false,
       loadingMessage: null,
+      waiting: false
     };
   },
   mounted() {
     this.roomId = this.$route.hash;
+    if (this.currentUser) {
+        this.waiting = true;
+        const self = this;
+        this.$matrix.getMatrixClient(this.currentUser)
+        .then(() => {
+          // Already joined?
+          const room = self.$matrix.getRoom(self.roomId);
+          if (room && room.hasMembershipState(self.currentUser.user_id, "join")) {
+            // Yes, go to room
+            self.$matrix.setCurrentRoom(room);
+            self.$router.replace({ name: "Chat" });
+            return;
+          }
+
+          this.waiting = false;
+        })
+        .catch(ignoredErr => {
+          this.waiting = false;
+        });
+    }
   },
   computed: {
     currentUser() {
