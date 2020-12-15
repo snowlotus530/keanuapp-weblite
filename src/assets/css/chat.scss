@@ -126,7 +126,7 @@ $chat-text-size: 0.7pt;
         right:-30px;
         top:0;
         .v-icon {
-            color: #cccccc;
+            color: #eeeeee;
             &:hover {
                 color: #888888;
             }
@@ -314,11 +314,19 @@ $chat-text-size: 0.7pt;
 }
 
 .quick-reaction-container {
+    position: absolute;
+    top: -18px;
+    right: 10px;
+    background-color: #000000;
+    border: 3px solid white;
+    border-radius: 15px;
+    height: 30px;
     .quick-reaction {
-        border: 1px solid #e2e2e2;
-        border-radius: 9px;
+        // border: 1px solid #e2e2e2;
+        // border-radius: 9px;
         margin: 0px 2px;
         padding: 2px;
+        font-size: 10px;
         &:hover {
             border: 1px solid #888888;
             background-color: #e2e2e2;
@@ -328,8 +336,10 @@ $chat-text-size: 0.7pt;
             font-size: 0.7rem;
         }
     }
-    .sent {
-        background-color: palegreen;
+    .sent .quick-reaction-count {
+        color: white;
+        font-weight: 700;
+        // background-color: palegreen;
     }
 }
 
