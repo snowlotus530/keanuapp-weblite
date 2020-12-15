@@ -42,7 +42,7 @@ export default {
     {
       // Can we find the original message?
       const originalEventId = relatesTo['m.in_reply_to'].event_id;
-      if (originalEventId) {
+      if (originalEventId && this.timelineSet) {
         const originalEvent = this.timelineSet.findEventById(originalEventId);
         this.inReplyToEvent = originalEvent;
         this.inReplyToSender = this.messageEventDisplayName(originalEvent);

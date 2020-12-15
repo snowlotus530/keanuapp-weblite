@@ -1,5 +1,5 @@
 <template>
-  <div class="quick-reaction-container">
+  <div class="quick-reaction-container" v-show="reactions">
     <span :class="{'quick-reaction':true,'sent':value.includes($matrix.currentUserId)}" v-for="(value, name) in reactionMap" :key="name" @mousedown="onClickEmoji(name)">
       {{ name }} <span class="quick-reaction-count">{{ value.length }}</span>
     </span>
