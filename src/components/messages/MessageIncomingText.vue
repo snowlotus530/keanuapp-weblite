@@ -8,13 +8,18 @@
     </v-avatar>
 
     <div class="bubble">
+      <div class="original-message" v-if="inReplyToText">
+        <div class="original-message-sender">{{ inReplyToSender || 'Someone' }} said:</div>
+        <div class="original-message-text">{{ inReplyToText }}</div>
+      </div>
       <div class="message">
-        {{ event.getContent().body }}
+        {{ messageText }}
         <span class="edit-marker" v-if="event.replacingEventId()"
           >(edited)</span
         >
       </div>
       <QuickReactions :event="event" :reactions="reactions" />
+      <!-- <div>{{ JSON.stringify(event) }}</div> -->
     </div>
     <v-btn icon class="op-button" @click.stop="showContextMenu"
       ><v-icon>more_vert</v-icon></v-btn

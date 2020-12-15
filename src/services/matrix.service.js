@@ -24,6 +24,7 @@ export default {
                     matrixClient: null,
                     matrixClientReady: false,
                     rooms: [],
+                    currentRoom: null,
                 }
             },
             mounted() {
@@ -47,11 +48,15 @@ export default {
                 currentRoomId() {
                     return this.$store.state.currentRoomId;
                 },
+            },
 
-                currentRoom() {
-                    return this.getRoom(this.currentRoomId);
-                },
-
+            watch: {
+                currentRoomId: {
+                    immediate: true,
+                    handler(roomId) {
+                        this.currentRoom = this.getRoom(roomId);
+                    }
+                }
             },
 
             methods: {
@@ -120,6 +125,8 @@ export default {
                 initClient() {
                     this.reloadRooms();
                     this.matrixClientReady = true;
+                    this.currentRoom = null;
+                    this.currentRoom = this.getRoom(this.currentRoomId);
                     this.matrixClient.emit('Matrix.initialized', this.matrixClient);
                 },
 
@@ -259,6 +266,9 @@ export default {
                 },
 
                 getRoom(roomId) {
+                    if (!roomId) {
+                        return null;
+                    }
                     var room = this.rooms.find(room => {
                         if (roomId.startsWith("#")) {
                             return room.getCanonicalAlias() == roomId;
