@@ -113,7 +113,7 @@ class Util {
         });
     }
 
-    sendTextMessage(matrixClient, roomId, text, editedEvent) {
+    sendTextMessage(matrixClient, roomId, text, editedEvent, replyToEvent) {
         var content = ContentHelpers.makeTextMessage(text);
         if (editedEvent) {
             content['m.relates_to'] = {
@@ -124,6 +124,18 @@ class Util {
                 body: content.body,
                 msgtype: content.msgtype
             }
+        } else if (replyToEvent) {
+            content['m.relates_to'] = {
+                'm.in_reply_to': {
+                    event_id: replyToEvent.getId()
+                }
+            }
+
+            // Prefix the content with reply info (seems to be a legacy thing)
+            const prefix = replyToEvent.getContent().body.split('\n').map((item,index) => {
+                return "> " + (index == 0 ? ("<" + replyToEvent.getSender() + "> ") : "") + item;
+            }).join('\n');
+            content.body = prefix + "\n\n" + content.body;
         }
         return this.sendMessage(matrixClient, roomId, "m.room.message", content);
     }

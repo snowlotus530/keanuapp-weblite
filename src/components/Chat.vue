@@ -14,6 +14,7 @@
               v-on:close="showContextMenu = false"
               v-if="selectedEvent && showContextMenu"
               v-on:addreaction="addReaction"
+              v-on:addreply="addReply(selectedEvent)"
               v-on:edit="edit(selectedEvent)"
               :event="selectedEvent"
               :incoming="selectedEvent.getSender() != $matrix.currentUserId"
@@ -55,16 +56,10 @@
                   'm.reaction'
                 )
               "
+              :timelineSet="timelineWindow._timelineSet"
               v-on:send-quick-reaction="sendQuickReaction"
               v-on:context-menu="showContextMenuForEvent($event)"
             />
-            <!-- <message-operations
-              v-on:close="showContextMenu = false"
-              v-if="selectedEvent == event && showContextMenu"
-              v-on:addreaction="addReaction"
-              :event="event"
-              :incoming="event.getSender() != $matrix.currentUserId"
-            /> -->
           </div>
         </div>
       </div>
@@ -73,6 +68,8 @@
     <!-- Input area -->
     <v-container v-if="room" fluid class="input-area-outer">
       <v-row class="ma-0 pa-0">
+        <div v-if="replyToEvent">REPLYING TO EVENT: {{ replyToEvent.getContent().body }}</div>
+
         <!-- CONTACT IS TYPING -->
         <div class="typing">
           {{ typingMembersString }}
@@ -112,8 +109,8 @@
           />
         </v-col>
 
-        <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1" v-if="editedEvent">
-          <v-btn fab small elevation="0" color="black" @click.stop="cancelEdit">
+        <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1" v-if="editedEvent || replyToEvent">
+          <v-btn fab small elevation="0" color="black" @click.stop="cancelEditReply">
             <v-icon color="white">cancel</v-icon>
           </v-btn>
         </v-col>
@@ -261,6 +258,7 @@ export default {
       showEmojiPicker: false,
       selectedEvent: null,
       editedEvent: null,
+      replyToEvent: null,
       showContextMenu: false,
       /**
        * Current chat container size. We need to keep track of this so that if and when
@@ -298,7 +296,7 @@ export default {
       return this.room.roomId;
     },
     attachButtonDisabled() {
-      return this.editedEvent || this.currentInput.length > 0;
+      return this.editedEvent != null || this.replyToEvent != null || this.currentInput.length > 0;
     },
     sendButtonDisabled() {
       return this.currentInput.length == 0;
@@ -328,6 +326,7 @@ export default {
 
   watch: {
     room: {
+      immediate: true,
       handler(room, ignoredOldVal) {
         console.log("Chat: Current room changed");
 
@@ -351,8 +350,7 @@ export default {
             this.paginateBackIfNeeded();
           });
         });
-      },
-      immediate: true,
+      }
     },
   },
 
@@ -524,7 +522,8 @@ export default {
             this.$matrix.matrixClient,
             this.roomId,
             this.currentInput,
-            this.editedEvent
+            this.editedEvent,
+            this.replyToEvent
           )
           .then(() => {
             console.log("Sent message");
@@ -534,6 +533,7 @@ export default {
           });
         this.currentInput = "";
         this.editedEvent = null; //TODO - Is this a good place to reset this?
+        this.replyToEvent = null;
       }
     },
 
@@ -678,15 +678,21 @@ export default {
       this.showEmojiPicker = true;
     },
 
+    addReply(event) {
+      this.replyToEvent = event;
+      this.$refs.messageInput.focus();
+    },
+
     edit(event) {
       this.editedEvent = event;
       this.currentInput = event.getContent().body;
       this.$refs.messageInput.focus();
     },
 
-    cancelEdit() {
+    cancelEditReply() {
       this.currentInput = "";
       this.editedEvent = null;
+      this.replyToEvent = null;
     },
 
     emojiSelected(e) {
