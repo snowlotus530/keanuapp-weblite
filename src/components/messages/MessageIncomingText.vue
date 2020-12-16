@@ -24,9 +24,11 @@
     <v-btn icon class="op-button" @click.stop="showContextMenu"
       ><v-icon>more_vert</v-icon></v-btn
     >
-    <div class="sender">{{ messageEventDisplayName(event) }}</div>
-    <div class="time">
-      {{ formatTime(event.event.origin_server_ts) }}
+    <div v-if="showSenderAndTime">
+      <div class="sender">{{ messageEventDisplayName(event) }}</div>
+      <div class="time">
+        {{ formatTime(event.event.origin_server_ts) }}
+      </div>
     </div>
   </div>
 </template>

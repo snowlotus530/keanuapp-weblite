@@ -17,6 +17,12 @@ export default {
         return {}
       }
     },
+    nextEvent: {
+      type: Object,
+      default: function () {
+        return null
+      }
+    },
     reactions: {
       type: Object,
       default: function () {
@@ -50,6 +56,18 @@ export default {
     }
   },
   computed: {
+    /**
+     * Don't show sender and time if the next event is within 2 minutes and also from us (= back to back messages)
+     */
+    showSenderAndTime() {
+      if (this.nextEvent && this.nextEvent.getSender() == this.event.getSender()) {
+        const ts1 = this.nextEvent.event.origin_server_ts;
+        const ts2 = this.event.event.origin_server_ts;
+        return (ts1 - ts2) < (2 * 60 * 1000); // less than 2 minutes
+      }
+      return true;
+    },
+
     inReplyToText() {
       const relatesTo = this.event.getWireContent()['m.relates_to'];
       if (relatesTo && relatesTo['m.in_reply_to'])
