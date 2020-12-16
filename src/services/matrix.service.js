@@ -296,6 +296,44 @@ export default {
                 uploadFile(file, opts) {
                     return this.matrixClient.uploadContent(file, opts);
                 },
+
+                getPublicRoomInfo(roomId) {
+                    if (!roomId) {
+                        return Promise.reject("Invalid parameters");
+                    }
+
+                    const parts = roomId.split(':');
+                    if (parts.length != 2) {
+                        return Promise.reject("Unknown room server");
+                    }
+
+                    const server = parts[1];
+                    const tempMatrixClient = sdk.createClient("https://" + server);
+
+                    const findOrGetMore = function _findOrGetMore(response) {
+                        for (var room of response.chunk) {
+                            if ((roomId.startsWith("#") && room.canonical_alias == roomId) || (roomId.startsWith("!") && room.room_id == roomId)){
+                                room.avatar = tempMatrixClient.mxcUrlToHttp(room.avatar_url, 80, 80, 'scale', true);
+                                return Promise.resolve(room);
+                            }
+                        }
+                        if (response.next_batch) {
+                            return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", {limit:1000, next_batch:response.next_batch})
+                            //return tempMatrixClient.publicRooms({limit:1,next_batch:response.next_batch})
+                            .then(response => {
+                                return _findOrGetMore(response);
+                            }) 
+                        } else {
+                            return Promise.reject("No more data");
+                        }
+                    };
+
+                    return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", {limit:1000})
+                    //return tempMatrixClient.publicRooms({limit:1})
+                    .then(response => {
+                        return findOrGetMore(response);
+                    });
+                }
             }
         })
 
