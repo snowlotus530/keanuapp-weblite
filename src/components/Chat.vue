@@ -27,7 +27,7 @@
         @notify="handleChatContainerResize"
       />
 
-      <div v-for="event in events" :key="event.getId()">
+      <div v-for="(event,index) in events" :key="event.getId()">
         <div
           v-if="
             !event.isRelation() && !event.isRedacted() && !event.isRedaction()
@@ -49,6 +49,7 @@
               :is="componentForEvent(event)"
               :room="room"
               :event="event"
+              :nextEvent="events[index + 1]"
               :reactions="
                 timelineWindow._timelineSet.getRelationsForEvent(
                   event.getId(),

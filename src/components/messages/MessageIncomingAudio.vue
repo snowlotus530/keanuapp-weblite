@@ -13,9 +13,11 @@
         messageEventDisplayName(event).substring(0, 1).toUpperCase()
       }}</span>
     </v-avatar>
-    <div class="sender">{{ messageEventDisplayName(event) }}</div>
-    <div class="time">
-      {{ formatTime(event.event.origin_server_ts) }}
+    <div v-if="showSenderAndTime">
+      <div class="sender">{{ messageEventDisplayName(event) }}</div>
+      <div class="time">
+        {{ formatTime(event.event.origin_server_ts) }}
+      </div>
     </div>
   </div>
 </template>
