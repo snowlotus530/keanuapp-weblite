@@ -1,6 +1,10 @@
 <template>
-  <div class="d-flex justify-center login-root">
-    <div color="rgba(255,255,255,0.1)">
+  <div class="login-root">
+    <v-btn v-if="showBackArrow" icon @click.stop="$navigation.pop">
+      <v-icon>arrow_back</v-icon>
+    </v-btn>
+
+    <div color="rgba(255,255,255,0.1)" class="text-center">
       <h4>Login</h4>
       <v-form v-model="isValid">
         <v-text-field
@@ -65,10 +69,13 @@ export default {
     currentUser() {
       return this.$store.state.auth.user;
     },
+    showBackArrow() {
+      return this.$navigation.canPop();
+    }
   },
   created() {
     if (this.loggedIn) {
-      this.$router.replace({name: "Chat"});
+      this.$navigation.push({name: "Chat"}, true);
     }
   },
   watch: {
@@ -103,12 +110,12 @@ export default {
   },
   methods: {
     handleLogin() {
+      this.$navigation.push({name: "Chat"}, true);
       if (this.user.username && this.user.password) {
         this.loading = true;
-        const self = this;
         this.$store.dispatch("auth/login", this.user).then(
           () => {
-            self.$router.replace({ name: "Chat" });
+            this.$navigation.push({name: "Chat"}, true);
           },
           (error) => {
             this.loading = false;

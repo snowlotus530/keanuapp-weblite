@@ -1,6 +1,6 @@
 <template>
   <div class="join-root">
-    <div v-if="!waiting" class="text-center">
+    <div v-if="!waitingForInfo && !waitingForMembership" class="text-center">
       <v-btn
         class="btn-login"
         text
@@ -62,34 +62,34 @@ export default {
       guestUser: new User("https://neo.keanu.im", "", "", true),
       loading: false,
       loadingMessage: null,
-      waiting: true,
+      waitingForInfo: true,
+      waitingForMembership: false,
     };
   },
   mounted() {
     this.roomId = this.$route.hash;
     this.roomName = this.roomId;
     if (this.currentUser) {
-      this.waiting = true;
+      this.waitingForMembership = true;
       const self = this;
       this.$matrix
         .getMatrixClient(this.currentUser)
         .then(() => {
-          // Already joined?
           const room = self.$matrix.getRoom(self.roomId);
-          if (
-            room &&
-            room.hasMembershipState(self.currentUser.user_id, "join")
-          ) {
-            // Yes, go to room
-            self.$matrix.setCurrentRoom(room);
-            self.$router.replace({ name: "Chat" });
-            return;
-          }
+          if (room) {
+            self.$matrix.setCurrentRoom(room); // Go to this room, now or when joined.
 
-          this.waiting = false;
+            // Already joined?
+            if (room.hasMembershipState(self.currentUser.user_id, "join")) {
+              // Yes, go to room
+              self.$navigation.push({ name: "Chat" }, true);
+              return;
+            }
+          }
+          this.waitingForMembership = false;
         })
         .catch((ignoredErr) => {
-          this.waiting = false;
+          this.waitingForMembership = false;
         });
     }
 
@@ -99,11 +99,11 @@ export default {
         console.log("Found room:", room);
         this.roomName = room.name;
         this.roomAvatar = room.avatar;
-        this.waiting = false;
+        this.waitingForInfo = false;
       })
       .catch((err) => {
         console.log("Could not find room info", err);
-        this.waiting = false;
+        this.waitingForInfo = false;
       });
   },
   computed: {
@@ -113,7 +113,7 @@ export default {
   },
   methods: {
     handleLogin() {
-      this.$router.push("/login"); // TODO - replace?
+      this.$navigation.push({ name: "Login" }, false);
     },
 
     handleOpenApp() {
@@ -138,7 +138,7 @@ export default {
           this.$matrix.setCurrentRoom(room);
           this.loading = false;
           this.loadingMessage = null;
-          this.$router.replace({ name: "Chat" });
+          this.$navigation.push({ name: "Chat" }, true);
         })
         .catch((err) => {
           // TODO - handle error
