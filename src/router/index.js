@@ -19,7 +19,9 @@ const routes = [
   },
   {
     path: '/login',
-    component: Login
+    name: 'Login',
+    component: Login,
+    props: true
   },
   {
     path: '/join/',

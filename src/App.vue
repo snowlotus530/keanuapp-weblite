@@ -69,7 +69,7 @@ export default {
     },
     logOut() {
       this.$store.dispatch("auth/logout");
-      this.$router.replace("/login");
+      this.$navigation.push("/login", true);
     },
   },
   computed: {
