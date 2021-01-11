@@ -69,7 +69,7 @@ export default {
     },
     logOut() {
       this.$store.dispatch("auth/logout");
-      this.$navigation.push("/login", true);
+      this.$navigation.push("/login", -1);
     },
   },
   computed: {

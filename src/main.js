@@ -30,12 +30,12 @@ Vue.use((Vue) => {
   };
 });
 
+Vue.use(navigation, router);
+
 new Vue({
   vuetify,
   router,
   store,
   matrix,
   render: h => h(App)
-}).$mount('#app')
-
-Vue.use(navigation, router);
+}).$mount('#app');

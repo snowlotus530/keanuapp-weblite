@@ -7,6 +7,7 @@
         small
         @click.stop="handleLogin"
         :loading="loading"
+        v-if="!currentUser"
         >Login</v-btn
       >
 
@@ -37,7 +38,17 @@
         block
         @click.stop="handleJoin"
         :loading="loading"
+        v-if="!currentUser"
         >Join as guest</v-btn
+      >
+      <v-btn
+        class="btn-dark"
+        large
+        block
+        @click.stop="handleJoin"
+        :loading="loading"
+        v-else
+        >Join room</v-btn
       >
 
       <div class="join-privacy">
@@ -75,16 +86,14 @@ export default {
       this.$matrix
         .getMatrixClient(this.currentUser)
         .then(() => {
-          const room = self.$matrix.getRoom(self.roomId);
-          if (room) {
-            self.$matrix.setCurrentRoom(room); // Go to this room, now or when joined.
+            self.$matrix.setCurrentRoomId(self.roomId); // Go to this room, now or when joined.
 
             // Already joined?
-            if (room.hasMembershipState(self.currentUser.user_id, "join")) {
+            const room = self.$matrix.getRoom(self.roomId);
+            if (room && room.hasMembershipState(self.currentUser.user_id, "join")) {
               // Yes, go to room
-              self.$navigation.push({ name: "Chat" }, true);
+              self.$navigation.push({ name: "Chat" }, -1);
               return;
-            }
           }
           this.waitingForMembership = false;
         })
@@ -113,7 +122,7 @@ export default {
   },
   methods: {
     handleLogin() {
-      this.$navigation.push({ name: "Login" }, false);
+      this.$navigation.push({ name: "Login" }, 1);
     },
 
     handleOpenApp() {
@@ -135,10 +144,12 @@ export default {
           return this.$matrix.matrixClient.joinRoom(this.roomId);
         })
         .then((room) => {
-          this.$matrix.setCurrentRoom(room);
+          this.$matrix.setCurrentRoomId(room.roomId);
           this.loading = false;
           this.loadingMessage = null;
-          this.$navigation.push({ name: "Chat" }, true);
+          this.$nextTick(() => {
+            this.$navigation.push({ name: "Chat" }, -1);
+          });
         })
         .catch((err) => {
           // TODO - handle error

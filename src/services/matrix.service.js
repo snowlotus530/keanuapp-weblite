@@ -125,7 +125,6 @@ export default {
                 initClient() {
                     this.reloadRooms();
                     this.matrixClientReady = true;
-                    this.currentRoom = null;
                     this.currentRoom = this.getRoom(this.currentRoomId);
                     this.matrixClient.emit('Matrix.initialized', this.matrixClient);
                 },
@@ -250,15 +249,10 @@ export default {
                     this.rooms.forEach(room => {
                         Vue.set(room, "avatar", room.getAvatarUrl(this.matrixClient.getHomeserverUrl(), 80, 80, "scale", true));
                     });
-                },
-
-                setCurrentRoom(room) {
-                    // If we don't know about this room yet (e.g. we just joined)
-                    // add it to our list.
-                    if (!this.getRoom(room.roomId)) {
-                        this.rooms.push(room);
+                    if (this.currentRoom == null && this.currentRoomId) {
+                        // Try to set it!
+                        this.currentRoom = this.getRoom(this.currentRoomId);
                     }
-                    this.setCurrentRoomId(room.roomId);
                 },
 
                 setCurrentRoomId(roomId) {
@@ -278,7 +272,7 @@ export default {
                     if (!room && this.matrixClient) {
                         room = this.matrixClient.getRoom(roomId);
                     }
-                    return room;
+                    return room || null;
                 },
 
                 on(event, handler) {

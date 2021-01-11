@@ -66,7 +66,11 @@ export default {
     },
 
     updateMemberCount() {
-      this.memberCount = this.room.getJoinedMemberCount();
+      if (!this.room) {
+        this.memberCount = 0;
+      } else {
+        this.memberCount = this.room.getJoinedMemberCount();
+      }
     },
 
     showRoomInfo() {
