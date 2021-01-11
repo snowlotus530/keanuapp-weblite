@@ -8,8 +8,11 @@
     </v-avatar>
 
     <div class="bubble">
+      <QuickReactions :event="event" :reactions="reactions" />
       <div class="original-message" v-if="inReplyToText">
-        <div class="original-message-sender">{{ inReplyToSender || 'Someone' }} said:</div>
+        <div class="original-message-sender">
+          {{ inReplyToSender || "Someone" }} said:
+        </div>
         <div class="original-message-text">{{ inReplyToText }}</div>
       </div>
       <div class="message">
@@ -18,13 +21,14 @@
           >(edited)</span
         >
       </div>
-      <QuickReactions :event="event" :reactions="reactions" />
       <!-- <div>{{ JSON.stringify(event) }}</div> -->
     </div>
-    <v-btn icon class="op-button" @click.stop="showContextMenu"
-      ><v-icon>more_vert</v-icon></v-btn
-    >
-    <div v-if="showSenderAndTime">
+    <div class="op-button" ref="opbutton">
+      <v-btn icon @click.stop="showContextMenu($refs.opbutton)"
+        ><v-icon>more_vert</v-icon></v-btn
+      >
+    </div>
+    <div v-if="showSenderAndTime" class="senderAndTime">
       <div class="sender">{{ messageEventDisplayName(event) }}</div>
       <div class="time">
         {{ formatTime(event.event.origin_server_ts) }}

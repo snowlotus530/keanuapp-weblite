@@ -114,8 +114,8 @@ export default {
     }
   },
   methods: {
-    showContextMenu() {
-      this.$emit("context-menu", this.event);
+    showContextMenu(buttonRef) {
+      this.$emit("context-menu", {event: this.event,anchor: buttonRef});
     },
 
     /**

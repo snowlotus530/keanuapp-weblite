@@ -1,19 +1,21 @@
 <template>
   <div class="messageIn">
-    <div class="audio-bubble">
-      <audio controls :src="src">Audio file</audio>
-      <QuickReactions :event="event" :reactions="reactions" />
-    </div>
-    <v-btn icon class="op-button" @click.stop="showContextMenu"
-      ><v-icon>more_vert</v-icon></v-btn
-    >
     <v-avatar class="avatar" size="32" color="#ededed">
       <img v-if="messageEventAvatar(event)" :src="messageEventAvatar(event)" />
       <span v-else class="white--text headline">{{
         messageEventDisplayName(event).substring(0, 1).toUpperCase()
       }}</span>
     </v-avatar>
-    <div v-if="showSenderAndTime">
+    <div class="audio-bubble">
+      <audio controls :src="src">Audio file</audio>
+      <QuickReactions :event="event" :reactions="reactions" />
+    </div>
+    <div class="op-button" ref="opbutton">
+      <v-btn icon @click.stop="showContextMenu($refs.opbutton)"
+        ><v-icon>more_vert</v-icon></v-btn
+      >
+    </div>
+    <div v-if="showSenderAndTime" class="senderAndTime">
       <div class="sender">{{ messageEventDisplayName(event) }}</div>
       <div class="time">
         {{ formatTime(event.event.origin_server_ts) }}
