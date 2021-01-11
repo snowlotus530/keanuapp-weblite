@@ -70,12 +70,12 @@ export default {
       return this.$store.state.auth.user;
     },
     showBackArrow() {
-      return this.$navigation.canPop();
+      return this.$navigation && this.$navigation.canPop();
     }
   },
   created() {
     if (this.loggedIn) {
-      this.$navigation.push({name: "Chat"}, true);
+      this.$navigation.push({name: "Chat"}, -1);
     }
   },
   watch: {
@@ -110,12 +110,11 @@ export default {
   },
   methods: {
     handleLogin() {
-      this.$navigation.push({name: "Chat"}, true);
       if (this.user.username && this.user.password) {
         this.loading = true;
         this.$store.dispatch("auth/login", this.user).then(
           () => {
-            this.$navigation.push({name: "Chat"}, true);
+            this.$navigation.push({name: "Chat"}, -1);
           },
           (error) => {
             this.loading = false;

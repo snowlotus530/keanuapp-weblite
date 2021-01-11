@@ -3,12 +3,6 @@ export default {
         var routes = [];
         var zeroIndex = undefined;
 
-        // window.addEventListener('popstate', () => {
-        //     if (routes.length > 1) {
-        //         routes.splice(routes.length - 1);
-        //     }
-        // });
-
         router.beforeResolve((to, ignoredfrom, next) => {
             if (!zeroIndex) {
                 routes = [to];
@@ -32,21 +26,27 @@ export default {
         })
 
         const navigationService = {
-            push(route, asRoot) {
-                asRoot = asRoot || false;
-                //var resolved = router.resolve(route);
-                //resolved.route.meta = route.meta || {};
-                if (asRoot) {
-                    const i = routes.length - 1; // window.history.length - zeroIndex;
+            /***
+             * @param mode Mode of operation. -1 = push as root, 0 = replace, 1 = normal push
+             */
+            push(route, mode) {
+                if (mode === undefined) {
+                    mode = 1;
+                }
+                if (mode == -1) {
+                    const i = routes.length - 1;
                     routes = [route];
-                    //resolved.route.meta.index = 0;
                     if (i > 0) {
                         router.go(-i);
                     } else {
                         router.replace(route).catch((ignoredErr) => {});
                     }
+                } else if (mode == 0) {
+                    // Replace
+                    routes.pop()
+                    routes.push(route);
+                    router.replace(route).catch((ignoredErr) => {});
                 } else {
-                    //resolved.route.meta.index = routes.length;
                     routes.push(route);
                     router.push(route).catch((ignoredErr) => {});
                 }

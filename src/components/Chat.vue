@@ -8,7 +8,7 @@
       v-on:scroll="onScroll"
       @click.prevent="closeContextMenuIfOpen"
     >
-      <div class="message-operations-strut">
+      <div ref="messageOperationsStrut" class="message-operations-strut">
       <message-operations
         :style="opStyle"
               v-on:close="showContextMenu = false"
@@ -261,6 +261,8 @@ export default {
       editedEvent: null,
       replyToEvent: null,
       showContextMenu: false,
+      showContextMenuAnchor: null,
+
       /**
        * Current chat container size. We need to keep track of this so that if and when
        * a soft keyboard is shown/hidden we can restore the scroll position correctly.
@@ -287,14 +289,14 @@ export default {
   },
 
   computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
     room() {
       return this.$matrix.currentRoom;
     },
     roomId() {
-      if (!this.room) {
-        return null;
-      }
-      return this.room.roomId;
+      return this.$matrix.currentRoomId;
     },
     attachButtonDisabled() {
       return this.editedEvent != null || this.replyToEvent != null || this.currentInput.length > 0;
@@ -316,11 +318,17 @@ export default {
       // Calculate where to show the context menu.
       //
       const ref = this.selectedEvent && this.$refs[this.selectedEvent.getId()];
+      var top = 0;
+      var left = 0;
       if (ref && ref[0]) {
-        const offset = ref[0].offsetTop - this.scrollPosition.node.offsetTop;
-        return "top:" + offset + "px";
+        if (this.showContextMenuAnchor) {
+          var rectAnchor = this.showContextMenuAnchor.getBoundingClientRect();
+          var rectChat = this.$refs.messageOperationsStrut.getBoundingClientRect();
+          top = rectAnchor.top - rectChat.top;
+          left = rectAnchor.left - rectChat.left;
+        }
       }
-      return "top:0px";
+      return "top:" + top + "px;left:" + left + "px";
     }
 
   },
@@ -337,25 +345,57 @@ export default {
         this.typingMembers = [];
         
         if (!room) {
+          // Public room?
+          if (this.roomId && this.roomId.startsWith('#')) {
+            this.onRoomNotJoined();
+          }
           return; // no room
         }
 
-        this.timelineWindow = new TimelineWindow(
-          this.$matrix.matrixClient,
-          this.room.getUnfilteredTimelineSet(),
-          {}
-        );
-        this.timelineWindow.load(null, 20).then(() => {
-          this.events = this.timelineWindow.getEvents();
-          this.$nextTick(() => {
-            this.paginateBackIfNeeded();
-          });
-        });
+          // Joined?
+          if (room.hasMembershipState(this.currentUser.user_id, "join")) {
+            // Yes, load everything
+            this.onRoomJoined();
+          } else {
+            this.onRoomNotJoined();
+          }
+
+  //   this.$matrix
+  //     .getPublicRoomInfo(this.roomId)
+  //     .then((room) => {
+  //       console.log("Found room:", room);
+  //       this.roomName = room.name;
+  //       this.roomAvatar = room.avatar;
+  //       this.waitingForInfo = false;
+  //     })
+  //     .catch((err) => {
+  //       console.log("Could not find room info", err);
+  //       this.waitingForInfo = false;
+  //     });
+  // },
       }
     },
   },
 
   methods: {
+    onRoomJoined() {
+      this.timelineWindow = new TimelineWindow(
+          this.$matrix.matrixClient,
+          this.room.getUnfilteredTimelineSet(),
+          {}
+      );
+      this.timelineWindow.load(null, 20).then(() => {
+          this.events = this.timelineWindow.getEvents();
+          this.$nextTick(() => {
+            this.paginateBackIfNeeded();
+          });
+        });
+    },
+
+    onRoomNotJoined() {
+      this.$navigation.push({ name: "Join", hash: this.roomId }, 0);
+    },
+
     touchX(event) {
       if (event.type.indexOf("mouse") !== -1) {
         return event.clientX;
@@ -721,13 +761,15 @@ export default {
         });
     },
 
-    showContextMenuForEvent(event) {
+    showContextMenuForEvent(e) {
+      const event = e.event;
       const ref = this.$refs[event.getId()];
       if (ref) {
         console.log("Got the ref", ref);
       }
       this.selectedEvent = event;
       this.showContextMenu = true;
+      this.showContextMenuAnchor = e.anchor;
     },
 
     closeContextMenuIfOpen(e) {
