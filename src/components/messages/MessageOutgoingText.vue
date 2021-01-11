@@ -1,8 +1,16 @@
 <template>
   <div class="messageOut">
+    <div class="op-button" ref="opbutton">
+      <v-btn icon @click.stop="showContextMenu($refs.opbutton)"
+        ><v-icon>more_vert</v-icon></v-btn
+      >
+    </div>
     <div class="bubble">
+      <QuickReactions :event="event" :reactions="reactions" />
       <div class="original-message" v-if="inReplyToText">
-        <div class="original-message-sender">{{ inReplyToSender || 'Someone' }} said:</div>
+        <div class="original-message-sender">
+          {{ inReplyToSender || "Someone" }} said:
+        </div>
         <div class="original-message-text">{{ inReplyToText }}</div>
       </div>
 
@@ -12,16 +20,14 @@
           >(edited)</span
         >
       </div>
-      <QuickReactions :event="event" :reactions="reactions" />
     </div>
-    <v-btn icon class="op-button" @click.stop="showContextMenu"
-      ><v-icon>more_vert</v-icon></v-btn
-    >
     <!-- <div class="sender">{{ "You" }}</div> -->
-    <div class="time">
-      {{ formatTime(event.event.origin_server_ts) }}
+    <div class="senderAndTime">
+      <div class="time">
+        {{ formatTime(event.event.origin_server_ts) }}
+      </div>
+      <div class="status">{{ event.status }}</div>
     </div>
-    <div class="status">{{ event.status }}</div>
   </div>
 </template>
 
