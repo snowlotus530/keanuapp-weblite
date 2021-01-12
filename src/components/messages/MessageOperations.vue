@@ -9,6 +9,9 @@
     <v-btn v-if="isEditable" icon @click.stop="edit" class="ma-0 pa-0">
       <v-icon>edit</v-icon>
     </v-btn>
+    <v-btn v-if="isDownloadable" icon @click.stop="download" class="ma-0 pa-0">
+      <v-icon>get_app</v-icon>
+    </v-btn>
   </div>
 </template>
 
@@ -36,6 +39,10 @@ export default {
   computed: {
     isEditable() {
       return !this.incoming && this.event.getContent().msgtype == "m.text";
+    },
+    isDownloadable() {
+      const msgtype = this.event.getContent().msgtype;
+      return ['m.video','m.audio','m.image','m.file'].includes(msgtype);
     }
   },
 
@@ -51,6 +58,10 @@ export default {
     edit() {
       this.$emit("close");
       this.$emit("edit", {event:this.event});
+    },
+    download() {
+      this.$emit("close");
+      this.$emit("download", {event:this.event});
     }
   }
 };
