@@ -92,7 +92,7 @@ export default {
     },
 
     showRoomInfo() {
-      this.$router.push({ name: "RoomInfo" });
+      this.$navigation.push({ name: "RoomInfo" });
     },
 
     leaveRoom() {
