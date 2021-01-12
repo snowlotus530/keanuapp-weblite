@@ -75,7 +75,7 @@ export default {
   },
   created() {
     if (this.loggedIn) {
-      this.$navigation.push({name: "Chat", params: { roomId: null }}, -1);
+      this.$navigation.push({name: "Chat", params: { roomId: this.$matrix.currentRoomId }}, -1);
     }
   },
   watch: {
@@ -114,7 +114,7 @@ export default {
         this.loading = true;
         this.$store.dispatch("auth/login", this.user).then(
           () => {
-            this.$navigation.push({name: "Chat", params: { roomId: null }}, -1);
+            this.$navigation.push({name: "Chat", params: { roomId: this.$matrix.currentRoomId }}, -1);
           },
           (error) => {
             this.loading = false;

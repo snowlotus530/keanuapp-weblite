@@ -15,7 +15,7 @@ const routes = [
     component: Chat
   },
   {
-    path: '/room/:roomId',
+    path: '/room/:roomId?',
     name: 'Chat',
     component: Chat
   },
@@ -47,11 +47,11 @@ router.beforeEach((to, from, next) => {
   var authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user');
 
-  if (to.name == 'Join' && !to.params.roomId && to.hash) {
-    to.params.roomId = to.hash;
-  }
-
   if (to.name == 'Chat' || to.name == 'Join') {
+    if (!to.params.roomId && to.hash) {
+      // Public rooms start with '#', confuses the router. If hash but no roomId param, set it.
+      to.params.roomId = to.hash;
+    }
     const roomId = util.sanitizeRoomId(to.params.roomId);
     router.app.$matrix.setCurrentRoomId(roomId);
     if (roomId && roomId.startsWith('#')) {
