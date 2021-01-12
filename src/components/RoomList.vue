@@ -26,7 +26,7 @@ export default {
   watch: {
     currentRoomId() {
       this.$emit("close");
-      this.$matrix.setCurrentRoomId(this.currentRoomId);
+      this.$navigation.push({name: 'Chat', params: { roomId: this.currentRoomId }}, -1);
     },
   },
 };

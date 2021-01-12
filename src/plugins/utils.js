@@ -333,6 +333,13 @@ class Util {
         }
         return result;
     }
+
+    sanitizeRoomId(roomId) {
+        if (roomId && roomId.match(/^(!|#).+$/)) {
+            return roomId;
+        }
+        return null;
+    }
 }
 export default new Util();
 
