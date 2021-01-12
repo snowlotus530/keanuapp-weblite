@@ -338,7 +338,7 @@ export default {
     room: {
       immediate: true,
       handler(room, oldRoom) {
-        if (room == oldRoom) {
+        if (room && room == oldRoom) {
           return; // No change.
         }
         console.log("Chat: Current room changed");
