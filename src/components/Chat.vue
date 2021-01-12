@@ -337,7 +337,10 @@ export default {
   watch: {
     room: {
       immediate: true,
-      handler(room, ignoredOldVal) {
+      handler(room, oldRoom) {
+        if (room == oldRoom) {
+          return; // No change.
+        }
         console.log("Chat: Current room changed");
 
         // Clear old events

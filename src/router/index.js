@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 //import Home from '../components/Home.vue'
 import Chat from '../components/Chat.vue'
 import Login from '../components/Login.vue'
+import util from '../plugins/utils'
 
 Vue.use(VueRouter)
 
@@ -13,7 +14,7 @@ const routes = [
     component: Chat
   },
   {
-    path: '/room/',
+    path: '/room/:roomId',
     name: 'Chat',
     component: Chat
   },
@@ -46,10 +47,11 @@ router.beforeEach((to, from, next) => {
   var authRequired = !publicPages.includes(to.path) && !to.path.startsWith('/join');
   const loggedIn = localStorage.getItem('user');
 
-  if (to.path.startsWith('/room/')) {
-    if (to.hash && to.hash.startsWith('#')) {
+  if (to.name == 'Chat') {
+    const roomId = util.sanitizeRoomId(to.params.roomId);
+    router.app.$matrix.setCurrentRoomId(roomId);
+    if (roomId && roomId.startsWith('#')) {
       //Invite to public room
-      router.app.$matrix.setCurrentRoomId(to.hash);
       authRequired = false;
     }
   }

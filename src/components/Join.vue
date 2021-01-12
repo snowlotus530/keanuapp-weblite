@@ -62,6 +62,7 @@
 
 <script>
 import User from "../models/user";
+import util from "../plugins/utils";
 
 export default {
   name: "Join",
@@ -92,7 +93,7 @@ export default {
             const room = self.$matrix.getRoom(self.roomId);
             if (room && room.hasMembershipState(self.currentUser.user_id, "join")) {
               // Yes, go to room
-              self.$navigation.push({ name: "Chat" }, -1);
+              self.$navigation.push({ name: 'Chat', params: { roomId: util.sanitizeRoomId(self.roomId) }}, -1);
               return;
           }
           this.waitingForMembership = false;
@@ -144,11 +145,10 @@ export default {
           return this.$matrix.matrixClient.joinRoom(this.roomId);
         })
         .then((room) => {
-          this.$matrix.setCurrentRoomId(room.roomId);
           this.loading = false;
           this.loadingMessage = null;
           this.$nextTick(() => {
-            this.$navigation.push({ name: "Chat" }, -1);
+            this.$navigation.push({ name: "Chat", params: { roomId: room.roomId }}, -1);
           });
         })
         .catch((err) => {
