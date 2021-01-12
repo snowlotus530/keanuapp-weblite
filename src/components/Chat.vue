@@ -397,7 +397,7 @@ export default {
     },
 
     onRoomNotJoined() {
-      this.$navigation.push({ name: "Join", hash: this.roomId }, 0);
+      this.$navigation.push({ name: "Join", params: { roomId: this.roomId }}, 0);
     },
 
     touchX(event) {

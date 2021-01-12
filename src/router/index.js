@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 //import Home from '../components/Home.vue'
 import Chat from '../components/Chat.vue'
+import Join from '../components/Join.vue'
 import Login from '../components/Login.vue'
 import util from '../plugins/utils'
 
@@ -31,10 +32,9 @@ const routes = [
     props: true
   },
   {
-    path: '/join/',
+    path: '/join/:roomId?',
     name: 'Join',
-    component: () => import('../components/Join.vue'),
-    props: true
+    component: Join
   },
 ]
 
@@ -44,10 +44,14 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const publicPages = ['/login'];
-  var authRequired = !publicPages.includes(to.path) && !to.path.startsWith('/join');
+  var authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user');
 
-  if (to.name == 'Chat') {
+  if (to.name == 'Join' && !to.params.roomId && to.hash) {
+    to.params.roomId = to.hash;
+  }
+
+  if (to.name == 'Chat' || to.name == 'Join') {
     const roomId = util.sanitizeRoomId(to.params.roomId);
     router.app.$matrix.setCurrentRoomId(roomId);
     if (roomId && roomId.startsWith('#')) {

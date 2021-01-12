@@ -15,7 +15,7 @@
     "js-sha256": "^0.9.0",
     "json-web-key": "^0.4.0",
     "material-design-icons-iconfont": "^5.0.1",
-    "matrix-js-sdk": "^9.0.1",
+    "matrix-js-sdk": "^9.4.1",
     "olm": "https://packages.matrix.org/npm/olm/olm-3.2.1.tgz",
     "raw-loader": "^4.0.2",
     "roboto-fontface": "*",

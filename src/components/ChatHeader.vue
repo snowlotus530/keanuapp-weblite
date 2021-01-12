@@ -106,7 +106,7 @@ export default {
       .then(() => {
         console.log("Left room");
         this.$matrix.matrixClient.store.removeRoom(roomId);
-        this.$navigation.push({name:'Chat'}, -1);
+        this.$navigation.push({name:'Chat', params:{roomId:null}}, -1);
       })
       .catch(err => {
         console.log("Error leaving", err);

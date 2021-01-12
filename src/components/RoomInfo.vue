@@ -4,7 +4,7 @@
       <v-row class="chat-header-row align-center">
 
         <v-col class="text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
-          <v-btn icon @click.stop="$router.go(-1)">
+          <v-btn v-show="$navigation && $navigation.canPop()" icon @click.stop="$navigation.pop">
             <v-icon>arrow_back</v-icon>
           </v-btn>
         </v-col>

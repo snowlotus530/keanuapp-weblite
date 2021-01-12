@@ -79,7 +79,9 @@ export default {
     };
   },
   mounted() {
-    this.roomId = this.$route.hash;
+    this.$matrix.on("Room.myMembership", this.onMyMembership);
+
+    this.roomId = this.$matrix.currentRoomId;
     this.roomName = this.roomId;
     if (this.currentUser) {
       this.waitingForMembership = true;
@@ -87,14 +89,23 @@ export default {
       this.$matrix
         .getMatrixClient(this.currentUser)
         .then(() => {
-            self.$matrix.setCurrentRoomId(self.roomId); // Go to this room, now or when joined.
+          self.$matrix.setCurrentRoomId(self.roomId); // Go to this room, now or when joined.
 
-            // Already joined?
-            const room = self.$matrix.getRoom(self.roomId);
-            if (room && room.hasMembershipState(self.currentUser.user_id, "join")) {
-              // Yes, go to room
-              self.$navigation.push({ name: 'Chat', params: { roomId: util.sanitizeRoomId(self.roomId) }}, -1);
-              return;
+          // Already joined?
+          const room = self.$matrix.getRoom(self.roomId);
+          if (
+            room &&
+            room.hasMembershipState(self.currentUser.user_id, "join")
+          ) {
+            // Yes, go to room
+            self.$navigation.push(
+              {
+                name: "Chat",
+                params: { roomId: util.sanitizeRoomId(self.roomId) },
+              },
+              -1
+            );
+            return;
           }
           this.waitingForMembership = false;
         })
@@ -103,18 +114,30 @@ export default {
         });
     }
 
-    this.$matrix
-      .getPublicRoomInfo(this.roomId)
-      .then((room) => {
-        console.log("Found room:", room);
-        this.roomName = room.name;
-        this.roomAvatar = room.avatar;
-        this.waitingForInfo = false;
-      })
-      .catch((err) => {
-        console.log("Could not find room info", err);
-        this.waitingForInfo = false;
-      });
+    if (this.roomId.startsWith("#")) {
+      this.$matrix
+        .getPublicRoomInfo(this.roomId)
+        .then((room) => {
+          console.log("Found room:", room);
+          this.roomName = room.name;
+          this.roomAvatar = room.avatar;
+          this.waitingForInfo = false;
+        })
+        .catch((err) => {
+          console.log("Could not find room info", err);
+          this.waitingForInfo = false;
+        });
+    } else {
+      // Private room, try to get name
+      const room = this.$matrix.getRoom(this.roomId);
+      if (room) {
+        this.roomName = room.name || this.roomName;
+      }
+      this.waitingForInfo = false;
+    }
+  },
+  destroyed() {
+    this.$matrix.off("Room.myMembership", this.onMyMembership);
   },
   computed: {
     currentUser() {
@@ -122,6 +145,12 @@ export default {
     },
   },
   methods: {
+    onMyMembership(room, membership, ignoredprevMembership) {
+      if (room && room.roomId == this.roomId && membership == "join") {
+        this.$navigation.push({ name: "Chat", params: { roomId: this.roomId } },-1);
+      }
+    },
+
     handleLogin() {
       this.$navigation.push({ name: "Login" }, 1);
     },
@@ -148,7 +177,10 @@ export default {
           this.loading = false;
           this.loadingMessage = null;
           this.$nextTick(() => {
-            this.$navigation.push({ name: "Chat", params: { roomId: room.roomId }}, -1);
+            this.$navigation.push(
+              { name: "Chat", params: { roomId: room.roomId } },
+              -1
+            );
           });
         })
         .catch((err) => {

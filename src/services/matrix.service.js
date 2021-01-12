@@ -312,11 +312,14 @@ export default {
                             }
                         }
                         if (response.next_batch) {
-                            return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", {limit:1000, next_batch:response.next_batch})
+                            return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", {limit:1000, since:response.next_batch})
                             //return tempMatrixClient.publicRooms({limit:1,next_batch:response.next_batch})
                             .then(response => {
                                 return _findOrGetMore(response);
-                            }) 
+                            })
+                            .catch(err => {
+                                return Promise.reject("Failed to find room: " + err);
+                            });
                         } else {
                             return Promise.reject("No more data");
                         }
@@ -326,6 +329,9 @@ export default {
                     //return tempMatrixClient.publicRooms({limit:1})
                     .then(response => {
                         return findOrGetMore(response);
+                    })
+                    .catch(err => {
+                        return Promise.reject("Failed to find room: " + err);
                     });
                 }
             }
