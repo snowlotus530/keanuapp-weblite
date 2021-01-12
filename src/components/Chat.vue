@@ -16,6 +16,7 @@
               v-on:addreaction="addReaction"
               v-on:addreply="addReply(selectedEvent)"
               v-on:edit="edit(selectedEvent)"
+              v-on:download="download(selectedEvent)"
               :event="selectedEvent"
               :incoming="selectedEvent.getSender() != $matrix.currentUserId"
             />
@@ -728,6 +729,21 @@ export default {
       this.editedEvent = event;
       this.currentInput = event.getContent().body;
       this.$refs.messageInput.focus();
+    },
+
+    download(event) {
+      util
+        .getAttachment(this.$matrix.matrixClient, event)
+        .then((url) => {
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = event.getContent().body || "Download";
+          link.click();
+          URL.revokeObjectURL(url);
+        })
+        .catch((err) => {
+          console.log("Failed to fetch attachment: ", err);
+        });
     },
 
     cancelEditReply() {
