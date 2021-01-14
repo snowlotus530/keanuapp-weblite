@@ -132,7 +132,7 @@ class Util {
             }
 
             // Prefix the content with reply info (seems to be a legacy thing)
-            const prefix = replyToEvent.getContent().body.split('\n').map((item,index) => {
+            const prefix = replyToEvent.getContent().body.split('\n').map((item, index) => {
                 return "> " + (index == 0 ? ("<" + replyToEvent.getSender() + "> ") : "") + item;
             }).join('\n');
             content.body = prefix + "\n\n" + content.body;
@@ -338,6 +338,31 @@ class Util {
         if (roomId && roomId.match(/^(!|#).+$/)) {
             return roomId;
         }
+        return null;
+    }
+
+    getLastVisibleElement(parentNode) {
+        const y = parentNode.scrollTop + parentNode.clientHeight;
+
+        let start = 0;
+        let end = parentNode.children.length - 1;
+
+        while (start <= end) {
+            let middle = Math.floor((start + end) / 2);
+            const yMiddleTop = parentNode.children[middle].offsetTop;
+            const yMiddleBottom = yMiddleTop + parentNode.children[middle].clientHeight;
+            if (yMiddleTop <= y && yMiddleBottom >= y) {
+                // found the key
+                return parentNode.children[middle];
+            } else if (yMiddleBottom < y) {
+                // continue searching to the right
+                start = middle + 1;
+            } else {
+                // search searching to the left
+                end = middle - 1;
+            }
+        }
+        // key wasn't found
         return null;
     }
 }

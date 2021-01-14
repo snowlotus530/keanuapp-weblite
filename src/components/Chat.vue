@@ -28,7 +28,7 @@
         @notify="handleChatContainerResize"
       />
 
-      <div v-for="(event,index) in events" :key="event.getId()">
+      <div v-for="(event,index) in events" :key="event.getId()" :eventId="event.getId()">
         <div
           v-if="
             !event.isRelation() && !event.isRedacted() && !event.isRedaction()
@@ -62,6 +62,8 @@
               v-on:send-quick-reaction="sendQuickReaction"
               v-on:context-menu="showContextMenuForEvent($event)"
             />
+            <div>EventID: {{ event.getId() }}</div>
+            <div v-if="event.getId() == readMarker">------- READ MARKER -------</div>
           </div>
         </div>
       </div>
@@ -197,6 +199,8 @@ import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
 import ChatHeader from "./ChatHeader";
 
+const READ_RECEIPT_TIMEOUT = 5000; /* How long a message must have been visible before the read marker is updated */
+
 // from https://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
 function ScrollPosition(node) {
   this.node = node;
@@ -263,6 +267,7 @@ export default {
       replyToEvent: null,
       showContextMenu: false,
       showContextMenuAnchor: null,
+      initialLoadDone: false,
 
       /**
        * Current chat container size. We need to keep track of this so that if and when
@@ -273,6 +278,12 @@ export default {
 
       /** Shows a dialog with info about an operation being disallowed for guests */
       showNotAllowedForGuests: false,
+
+      /** A timer for read receipts. */
+      rrTimer: null,
+
+      /** Timestamp of last send Read Receipt */
+      lastRRTimestamp: null,
     };
   },
 
@@ -298,6 +309,16 @@ export default {
     },
     roomId() {
       return this.$matrix.currentRoomId;
+    },
+    readMarker() {
+      return this.fullyReadMarker || this.room.getEventReadUpTo(this.$matrix.currentUserId, false);
+    },
+    fullyReadMarker() {
+      const readEvent = this.room.getAccountData('m.fully_read');
+      if (readEvent) {
+        return readEvent.getContent().event_id;
+      }
+      return null;
     },
     attachButtonDisabled() {
       return this.editedEvent != null || this.replyToEvent != null || this.currentInput.length > 0;
@@ -347,7 +368,8 @@ export default {
         this.events = [];
         this.timelineWindow = null;
         this.typingMembers = [];
-        
+        this.initialLoadDone = false;
+
         if (!room) {
           // Public room?
           if (this.roomId && this.roomId.startsWith('#')) {
@@ -363,35 +385,53 @@ export default {
           } else {
             this.onRoomNotJoined();
           }
-
-  //   this.$matrix
-  //     .getPublicRoomInfo(this.roomId)
-  //     .then((room) => {
-  //       console.log("Found room:", room);
-  //       this.roomName = room.name;
-  //       this.roomAvatar = room.avatar;
-  //       this.waitingForInfo = false;
-  //     })
-  //     .catch((err) => {
-  //       console.log("Could not find room info", err);
-  //       this.waitingForInfo = false;
-  //     });
-  // },
       }
     },
   },
 
   methods: {
     onRoomJoined() {
+
+      var initialEventId = this.readMarker;
+      console.log("Read up to " + initialEventId);
+
       this.timelineWindow = new TimelineWindow(
           this.$matrix.matrixClient,
           this.room.getUnfilteredTimelineSet(),
           {}
       );
-      this.timelineWindow.load(null, 20).then(() => {
+      this.timelineWindow.load(initialEventId, 20).then(() => {
           this.events = this.timelineWindow.getEvents();
-          this.$nextTick(() => {
-            this.paginateBackIfNeeded();
+
+          const getMoreIfNeeded = function _getMoreIfNeeded() {
+            const container = this.$refs.chatContainer;
+            if (container.scrollHeight <= container.clientHeight && 
+              this.timelineWindow &&
+              this.timelineWindow.canPaginate(EventTimeline.BACKWARDS)) {
+                return this.timelineWindow.paginate(EventTimeline.BACKWARDS, 10, true)
+                  .then(success => {
+                    if (success) {
+                      this.events = this.timelineWindow.getEvents();
+                      return _getMoreIfNeeded.call(this);
+                    } else {
+                        return Promise.reject("Failed to paginate");
+                      }
+                    });
+            } else {
+              return Promise.resolve("Done");
+            }            
+          }.bind(this);
+
+          getMoreIfNeeded()
+          .catch(err => {
+            console.log("ERROR " + err);
+          })
+          .finally(() => {
+            this.initialLoadDone = true;
+          if (initialEventId) {
+            this.scrollToEvent(initialEventId);
+          }
+          this.restartRRTimer();
           });
         });
     },
@@ -521,13 +561,17 @@ export default {
       ) {
         this.handleScrolledToBottom(false);
       }
+      this.restartRRTimer();
     },
     onEvent(event) {
       console.log("OnEvent", JSON.stringify(event));
       if (event.getRoomId() !== this.roomId) {
         return; // Not for this room
       }
-      this.paginateBackIfNeeded();
+
+      if (this.initialLoadDone) {
+        this.paginateBackIfNeeded();
+      }
 
       // If we are at bottom, scroll to see new events...
       const container = this.$refs.chatContainer;
@@ -538,7 +582,7 @@ export default {
       ) {
         scrollToSeeNew = true;
       }
-      if (event.forwardLooking && !event.isRelation()) {
+      if (this.initialLoadDone && event.forwardLooking && !event.isRelation()) {
         this.handleScrolledToBottom(scrollToSeeNew);
       }
     },
@@ -698,6 +742,19 @@ export default {
       }
     },
 
+    /**
+    * Scroll so that the given event is at the middle of the chat view (if more events) or else at the bottom.
+    */
+    scrollToEvent(eventId) {
+      const container = this.$refs.chatContainer;
+      const ref = this.$refs[eventId];
+      if (container && ref) {
+        const targetY = container.clientHeight / 2;
+        const sourceY = ref[0].offsetTop;
+        container.scrollTo(0, sourceY - targetY);
+      }
+    },
+
     smoothScrollToEnd() {
       this.$nextTick(function () {
         const container = this.$refs.chatContainer;
@@ -795,6 +852,50 @@ export default {
       if (this.showContextMenu) {
         this.showContextMenu = false;
         e.preventDefault();
+      }
+    },
+
+    /**
+    * Start/restart the timer to Read Receipts.
+    */
+    restartRRTimer() {
+      if (this.rrTimer) {
+        clearInterval(this.rrTimer);
+        this.rrTimer = null;
+      }
+      this.rrTimer = setInterval(this.rrTimerElapsed, READ_RECEIPT_TIMEOUT);
+    },
+
+    rrTimerElapsed() {
+      const container = this.$refs.chatContainer;
+      const el = util.getLastVisibleElement(container);
+      if (el) {
+        const eventId = el.getAttribute('eventId');
+        if (eventId && this.room) {
+          const event = this.room.findEventById(eventId);
+          if (event && event.getTs() > this.lastRRTimestamp) {
+            
+            // Disable timer while we are sending
+            clearInterval(this.rrTimer);
+            this.rrTimer = null;
+
+            // Send read receipt
+            this.$matrix.matrixClient.sendReadReceipt(event)
+            .then(() => {
+              this.$matrix.matrixClient.setRoomReadMarkers(this.room.roomId, eventId)
+            })
+            .then(() => {
+              console.log("RR sent for event: " + eventId);
+              this.lastRRTimestamp = event.getTs();
+            })
+            .catch(err => {
+              console.log("Failed to update read marker: ", err);
+            })
+            .finally(() => {
+              this.restartRRTimer();
+            });
+          }
+        }
       }
     }
   },
