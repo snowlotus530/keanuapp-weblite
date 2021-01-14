@@ -364,3 +364,33 @@
     font-size: 21 * $chat-text-size;
     color: black;
 }
+
+
+.read-marker {
+    //display: block;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    height: 1px;
+    line-height: var(--v-theme-title-featured-line-height);
+    position: relative;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 9.88014 * $chat-text-size;
+    line-height: 140%;
+    /* identical to box height, or 14px */
+    letter-spacing: 0.29px;
+    color: #9C9CAE;
+    background-color: #9C9CAE;
+    &::after {
+        position: absolute;
+        left: 10px;
+        top: -6px;
+        background: white;
+        padding-left: 10px;
+        padding-right: 10px;
+        content: attr(title);
+    }
+}

@@ -62,8 +62,8 @@
               v-on:send-quick-reaction="sendQuickReaction"
               v-on:context-menu="showContextMenuForEvent($event)"
             />
-            <div>EventID: {{ event.getId() }}</div>
-            <div v-if="event.getId() == readMarker">------- READ MARKER -------</div>
+            <!-- <div>EventID: {{ event.getId() }}</div> -->
+            <div v-if="event.getId() == readMarker && index < (events.length - 1)" class="read-marker" title="Unread messages" />
           </div>
         </div>
       </div>
