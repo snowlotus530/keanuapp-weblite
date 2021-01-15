@@ -12,24 +12,23 @@
 
     <v-navigation-drawer app v-model="openDrawer">
       <v-list nav dense>
-
         <template v-if="!currentUser && $route.path != '/login'">
-        <v-btn color="green" dark to="/login" replace
-          ><v-icon>mdi-login</v-icon>Login</v-btn
-        >
-      </template>
-      <template v-else-if="currentUser">
-        <div class="ma-2">{{ currentUser.user_id }}</div>
-            <v-list-item @click.prevent="logOut">
-              <v-list-item-icon><v-icon>logout</v-icon></v-list-item-icon>
-              <v-list-item-title>Logout</v-list-item-title>
-            </v-list-item>
-      </template>
+          <v-btn
+            color="green"
+            dark
+            @click="openDrawer = false;$navigation.push({ path: '/login' }, -1)"
+            ><v-icon>mdi-login</v-icon>Login</v-btn
+          >
+        </template>
+        <template v-else-if="currentUser">
+          <div class="ma-2">{{ currentUser.user_id }}</div>
+          <v-list-item @click.prevent="logOut">
+            <v-list-item-icon><v-icon>logout</v-icon></v-list-item-icon>
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item>
+        </template>
 
-        <RoomList
-          v-if="$matrix.ready"
-          @close="openDrawer = false"
-        />
+        <RoomList v-if="$matrix.ready" @close="openDrawer = false" />
       </v-list>
     </v-navigation-drawer>
 
@@ -38,10 +37,11 @@
     </v-main>
 
     <v-footer app class="copyright">
-       <v-btn icon x-small @click.stop="openDrawer = !openDrawer">
+      <v-btn icon x-small @click.stop="openDrawer = !openDrawer">
         <v-icon>menu</v-icon>
-       </v-btn>
-      Powered by Guardian Project. Version: {{ buildVersion }}</v-footer>
+      </v-btn>
+      Powered by Guardian Project. Version: {{ buildVersion }}</v-footer
+    >
   </v-app>
 </template>
 
@@ -68,8 +68,11 @@ export default {
       return this.$store.state.auth.status.loggedIn;
     },
     logOut() {
+      this.openDrawer = false;
       this.$store.dispatch("auth/logout");
-      this.$navigation.push("/login", -1);
+      this.$nextTick(() => {
+        this.$navigation.push({path: "/login"}, -1);
+      })
     },
   },
   computed: {
@@ -82,7 +85,8 @@ export default {
       immediate: true,
       handler(ignorednewVal, ignoredoldVal) {
         if (this.loggedIn()) {
-          this.$matrix.getMatrixClient(this.currentUser)
+          this.$matrix
+            .getMatrixClient(this.currentUser)
             .then(() => {
               console.log("Matrix client ready");
             })

@@ -282,8 +282,8 @@ export default {
       /** A timer for read receipts. */
       rrTimer: null,
 
-      /** Timestamp of last send Read Receipt */
-      lastRRTimestamp: null,
+      /** Last event we sent a Read Receipt/Read Marker for */
+      lastRR: null,
     };
   },
 
@@ -293,6 +293,10 @@ export default {
     this.$matrix.on("Room.timeline", this.onEvent);
     this.$matrix.on("RoomMember.typing", this.onUserTyping);
     this.chatContainerSize = this.$refs.chatContainerResizer.$el.clientHeight;
+  },
+
+  beforeDestroy() {
+    this.stopRRTimer();
   },
 
   destroyed() {
@@ -308,9 +312,16 @@ export default {
       return this.$matrix.currentRoom;
     },
     roomId() {
+      if (this.room) {
+        return this.room.roomId;
+      }
       return this.$matrix.currentRoomId;
     },
     readMarker() {
+      if (this.lastRR) {
+        // If we have sent a RR, use that as read marker (so we don't have to wait for server round trip)
+        return this.lastRR.getId();
+      }
       return this.fullyReadMarker || this.room.getEventReadUpTo(this.$matrix.currentUserId, false);
     },
     fullyReadMarker() {
@@ -369,6 +380,10 @@ export default {
         this.timelineWindow = null;
         this.typingMembers = [];
         this.initialLoadDone = false;
+
+        // Stop RR timer
+        this.stopRRTimer();
+        this.lastRR = null;
 
         if (!room) {
           // Public room?
@@ -552,6 +567,9 @@ export default {
     },
     onScroll(ignoredevent) {
       const container = this.$refs.chatContainer;
+      if (!container) {
+        return;
+      }
       if (container.scrollTop == 0) {
         // Scrolled to top
         this.handleScrolledToTop();
@@ -855,14 +873,19 @@ export default {
       }
     },
 
-    /**
-    * Start/restart the timer to Read Receipts.
-    */
-    restartRRTimer() {
+    /** Stop Read Receipt timer */
+    stopRRTimer() {
       if (this.rrTimer) {
         clearInterval(this.rrTimer);
         this.rrTimer = null;
       }
+    },
+    
+    /**
+    * Start/restart the timer to Read Receipts.
+    */
+    restartRRTimer() {
+      this.stopRRTimer();
       this.rrTimer = setInterval(this.rrTimerElapsed, READ_RECEIPT_TIMEOUT);
     },
 
@@ -873,7 +896,7 @@ export default {
         const eventId = el.getAttribute('eventId');
         if (eventId && this.room) {
           const event = this.room.findEventById(eventId);
-          if (event && event.getTs() > this.lastRRTimestamp) {
+          if (event && (!this.lastRR || event.getTs() > this.lastRR.getTs())) {
             
             // Disable timer while we are sending
             clearInterval(this.rrTimer);
@@ -886,7 +909,7 @@ export default {
             })
             .then(() => {
               console.log("RR sent for event: " + eventId);
-              this.lastRRTimestamp = event.getTs();
+              this.lastRR = event;             
             })
             .catch(err => {
               console.log("Failed to update read marker: ", err);

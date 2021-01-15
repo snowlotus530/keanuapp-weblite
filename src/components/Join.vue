@@ -19,9 +19,9 @@
       </v-avatar>
       <div class="join-title">Welcome to {{ roomName }}</div>
       <div class="join-message">
-        Join the group chat in a web browser or with the Keanu app.
+        <!-- Join the group chat in a web browser or with the Keanu app. -->
       </div>
-      <v-btn
+      <!--<v-btn
         class="btn-light"
         large
         block
@@ -30,7 +30,7 @@
         >Open Keanu app</v-btn
       >
 
-      <div class="join-or-divider">OR</div>
+      <div class="join-or-divider">OR</div> -->
 
       <v-btn
         class="btn-dark"
