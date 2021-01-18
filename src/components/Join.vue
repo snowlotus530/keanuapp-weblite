@@ -21,6 +21,16 @@
       <div class="join-message">
         <!-- Join the group chat in a web browser or with the Keanu app. -->
       </div>
+      <v-combobox
+        v-if="!currentUser || currentUser"
+        @update:search-input="updateDisplayName"
+        :items="defaultDisplayNames"
+        :value="displayName"
+        label="User name"
+        outlined
+        dense
+      ></v-combobox>
+
       <!--<v-btn
         class="btn-light"
         large
@@ -76,6 +86,8 @@ export default {
       loadingMessage: null,
       waitingForInfo: true,
       waitingForMembership: false,
+      displayName: null,
+      defaultDisplayNames: ["Guest Pandolin", "Guest Iguana", "Guest Horse"],
     };
   },
   mounted() {
@@ -112,6 +124,13 @@ export default {
         .catch((ignoredErr) => {
           this.waitingForMembership = false;
         });
+    } 
+    if (!this.currentUser || this.currentUser.is_guest) {
+      var values = require("!!raw-loader!../assets/usernames.txt").default.split('\n').filter((item) => {
+        return item.length > 0;
+      })
+      this.displayName = values[Math.floor(Math.random() * values.length)];
+      this.defaultDisplayNames = values;
     }
 
     if (this.roomId.startsWith("#")) {
@@ -147,7 +166,10 @@ export default {
   methods: {
     onMyMembership(room, membership, ignoredprevMembership) {
       if (room && room.roomId == this.roomId && membership == "join") {
-        this.$navigation.push({ name: "Chat", params: { roomId: this.roomId } },-1);
+        this.$navigation.push(
+          { name: "Chat", params: { roomId: this.roomId } },
+          -1
+        );
       }
     },
 
@@ -166,13 +188,20 @@ export default {
       if (this.currentUser) {
         clientPromise = this.$matrix.getMatrixClient(this.currentUser);
       } else {
-        clientPromise = this.$store.dispatch("auth/login", this.guestUser);
+        clientPromise = this.$store.dispatch("auth/login", this.guestUser)
       }
       return clientPromise
-        .then((ignoreduser) => {
+        .then(function(user) {
+          if ((this.currentUser && !this.currentUser.is_guest) || !this.displayName) {
+            return Promise.resolve(user);
+          } else {
+            return this.$matrix.matrixClient.setDisplayName(this.displayName, undefined);
+          }   
+        }.bind(this))
+        .then(function(ignoreduser) {
           this.loadingMessage = "Joining room...";
           return this.$matrix.matrixClient.joinRoom(this.roomId);
-        })
+        }.bind(this))
         .then((room) => {
           this.loading = false;
           this.loadingMessage = null;
@@ -190,6 +219,10 @@ export default {
           this.loadingMessage = err.toString();
         });
     },
+
+    updateDisplayName(value) {
+      this.displayName = value;
+    }
   },
 };
 </script>
