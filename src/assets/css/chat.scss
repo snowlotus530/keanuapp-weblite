@@ -1,5 +1,8 @@
 @import "@/assets/css/main.scss";
 
+$admin-bg: black;
+$admin-fg: white;
+
 .chat-root {
     position: absolute;
     left: 0px;
@@ -151,6 +154,9 @@
         position: relative;
         max-width: 70%;
     }
+    &.from-admin .bubble {
+        background-color: $admin-bg;
+    }
     .audio-bubble {
         overflow: scroll;
         display: inline-block;
@@ -264,6 +270,9 @@
         font-size: 0.8rem;
         color: #888888;
     }
+    .from-admin & {
+        color: $admin-fg;
+    }
 }
 
 .original-message {
@@ -332,15 +341,16 @@
 .quick-reaction-container {
     position: absolute;
     background-color: #000000;
-    border: 3px solid white;
-    border-radius: 15px;
-    height: 30px;
+    border: 2px solid white;
+    border-radius: 13px;
+    height: 26px;
     width: fit-content;
     right: 10px;
-    top: -12px;
+    top: -15px;
+    padding: 0px 6px;
     .quick-reaction {
-        margin: 0px 6px;
-        padding: 2px;
+        margin: 0px 0px;
+        padding: 1px;
         font-size: 10px;
         &:hover {
             border: 1px solid #888888;

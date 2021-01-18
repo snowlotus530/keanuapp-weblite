@@ -111,6 +111,14 @@ export default {
         return lines.join('\n');
       }
       return this.event.getContent().body;
+    },
+
+    /**
+     * Classes to set for the message. Currently only for "messageIn", TODO: - detect messageIn or messageOut.
+     */
+  
+    messageClasses() {
+      return {'messageIn':true,'from-admin':this.senderIsAdminOrModerator(this.event)}
     }
   },
   methods: {
@@ -152,6 +160,19 @@ export default {
         }
       }
       return null;
+    },
+
+    /**
+     * Return true if the event sender has a powel level > 0, e.g. is moderator or admin of some sort.
+     */
+    senderIsAdminOrModerator(event) {
+      if (this.room) {
+        const member = this.room.getMember(event.getSender());
+        if (member) {
+          return member.powerLevel > 0;
+        }
+      }
+      return false;
     },
 
     formatTime(time) {
