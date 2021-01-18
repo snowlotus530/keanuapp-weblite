@@ -1,5 +1,5 @@
 <template>
-  <div class="messageIn">
+  <div :class="messageClasses">
     <v-avatar class="avatar" size="32" color="#ededed">
       <img v-if="messageEventAvatar(event)" :src="messageEventAvatar(event)" />
       <span v-else class="white--text headline">{{
