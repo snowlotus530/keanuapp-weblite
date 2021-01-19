@@ -111,8 +111,17 @@ export default {
   methods: {
     handleLogin() {
       if (this.user.username && this.user.password) {
+
+        // Is it a full matrix user id? Modify a copy, so that the UI will still show the full ID.
+        var user = Object.assign({}, this.user);
+        if (user.username.startsWith('@') && user.username.includes(':')) {
+          const parts = user.username.split(":");
+          user.username = parts[0].substring(1);
+          user.server = "https://" + parts[1];
+        }
+
         this.loading = true;
-        this.$store.dispatch("auth/login", this.user).then(
+        this.$store.dispatch("auth/login", user).then(
           () => {
             this.$navigation.push({name: "Chat", params: { roomId: this.$matrix.currentRoomId }}, -1);
           },
