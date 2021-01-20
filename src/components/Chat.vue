@@ -29,6 +29,10 @@
       />
 
       <div v-for="(event,index) in events" :key="event.getId()" :eventId="event.getId()">
+       
+       <!-- DAY Marker, shown for every new day in the timeline -->
+        <div v-if="showDayMarkerBeforeEvent(event)" class="day-marker" :title="dayForEvent(event)" />
+        
         <div
           v-if="
             !event.isRelation() && !event.isRedacted() && !event.isRedaction()
@@ -920,6 +924,19 @@ export default {
           }
         }
       }
+    },
+
+    showDayMarkerBeforeEvent(event) {
+      const idx = this.events.indexOf(event);
+      if (idx <= 0) {
+        return true;
+      }
+      const previousEvent = this.events[idx - 1];
+      return util.dayDiff(previousEvent.getTs(), event.getTs()) > 0;
+    },
+
+    dayForEvent(event) {
+      return util.formatDay(event.getTs());
     }
   },
 };
