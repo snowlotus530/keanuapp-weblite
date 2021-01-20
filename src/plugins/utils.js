@@ -365,6 +365,56 @@ class Util {
         // key wasn't found
         return null;
     }
+
+    _importAll(r) {
+        var images = [];
+        r.keys().forEach(res => {
+            console.log("Avatar", res);
+            // // Remove"./"
+            // const parts = res.split("/");
+            // const pack = parts[1];
+            // const sticker = parts[2].split(".")[0];
+            const image = r(res);
+            images.push({ id: res, image: image });
+            // if (stickerPacks[pack] !== undefined) {
+            //     stickerPacks[pack].push({ image: image, name: sticker });
+            // }
+        });
+        return images;
+    }
+
+    getDefaultAvatars() {
+        return this._importAll(require.context('../assets/avatars/', true, /\.(jpeg|jpg|png)$/));
+    }
+
+    setAvatar(matrixClient, file, onUploadProgress) {
+        return new Promise((resolve, reject) => {
+            axios.get(file, { responseType: 'arraybuffer' })
+                .then(response => {
+                    const opts = {
+                        type: response.headers['content-type'].split(';')[0],
+                        name: "Avatar",
+                        progressHandler: onUploadProgress,
+                        onlyContentUri: false
+                    };
+                    matrixClient.uploadContent(response.data, opts)
+                        .then((response) => {
+                            const uri = response.content_uri;
+                            return matrixClient.setProfileInfo('avatar_url', { avatar_url: uri });
+                        })
+                        .then(result => {
+                            resolve(result);
+                        })
+                        .catch(err => {
+                            reject(err);
+                        });
+                })
+                .catch(err => {
+                    reject(err);
+                });
+
+        })
+    }
 }
 export default new Util();
 

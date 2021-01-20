@@ -650,10 +650,10 @@ export default {
     showAttachmentPicker() {
       // Guests not currently allowed to send attachments (=actually upload them)
       // See https://matrix.org/docs/spec/client_server/r0.2.0#guest-access
-      if (this.$matrix.currentUser && this.$matrix.currentUser.is_guest) {
-        this.showNotAllowedForGuests = true;
-        return;
-      }
+      // if (this.$matrix.currentUser && this.$matrix.currentUser.is_guest) {
+      //   this.showNotAllowedForGuests = true;
+      //   return;
+      // }
       this.$refs.attachment.click()
     },
 

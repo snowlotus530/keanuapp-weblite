@@ -38,6 +38,12 @@
         right: 0;
         margin: 20px;
     }
+
+    .join-user-info {
+        display: flex;
+        flex-wrap: nowrap;
+        max-width: 40%;
+    }
 }
 
 .join-avatar {
