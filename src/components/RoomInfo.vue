@@ -1,38 +1,23 @@
 <template>
-  <div v-if="room">
+  <div v-if="room" class="room-info">
     <div class="chat-header">
       <v-container fluid>
-        <v-row class="chat-header-row align-center">
-          <v-col class="text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
-            <v-btn
-              v-show="$navigation && $navigation.canPop()"
-              icon
-              @click.stop="$navigation.pop"
-            >
-              <v-icon>arrow_back</v-icon>
-            </v-btn>
-          </v-col>
-
-          <!-- <v-col class="chat-header-members text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
-          <v-btn icon class="members-icon" @click.stop="showRoomInfo">
-            <v-icon>people</v-icon>
-          </v-btn>
-          <div class="num-members">{{ memberCount }}</div>
-        </v-col> -->
-
-          <v-col class="flex-grow-1 flex-shrink-1 ma-0 pa-0">
-            <div class="room-name" v-if="room">
-              {{ room.summary.info.title }}
-            </div>
-          </v-col>
-          <!-- <v-col class="text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
-          <v-btn class="leave-button">Leave</v-btn>
-        </v-col> -->
-        </v-row>
+        <div class="room-name" v-if="room">
+          {{ room.summary.info.title }}
+        </div>
+        <v-btn
+          text
+          class="back"
+          v-show="$navigation && $navigation.canPop()"
+          @click.stop="$navigation.pop"
+        >
+          <v-icon>arrow_back</v-icon>
+          <span>BACK</span>
+        </v-btn>
       </v-container>
     </div>
 
-    <v-card class="members ma-3">
+    <v-card class="members ma-3" flat>
       <v-card-title
         >Members<v-spacer></v-spacer>
         <div>{{ room.getJoinedMemberCount() }}</div></v-card-title
@@ -40,8 +25,9 @@
       <v-card-text>
         <div
           class="member ma-2"
-          v-for="member in room.getJoinedMembers()"
+          v-for="(member, index) in joinedMembers"
           :key="member.userId"
+          v-show="showAllMembers || index < 5"
         >
           <v-avatar class="avatar" size="40" color="grey">
             <img v-if="memberAvatar(member)" :src="memberAvatar(member)" />
@@ -51,64 +37,59 @@
           </v-avatar>
           {{ member.user ? member.user.displayName : member.name
           }}{{ member.userId == $matrix.currentUserId ? " (you)" : "" }}
-          <v-btn
-            color="black"
-            v-if="member.userId == $matrix.currentUserId"
-            text
-            absolute
-            right
-            @click.stop="showEditDialog = true"
-            >edit</v-btn
-          >
+        </div>
+        <div class="show-all" @click="showAllMembers = !showAllMembers">
+          {{ showAllMembers ? "Hide" : "Show all" }}
         </div>
       </v-card-text>
     </v-card>
 
-    <v-card class="account ma-3">
-      <v-card-title>Your account</v-card-title>
+    <v-card class="account ma-3" flat>
+      <v-card-title>My Profile</v-card-title>
       <v-card-text>
         <div v-if="$matrix.currentUser.is_guest">
-          <div>You don't have a Keanu account, yet ;)</div>
-          <v-btn dark block @click.stop="upgradeAccount">Login</v-btn>
+          <div>
+            Your identity <b>{{ displayName }}</b> is temporary. You can change
+            your name or set a password to keep it.
+          </div>
+          <v-btn block class="outlined-button" @click.stop="viewProfile"
+            >View</v-btn
+          >
         </div>
       </v-card-text>
     </v-card>
 
-    <!-- EDIT dialog -->
-    <v-dialog v-model="showEditDialog" class="ma-0 pa-0" width="50%">
-      <v-card>
-        <v-card-title>Display name</v-card-title>
-        <v-card-text>
-          <v-text-field v-model="displayName" />
-        </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="showEditDialog = false">Cancel</v-btn>
-          <v-btn
-            color="primary"
-            text
-            @click="
-              $matrix.matrixClient.setDisplayName(displayName);
-              showEditDialog = false;
-            "
-            >Ok</v-btn
+    <v-card class="account ma-3" flat>
+      <v-card-text>
+          <v-btn color="red" block class="filled-button" @click.stop="showLeaveConfirmation = true"
+            >Leave group</v-btn
           >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+          <div>
+            Note: This step cannot be undone. Make sure you want to logout and delete the chat forever.
+          </div>
+      </v-card-text>
+    </v-card>
+
+    <LeaveRoomDialog :show="showLeaveConfirmation" :room="room" @close="showLeaveConfirmation = false" />
+
   </div>
 </template>
 
 <script>
+import LeaveRoomDialog from '../components/LeaveRoomDialog';
+
 export default {
   name: "RoomInfo",
+  components: {
+    LeaveRoomDialog
+  },
   data() {
     return {
       memberCount: null,
-      showEditDialog: false,
       user: null,
       displayName: "",
+      showAllMembers: false,
+      showLeaveConfirmation: false
     };
   },
   mounted() {
@@ -125,6 +106,23 @@ export default {
   computed: {
     room() {
       return this.$matrix.currentRoom;
+    },
+
+    joinedMembers() {
+      if (!this.room) {
+        return [];
+      }
+      const myUserId = this.$matrix.currentUserId;
+      return this.room.getJoinedMembers().sort((a, b) => {
+        if (a.userId == myUserId) {
+          return -1;
+        } else if (b.userId == myUserId) {
+          return 1;
+        }
+        const aName = a.user ? a.user.displayName : a.name;
+        const bName = b.user ? b.user.displayName : b.name;
+        return aName.localeCompare(bName);
+      });
     },
   },
 
@@ -151,8 +149,6 @@ export default {
       this.memberCount = this.room.getJoinedMemberCount();
     },
 
-    showRoomInfo() {},
-
     memberAvatar(member) {
       if (member) {
         return member.getAvatarUrl(
@@ -166,10 +162,18 @@ export default {
       return null;
     },
 
+    viewProfile() {
+      this.$navigation.push({ name: "Profile" }, 1);
+    },
+
+    leaveRoom() {
+      console.log("Leave");
+    },
+
     upgradeAccount() {
       this.$matrix
         .upgradeGuestAccount()
-        .then(user => {
+        .then((user) => {
           // Done, login with the "new" account to get a real token instead of our guest token.
           this.user = user;
           return this.$store.dispatch("auth/login", this.user);

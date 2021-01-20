@@ -4,6 +4,7 @@ import VueRouter from 'vue-router'
 import Chat from '../components/Chat.vue'
 import Join from '../components/Join.vue'
 import Login from '../components/Login.vue'
+import Profile from '../components/Profile.vue'
 import util from '../plugins/utils'
 
 Vue.use(VueRouter)
@@ -24,6 +25,11 @@ const routes = [
     name: 'RoomInfo',
     component: () => import('../components/RoomInfo.vue'),
     props: true,
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile
   },
   {
     path: '/login',

@@ -19,27 +19,19 @@
     </v-row>
 
     <!-- "REALLY LEAVE?" dialog -->
-    <v-dialog v-model="showLeaveConfirmation" class="ma-0 pa-0" width="50%">
-        <v-card>
-          <v-card-title>Are you sure you want to leave?</v-card-title>
-          <v-card-text>
-            <div>You may not be able to rejoin.</div>
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text @click="showLeaveConfirmation = false">Cancel</v-btn>
-            <v-btn color="primary" text @click="doLeaveRoom();showLeaveConfirmation = false">Next</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+    <LeaveRoomDialog :show="showLeaveConfirmation" :room="room" @close="showLeaveConfirmation = false" />
 
   </v-container>
 </template>
 
 <script>
+import LeaveRoomDialog from '../components/LeaveRoomDialog';
+
 export default {
   name: "ChatHeader",
+  components: {
+    LeaveRoomDialog
+  },
   data() {
     return {
       memberCount: null,
