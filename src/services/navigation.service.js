@@ -19,6 +19,11 @@ export default {
                 next(routes[0]);
                 return;
             }
+            // If we have a room id param, it needs to be the same, else we call "next" with the correct one
+            if (index >= 0 && routes[index].params && to.params && routes[index].params.roomId != to.params.roomId) {
+                next(routes[0]);
+                return;
+            }
             if (index >= 0) {
                 routes.splice(index + 1);
             }
