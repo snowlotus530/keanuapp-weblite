@@ -2,8 +2,8 @@
   <div v-if="room" class="room-info">
     <div class="chat-header">
       <v-container fluid>
-        <div class="room-name" v-if="room">
-          {{ room.summary.info.title }}
+        <div class="room-name">
+          Info
         </div>
         <v-btn
           text
@@ -16,6 +16,18 @@
         </v-btn>
       </v-container>
     </div>
+
+    <v-card class="members ma-3" flat>
+        <div class="text-center">
+        <v-avatar class="room-avatar">
+          <v-img v-if="roomAvatar" :src="roomAvatar" />
+          <span v-else class="white--text headline">{{
+            roomName.substring(0, 1).toUpperCase()
+          }}</span>
+        </v-avatar>
+        </div>
+        <div class="room-title">{{ roomName }}</div>
+    </v-card>
 
     <v-card class="members ma-3" flat>
       <v-card-title
@@ -61,27 +73,35 @@
 
     <v-card class="account ma-3" flat>
       <v-card-text>
-          <v-btn color="red" block class="filled-button" @click.stop="showLeaveConfirmation = true"
-            >Leave group</v-btn
-          >
-          <div>
-            Note: This step cannot be undone. Make sure you want to logout and delete the chat forever.
-          </div>
+        <v-btn
+          color="red"
+          block
+          class="filled-button"
+          @click.stop="showLeaveConfirmation = true"
+          >Leave group</v-btn
+        >
+        <div>
+          Note: This step cannot be undone. Make sure you want to logout and
+          delete the chat forever.
+        </div>
       </v-card-text>
     </v-card>
 
-    <LeaveRoomDialog :show="showLeaveConfirmation" :room="room" @close="showLeaveConfirmation = false" />
-
+    <LeaveRoomDialog
+      :show="showLeaveConfirmation"
+      :room="room"
+      @close="showLeaveConfirmation = false"
+    />
   </div>
 </template>
 
 <script>
-import LeaveRoomDialog from '../components/LeaveRoomDialog';
+import LeaveRoomDialog from "../components/LeaveRoomDialog";
 
 export default {
   name: "RoomInfo",
   components: {
-    LeaveRoomDialog
+    LeaveRoomDialog,
   },
   data() {
     return {
@@ -89,7 +109,7 @@ export default {
       user: null,
       displayName: "",
       showAllMembers: false,
-      showLeaveConfirmation: false
+      showLeaveConfirmation: false,
     };
   },
   mounted() {
@@ -106,6 +126,20 @@ export default {
   computed: {
     room() {
       return this.$matrix.currentRoom;
+    },
+
+    roomName() {
+      if (this.room) {
+        return this.room.name;
+      }
+      return "";
+    },
+
+    roomAvatar() {
+      if (this.room) {
+        return this.room.avatar;
+      }
+      return "";
     },
 
     joinedMembers() {
