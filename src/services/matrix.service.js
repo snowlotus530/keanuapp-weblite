@@ -65,10 +65,20 @@ export default {
                     var promiseLogin;
 
                     if (user.is_guest) {
+                        // Generate random username and password. We don't user REAL matrix
+                        // guest accounts because 1. They are not allowed to post media, 2. They
+                        // can not use avatars and 3. They can not seamlessly be upgraded to real accounts.
+                        //
+                        // Instead, we use an ILAG approach, Improved Landing as Guest.
+                        const user = util.randomUser();
+                        const pass = util.randomPass();
                         promiseLogin = tempMatrixClient
-                            .registerGuest({}, undefined)
+                            .register(user, pass, null, {
+                                type: "m.login.dummy",
+                              })
                             .then((response) => {
                                 console.log("Response", response);
+                                response.password = pass;
                                 response.is_guest = true;
                                 localStorage.setItem('user', JSON.stringify(response));
                                 return response;
@@ -106,19 +116,19 @@ export default {
                     if (!this.matrixClient || !this.currentUser || !this.currentUser.is_guest) {
                         return Promise.reject("Invalid params");
                     }
-                    const randomUsername = util.randomUser();
                     const randomPassword = util.randomPass();
-                    const data = {
-                        username:randomUsername,
-                        password:randomPassword,
-                        guest_access_token:this.currentUser.access_token
-                    };
-                    return this.matrixClient.registerRequest(data, undefined, undefined)
+                    const self = this;
+                    return this.matrixClient.register(this.matrixClient.getUserIdLocalpart(), randomPassword, null, {
+                        type: "m.login.dummy",
+                      }, undefined, this.currentUser.access_token)
                         .then((response) => {
                             console.log("Response", response);
                             response.is_guest = false;
-                            localStorage.setItem('user', JSON.stringify(response));
-                            return response;
+                            response.password = randomPassword;
+                            self.currentUser = response;
+                            localStorage.setItem('user', JSON.stringify(response)); // Update local storage as well.
+                            self.logout();
+                            return self.currentUser;
                         });
                 },
 
@@ -163,12 +173,13 @@ export default {
                         deviceId: user.device_id,
                         accessToken: user.access_token,
                         timelineSupport: true,
-                        unstableClientRelationAggregation: true
+                        unstableClientRelationAggregation: true,
+                        //useAuthorizationHeader: true
                     }
                     this.matrixClient = sdk.createClient(opts);
-                    if (user.is_guest) {
-                        this.matrixClient.setGuest(true);
-                    }
+                    // if (user.is_guest) {
+                    //     this.matrixClient.setGuest(true);
+                    // }
                     return this.matrixClient
                         .initCrypto()
                         .then(() => {
@@ -210,6 +221,7 @@ export default {
                     if (client) {
                         client.on("event", this.onEvent);
                         client.on("Room", this.onRoom);
+                        client.on("Session.logged_out", this.onSessionLoggedOut);
                     }
                 },
 
@@ -217,6 +229,7 @@ export default {
                     if (client) {
                         client.off("event", this.onEvent);
                         client.off("Room", this.onRoom);
+                        client.off("Session.logged_out", this.onSessionLoggedOut);
                     }
                 },
 
@@ -242,6 +255,11 @@ export default {
 
                 onRoom(ignoredroom) {
                     this.reloadRooms();
+                },
+
+                onSessionLoggedOut() {
+                    console.log("Logged out!");
+                    this.logout();
                 },
 
                 reloadRooms() {

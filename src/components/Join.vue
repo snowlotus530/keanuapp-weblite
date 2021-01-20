@@ -21,15 +21,26 @@
       <div class="join-message">
         <!-- Join the group chat in a web browser or with the Keanu app. -->
       </div>
-      <v-combobox
-        v-if="!currentUser || currentUser"
-        @update:search-input="updateDisplayName"
-        :items="defaultDisplayNames"
-        :value="displayName"
-        label="User name"
-        outlined
-        dense
-      ></v-combobox>
+      <v-container class="join-user-info">
+        <v-row>
+          <v-col class="flex-grow-0 flex-shrink-0">
+            <v-avatar @click="showAvatarPicker = true">
+              <v-img v-if="userAvatar" :src="userAvatar.image" />
+            </v-avatar>
+          </v-col>
+          <v-col class="flex-shrink-1 flex-grow-1">
+            <v-combobox
+              v-if="!currentUser || currentUser"
+              @update:search-input="updateDisplayName"
+              :items="defaultDisplayNames"
+              :value="displayName"
+              label="User name"
+              outlined
+              dense
+            ></v-combobox>
+          </v-col>
+        </v-row>
+      </v-container>
 
       <!--<v-btn
         class="btn-light"
@@ -67,6 +78,48 @@
 
       <div v-if="loadingMessage">{{ loadingMessage }}</div>
     </div>
+
+    <v-dialog
+      scrollable
+      :fullscreen="$vuetify.breakpoint.xs"
+      width="500"
+      transition="dialog-bottom-transition"
+      v-model="showAvatarPicker"
+    >
+      <v-card>
+        <v-toolbar dark flat color="primary">
+          <v-btn icon dark @click="showAvatarPicker = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Select an Avatar</v-toolbar-title>
+          <v-spacer></v-spacer>
+        </v-toolbar>
+        <v-card-text>
+          <v-container row wrap>
+            <v-col
+              v-for="avatar in availableAvatars"
+              :key="avatar.id"
+              xs4
+              sm3
+              d-flex
+            >
+              <v-card tile flat class="d-flex">
+                <v-card-text class="d-flex">
+                  <v-avatar
+                    size="48"
+                    @click="selectAvatar(avatar)"
+                    class="avatar-picker-avatar"
+                    :class="{ current: avatar === userAvatar }"
+                  >
+                    <img :src="avatar.image" />
+                  </v-avatar>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -86,12 +139,17 @@ export default {
       loadingMessage: null,
       waitingForInfo: true,
       waitingForMembership: false,
+      userAvatar: null,
       displayName: null,
-      defaultDisplayNames: ["Guest Pandolin", "Guest Iguana", "Guest Horse"],
+      defaultDisplayNames: [],
+      availableAvatars: [],
+      showAvatarPicker: false,
     };
   },
   mounted() {
     this.$matrix.on("Room.myMembership", this.onMyMembership);
+    this.availableAvatars = util.getDefaultAvatars();
+    this.userAvatar = this.availableAvatars[0];
 
     this.roomId = this.$matrix.currentRoomId;
     this.roomName = this.roomId;
@@ -124,11 +182,13 @@ export default {
         .catch((ignoredErr) => {
           this.waitingForMembership = false;
         });
-    } 
+    }
     if (!this.currentUser || this.currentUser.is_guest) {
-      var values = require("!!raw-loader!../assets/usernames.txt").default.split('\n').filter((item) => {
-        return item.length > 0;
-      })
+      var values = require("!!raw-loader!../assets/usernames.txt")
+        .default.split("\n")
+        .filter((item) => {
+          return item.length > 0;
+        });
       this.displayName = values[Math.floor(Math.random() * values.length)];
       this.defaultDisplayNames = values;
     }
@@ -188,20 +248,48 @@ export default {
       if (this.currentUser) {
         clientPromise = this.$matrix.getMatrixClient(this.currentUser);
       } else {
-        clientPromise = this.$store.dispatch("auth/login", this.guestUser)
+        clientPromise = this.$store.dispatch("auth/login", this.guestUser);
       }
       return clientPromise
-        .then(function(user) {
-          if ((this.currentUser && !this.currentUser.is_guest) || !this.displayName) {
-            return Promise.resolve(user);
-          } else {
-            return this.$matrix.matrixClient.setDisplayName(this.displayName, undefined);
-          }   
-        }.bind(this))
-        .then(function(ignoreduser) {
-          this.loadingMessage = "Joining room...";
-          return this.$matrix.matrixClient.joinRoom(this.roomId);
-        }.bind(this))
+        .then(
+          function (user) {
+            if (
+              (this.currentUser && !this.currentUser.is_guest) ||
+              !this.displayName
+            ) {
+              return Promise.resolve(user);
+            } else {
+              return this.$matrix.matrixClient.setDisplayName(
+                this.displayName,
+                undefined
+              );
+            }
+          }.bind(this)
+        )
+        .then(
+          function () {
+            if (
+              (this.currentUser && !this.currentUser.is_guest) ||
+              !this.userAvatar
+            ) {
+              return Promise.resolve("no avatar");
+            } else {
+              return util.setAvatar(
+                this.$matrix.matrixClient,
+                this.userAvatar.image,
+                function (progress) {
+                  console.log("Progress: " + JSON.stringify(progress));
+                }
+              );
+            }
+          }.bind(this)
+        )
+        .then(
+          function (ignoreduser) {
+            this.loadingMessage = "Joining room...";
+            return this.$matrix.matrixClient.joinRoom(this.roomId);
+          }.bind(this)
+        )
         .then((room) => {
           this.loading = false;
           this.loadingMessage = null;
@@ -222,7 +310,12 @@ export default {
 
     updateDisplayName(value) {
       this.displayName = value;
-    }
+    },
+
+    selectAvatar(avatar) {
+      this.userAvatar = avatar;
+      this.showAvatarPicker = false;
+    },
   },
 };
 </script>
