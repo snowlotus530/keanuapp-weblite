@@ -444,6 +444,33 @@ $admin-fg: white;
         background-color: transparent;
         border: none;
     }
+    .room-avatar {
+        background-color: #ededed;
+        width: 100px !important;
+        height: 100px !important;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        .headline {
+            font-size: 80 * $chat-text-size !important;
+        }
+    }
+    
+    .room-title {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        font-family: "Poppins", sans-serif;
+        font-style: normal;
+        font-weight: 800;
+        font-size: 40 * $chat-text-size;
+        line-height: 108.5%;
+        /* or 43px */
+        text-align: center;
+        letter-spacing: -0.8px;
+        
+        color: #000000;
+        overflow-wrap: break-word;
+    }
+
     .room-name {
         text-align: center;
         margin-top: 15px;
