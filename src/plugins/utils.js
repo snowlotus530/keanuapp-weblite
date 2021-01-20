@@ -1,8 +1,13 @@
 import axios from 'axios';
 import * as ContentHelpers from "matrix-js-sdk/lib/content-helpers";
+var dayjs = require('dayjs');
 var sha256 = require('js-sha256').sha256;
 var aesjs = require('aes-js');
 var base64Url = require('json-web-key/lib/base64url');
+
+// Install extended localized format
+var localizedFormat = require('dayjs/plugin/localizedFormat')
+dayjs.extend(localizedFormat)
 
 class Util {
     getAttachment(matrixClient, event) {
@@ -414,6 +419,32 @@ class Util {
                 });
 
         })
+    }
+
+    /**
+     * Return number of whole days between the timestamps, at end of that day.
+     * @param {*} ts1 
+     * @param {*} ts2 
+     */
+    dayDiff(ts1, ts2) {
+        var t1 = dayjs(ts1).endOf('day');
+        var t2 = dayjs(ts2).endOf('day');
+        return t2.diff(t1, 'day');
+    }
+
+    formatDay(timestamp) {
+        var then = dayjs(timestamp).endOf('day');
+        var now = dayjs().endOf('day');
+        const dayDiff = now.diff(then, 'day');
+        if (dayDiff < 1) {
+            return "Today";
+        } else if (dayDiff < 2) {
+            return "Yesterday";
+        } else if (dayDiff < 7) {
+            return "" + dayDiff + " days ago";
+        } else {
+            return then.format('L');
+        }
     }
 }
 export default new Util();
