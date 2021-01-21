@@ -373,7 +373,7 @@ $admin-fg: white;
 .room-name {
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
-    font-size: 14 * $chat-text-size;
+    font-size: 18 * $chat-text-size;
     text-transform: uppercase;
     color: black;
 }
@@ -448,27 +448,14 @@ $admin-fg: white;
         background-color: #ededed;
         width: 100px !important;
         height: 100px !important;
-        margin-top: 20px;
         margin-bottom: 20px;
         .headline {
-            font-size: 80 * $chat-text-size !important;
+            font-size: 70 * $chat-text-size !important;
         }
     }
     
-    .room-title {
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        font-family: "Poppins", sans-serif;
-        font-style: normal;
-        font-weight: 800;
-        font-size: 40 * $chat-text-size;
-        line-height: 108.5%;
-        /* or 43px */
-        text-align: center;
-        letter-spacing: -0.8px;
-        
-        color: #000000;
-        overflow-wrap: break-word;
+    .avatar .headline {
+        font-size: 16 * $chat-text-size !important;
     }
 
     .room-name {
@@ -484,9 +471,28 @@ $admin-fg: white;
         font-size: 12 * $chat-text-size;
     }
 
+    .qr {
+        width: 120px;
+        height: 120px;
+        width: min(30vw, 30vh); 
+        height: min(30vw, 30vh); 
+        background-color: #e0e0e0;
+        margin-top: 15px;
+    }
+
     .v-card {
         background-color: white;
         border-radius: 20px;
+    }
+
+    .member::after {
+        content: ' ';
+        display: block;
+        margin: 10px 0px;
+        bottom: 0px;
+        height: 1px;
+        background-color: #e1e1e1;
+        width: 100%;
     }
 
     .show-all {

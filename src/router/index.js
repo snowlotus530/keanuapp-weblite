@@ -75,4 +75,8 @@ router.beforeEach((to, from, next) => {
   }
 });
 
+router.getRoomLink = function(roomId) {
+  return window.location.origin + "/#/room/" + roomId;
+}
+
 export default router
