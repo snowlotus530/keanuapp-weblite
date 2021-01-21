@@ -10,6 +10,25 @@ $chat-standard-padding-xs: 8px;
 $chat-text-size: 1.0px;
 $chat-button-height: 50px;
 
+.h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 36 * $chat-text-size;
+    text-align: center;
+    color: black;
+    line-height: 108.5%;
+    letter-spacing: -0.8px;
+    overflow-wrap: break-word;
+}
+
+.h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 24 * $chat-text-size;
+    text-align: center;
+    color: black;
+}
+
 .v-btn.outlined-button {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
