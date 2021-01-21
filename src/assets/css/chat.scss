@@ -528,10 +528,29 @@ $admin-fg: white;
         border-radius: 20px;
     }
 
+    .user-info {
+        display: flex;
+        flex-wrap: nowrap;
+        max-width: 40%;
+    }
+
     .show-all {
         color: black;
         font-size: 14 * $chat-text-size;
         font-weight: bold;
         margin-left: 10px;
+    }
+
+    .action {
+        padding: 4px 20px;
+        &::after {
+            content: ' ';
+            display: block;
+            margin: 10px 0px;
+            bottom: 0px;
+            height: 1px;
+            background-color: #e1e1e1;
+            width: 100%;
+        }
     }
 }

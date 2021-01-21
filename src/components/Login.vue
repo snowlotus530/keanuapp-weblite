@@ -5,7 +5,7 @@
     </v-btn>
 
     <div color="rgba(255,255,255,0.1)" class="text-center">
-      <h4>Login</h4>
+      <div class="h2">Login</div>
       <v-form v-model="isValid">
         <v-text-field
           v-model="user.username"
@@ -90,19 +90,17 @@ export default {
     message() {
       if (
         this.message &&
-        this.message.message &&
-        this.message.message.toLowerCase().includes("user")
+        this.message.toLowerCase().includes("user")
       ) {
-        this.userErrorMessage = this.message.message;
+        this.userErrorMessage = this.message;
       } else {
         this.userErrorMessage = null;
       }
       if (
         this.message &&
-        this.message.message &&
-        this.message.message.toLowerCase().includes("pass")
+        this.message.toLowerCase().includes("pass")
       ) {
-        this.passErrorMessage = this.message.message;
+        this.passErrorMessage = this.message;
       } else {
         this.passErrorMessage = null;
       }
@@ -111,6 +109,9 @@ export default {
   methods: {
     handleLogin() {
       if (this.user.username && this.user.password) {
+
+      // Reset errors
+      this.message = null;
 
         // Is it a full matrix user id? Modify a copy, so that the UI will still show the full ID.
         var user = Object.assign({}, this.user);
@@ -128,9 +129,10 @@ export default {
           (error) => {
             this.loading = false;
             this.message =
-              (error.response && error.response.data) ||
+              (error.data && error.data.error) ||
               error.message ||
               error.toString();
+            console.log("Message set to ", this.message);
           }
         );
       }
