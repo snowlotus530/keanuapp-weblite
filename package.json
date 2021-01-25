@@ -23,6 +23,7 @@
     "roboto-fontface": "*",
     "v-emoji-picker": "^2.3.1",
     "vue": "^2.6.11",
+    "vue-clipboard2": "^0.3.1",
     "vue-resize": "^0.5.0",
     "vue-router": "^3.2.0",
     "vuetify": "^2.2.11",
