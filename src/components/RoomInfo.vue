@@ -29,6 +29,25 @@
       </div>
     </v-card>
 
+    <v-card class="account ma-3" flat>
+      <v-card-title class="h2">Permissions</v-card-title>
+      <v-card-text>
+        <div v-if="anyoneCanJoin">
+          <div>
+            Anyone with a link can join.
+          </div>
+          <v-text-field
+              :value="roomLink"
+              readonly
+              append-icon="content_copy"
+              filled
+              type="text"
+              @click:append="copyRoomLink"
+            ></v-text-field>
+        </div>
+      </v-card-text>
+    </v-card>
+
     <v-card class="members ma-3" flat>
       <v-card-title class="h2"
         >Members<v-spacer></v-spacer>
@@ -156,6 +175,21 @@ export default {
       return "";
     },
 
+    anyoneCanJoin() {
+      // TODO: fix this! For now, just return true of we have a canonical alias.
+      if (this.room && this.room.getCanonicalAlias() && this.room.getCanonicalAlias().startsWith('#')) {
+        return true;
+      }
+      return false;
+    },
+
+    roomLink() {
+      if (this.room) {
+        return this.$router.getRoomLink(this.room.getCanonicalAlias() || this.room.roomId);
+      }
+      return null;
+    },
+
     roomAvatar() {
       if (this.room) {
         return this.room.avatar;
@@ -207,7 +241,7 @@ export default {
     },
 
     updateQRCode() {
-      var fullUrl = this.$router.getRoomLink(this.room.getCanonicalAlias() || this.room.roomId);
+      var fullUrl = this.roomLink;
       var canvas = document.getElementById("room-qr");
       QRCode.toCanvas(
         canvas,
@@ -260,6 +294,14 @@ export default {
           console.log("ERROR", err);
         });
     },
+
+    copyRoomLink() {
+      this.$copyText(this.roomLink).then(function (e) {
+          console.log(e)
+        }, function (e) {
+          console.log(e)
+        });    
+      }
   },
 };
 </script>
