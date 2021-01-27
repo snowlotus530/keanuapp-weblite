@@ -50,8 +50,10 @@ export default {
       const originalEventId = relatesTo['m.in_reply_to'].event_id;
       if (originalEventId && this.timelineSet) {
         const originalEvent = this.timelineSet.findEventById(originalEventId);
-        this.inReplyToEvent = originalEvent;
-        this.inReplyToSender = this.messageEventDisplayName(originalEvent);
+        if (originalEvent) {
+          this.inReplyToEvent = originalEvent;
+          this.inReplyToSender = this.messageEventDisplayName(originalEvent);
+        }
       }
     }
   },
