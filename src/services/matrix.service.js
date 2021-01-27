@@ -1,6 +1,7 @@
 global.Olm = require("olm");
 import sdk from "matrix-js-sdk";
 import util from "../plugins/utils";
+import User from "../models/user";
 
 const LocalStorageCryptoStore = require("matrix-js-sdk/lib/crypto/store/localStorage-crypto-store")
     .LocalStorageCryptoStore;
@@ -61,10 +62,10 @@ export default {
 
             methods: {
                 login(user) {
-                    const tempMatrixClient = sdk.createClient(user.server);
+                    const tempMatrixClient = sdk.createClient(User.homeServerUrl(user.home_server));
                     var promiseLogin;
 
-                    if (user.is_guest) {
+                    if (user.is_guest && !user.access_token) {
                         // Generate random username and password. We don't user REAL matrix
                         // guest accounts because 1. They are not allowed to post media, 2. They
                         // can not use avatars and 3. They can not seamlessly be upgraded to real accounts.
@@ -83,11 +84,23 @@ export default {
                                 localStorage.setItem('user', JSON.stringify(response));
                                 return response;
                             })
+                    } else if (!user.is_guest && user.access_token) {
+                        // Logged in on "real" account
+                        promiseLogin = Promise.resolve("Already logged in");
                     } else {
+                        var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password" };
+                        if (user.device_id) {
+                            data.device_id = user.device_id;
+                        }
                         promiseLogin = tempMatrixClient
-                            .login("m.login.password", { user: user.username, password: user.password, type: "m.login.password" })
+                            .login("m.login.password", data)
                             .then((response) => {
-                                localStorage.setItem('user', JSON.stringify(response));
+                                var u = response;
+                                if (user.is_guest) {
+                                    // Copy over needed properties
+                                    u = Object.assign(user, response);
+                                }
+                                localStorage.setItem('user', JSON.stringify(u));
                                 return response;
                             })
                     }
@@ -104,8 +117,8 @@ export default {
                         this.matrixClient.stopClient();
                         this.matrixClient = null;
                         this.matrixClientReady = false;
-                        localStorage.removeItem('user');
                     }
+                    localStorage.removeItem('user');
                     this.$store.commit("setCurrentRoomId", null);
                 },
 
@@ -259,7 +272,21 @@ export default {
 
                 onSessionLoggedOut() {
                     console.log("Logged out!");
-                    this.logout();
+                    if (this.matrixClient) {
+                        this.removeMatrixClientListeners(this.matrixClient);
+                        this.matrixClient.stopClient();
+                        this.matrixClient = null;
+                        this.matrixClientReady = false;
+                    }
+                    this.$store.commit("setCurrentRoomId", null);
+                    
+                    // Clear the access token
+                    var user = JSON.parse(localStorage.getItem('user'));
+                    if (user) {
+                        delete user.access_token;
+                    }
+                    localStorage.setItem('user', JSON.stringify(user));
+                    this.$navigation.push({ name: "Login" }, -1);
                 },
 
                 reloadRooms() {

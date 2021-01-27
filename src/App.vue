@@ -84,9 +84,9 @@ export default {
     currentUser: {
       immediate: true,
       handler(ignorednewVal, ignoredoldVal) {
-        if (this.loggedIn()) {
+        if (this.currentUser) {
           this.$matrix
-            .getMatrixClient(this.currentUser)
+            .login(this.currentUser)
             .then(() => {
               console.log("Matrix client ready");
             })

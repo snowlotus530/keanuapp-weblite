@@ -115,11 +115,7 @@ export default {
 
         // Is it a full matrix user id? Modify a copy, so that the UI will still show the full ID.
         var user = Object.assign({}, this.user);
-        if (user.username.startsWith('@') && user.username.includes(':')) {
-          const parts = user.username.split(":");
-          user.username = parts[0].substring(1);
-          user.server = "https://" + parts[1];
-        }
+        user.normalize();
 
         this.loading = true;
         this.$store.dispatch("auth/login", user).then(
