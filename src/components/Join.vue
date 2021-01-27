@@ -157,7 +157,7 @@ export default {
       this.waitingForMembership = true;
       const self = this;
       this.$matrix
-        .getMatrixClient(this.currentUser)
+        .login(this.currentUser)
         .then(() => {
           self.$matrix.setCurrentRoomId(self.roomId); // Go to this room, now or when joined.
 
@@ -246,7 +246,7 @@ export default {
       this.loadingMessage = "Logging in...";
       var clientPromise;
       if (this.currentUser) {
-        clientPromise = this.$matrix.getMatrixClient(this.currentUser);
+        clientPromise = this.$matrix.login(this.currentUser);
       } else {
         clientPromise = this.$store.dispatch("auth/login", this.guestUser);
       }
