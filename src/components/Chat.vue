@@ -321,6 +321,12 @@ export default {
       }
       return this.$matrix.currentRoomId;
     },
+    roomAliasOrId() {
+      if (this.room) {
+        return this.room.getCanonicalAlias() || this.room.roomId;
+      }
+      return this.$matrix.currentRoomId;
+    },
     readMarker() {
       if (this.lastRR) {
         // If we have sent a RR, use that as read marker (so we don't have to wait for server round trip)
@@ -371,10 +377,10 @@ export default {
   },
 
   watch: {
-    room: {
+    roomId: {
       immediate: true,
-      handler(room, oldRoom) {
-        if (room && room == oldRoom) {
+      handler(value, oldValue) {
+        if (value && value == oldValue) {
           return; // No change.
         }
         console.log("Chat: Current room changed");
@@ -389,7 +395,7 @@ export default {
         this.stopRRTimer();
         this.lastRR = null;
 
-        if (!room) {
+        if (!this.room) {
           // Public room?
           if (this.roomId && this.roomId.startsWith('#')) {
             this.onRoomNotJoined();
@@ -398,7 +404,7 @@ export default {
         }
 
           // Joined?
-          if (room.hasMembershipState(this.currentUser.user_id, "join")) {
+          if (this.room.hasMembershipState(this.currentUser.user_id, "join")) {
             // Yes, load everything
             this.onRoomJoined();
           } else {
@@ -414,24 +420,28 @@ export default {
       var initialEventId = this.readMarker;
       console.log("Read up to " + initialEventId);
 
+      //initialEventId = null;
+      
       this.timelineWindow = new TimelineWindow(
           this.$matrix.matrixClient,
           this.room.getUnfilteredTimelineSet(),
           {}
       );
+      const self = this;
       this.timelineWindow.load(initialEventId, 20).then(() => {
-          this.events = this.timelineWindow.getEvents();
+        console.log("This is", self);
+          self.events = self.timelineWindow.getEvents();
 
           const getMoreIfNeeded = function _getMoreIfNeeded() {
-            const container = this.$refs.chatContainer;
+            const container = self.$refs.chatContainer;
             if (container.scrollHeight <= container.clientHeight && 
-              this.timelineWindow &&
-              this.timelineWindow.canPaginate(EventTimeline.BACKWARDS)) {
-                return this.timelineWindow.paginate(EventTimeline.BACKWARDS, 10, true)
+              self.timelineWindow &&
+              self.timelineWindow.canPaginate(EventTimeline.BACKWARDS)) {
+                return self.timelineWindow.paginate(EventTimeline.BACKWARDS, 10, true)
                   .then(success => {
                     if (success) {
-                      this.events = this.timelineWindow.getEvents();
-                      return _getMoreIfNeeded.call(this);
+                      self.events = self.timelineWindow.getEvents();
+                      return _getMoreIfNeeded.call(self);
                     } else {
                         return Promise.reject("Failed to paginate");
                       }
@@ -439,24 +449,24 @@ export default {
             } else {
               return Promise.resolve("Done");
             }            
-          }.bind(this);
+          }.bind(self);
 
           getMoreIfNeeded()
           .catch(err => {
             console.log("ERROR " + err);
           })
           .finally(() => {
-            this.initialLoadDone = true;
+            self.initialLoadDone = true;
           if (initialEventId) {
-            this.scrollToEvent(initialEventId);
+            self.scrollToEvent(initialEventId);
           }
-          this.restartRRTimer();
+          self.restartRRTimer();
           });
         });
     },
 
     onRoomNotJoined() {
-      this.$navigation.push({ name: "Join", params: { roomId: this.roomId }}, 0);
+      this.$navigation.push({ name: "Join", params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) }}, 0);
     },
 
     touchX(event) {
@@ -819,6 +829,7 @@ export default {
         .then((url) => {
           const link = document.createElement("a");
           link.href = url;
+          link.target = "_blank";
           link.download = event.getContent().body || "Download";
           link.click();
           URL.revokeObjectURL(url);

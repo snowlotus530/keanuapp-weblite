@@ -76,7 +76,7 @@ export default {
                         promiseLogin = tempMatrixClient
                             .register(user, pass, null, {
                                 type: "m.login.dummy",
-                              })
+                            })
                             .then((response) => {
                                 console.log("Response", response);
                                 response.password = pass;
@@ -133,7 +133,7 @@ export default {
                     const self = this;
                     return this.matrixClient.register(this.matrixClient.getUserIdLocalpart(), randomPassword, null, {
                         type: "m.login.dummy",
-                      }, undefined, this.currentUser.access_token)
+                    }, undefined, this.currentUser.access_token)
                         .then((response) => {
                             console.log("Response", response);
                             response.is_guest = false;
@@ -148,7 +148,6 @@ export default {
                 initClient() {
                     this.reloadRooms();
                     this.matrixClientReady = true;
-                    this.currentRoom = this.getRoom(this.currentRoomId);
                     this.matrixClient.emit('Matrix.initialized', this.matrixClient);
                 },
 
@@ -279,7 +278,7 @@ export default {
                         this.matrixClientReady = false;
                     }
                     this.$store.commit("setCurrentRoomId", null);
-                    
+
                     // Clear the access token
                     var user = JSON.parse(localStorage.getItem('user'));
                     if (user) {
@@ -290,34 +289,54 @@ export default {
                 },
 
                 reloadRooms() {
-                    this.rooms = this.matrixClient.getVisibleRooms();
-                    this.rooms.forEach(room => {
-                        Vue.set(room, "avatar", room.getAvatarUrl(this.matrixClient.getHomeserverUrl(), 80, 80, "scale", true));
+                    // TODO - do incremental update instead of replacing the whole array
+                    // each time!
+                    var updatedRooms = this.matrixClient.getVisibleRooms();
+                    updatedRooms = updatedRooms.filter(room => {
+                        return room._selfMembership;
                     });
-                    if (this.currentRoom == null && this.currentRoomId) {
-                        // Try to set it!
-                        this.currentRoom = this.getRoom(this.currentRoomId);
+                    updatedRooms.forEach(room => {
+                        if (!room.avatar) {
+                            Vue.set(room, "avatar", room.getAvatarUrl(this.matrixClient.getHomeserverUrl(), 80, 80, "scale", true));
+                        }
+                    });
+                    Vue.set(this, "rooms", updatedRooms);
+                    const currentRoom = this.getRoom(this.currentRoomId);
+                    if (this.currentRoom != currentRoom) {
+                        this.currentRoom = currentRoom;
                     }
                 },
 
                 setCurrentRoomId(roomId) {
                     this.$store.commit("setCurrentRoomId", roomId);
+                    this.currentRoom = this.getRoom(roomId);
                 },
 
                 getRoom(roomId) {
                     if (!roomId) {
                         return null;
                     }
-                    var room = this.rooms.find(room => {
-                        if (roomId.startsWith("#")) {
-                            return room.getCanonicalAlias() == roomId;
-                        }
-                        return room.roomId == roomId;
-                    });
-                    if (!room && this.matrixClient) {
-                        room = this.matrixClient.getRoom(roomId);
+                    var room = null;
+                    if (this.matrixClient) {
+                        const visibleRooms = this.matrixClient.getRooms();
+                        room = visibleRooms.find(room => {
+                            if (roomId.startsWith("#")) {
+                                return room.getCanonicalAlias() == roomId;
+                            }
+                            return room.roomId == roomId;
+                        });
                     }
                     return room || null;
+                },
+
+                leaveRoom(roomId) {
+                    return this.matrixClient.leave(roomId, undefined)
+                        .then(() => {
+                            this.rooms = this.rooms.filter(room => {
+                                room.roomId != roomId;
+                            });
+                            this.matrixClient.forget(roomId, true, undefined);
+                        })
                 },
 
                 on(event, handler) {
@@ -351,33 +370,33 @@ export default {
 
                     const findOrGetMore = function _findOrGetMore(response) {
                         for (var room of response.chunk) {
-                            if ((roomId.startsWith("#") && room.canonical_alias == roomId) || (roomId.startsWith("!") && room.room_id == roomId)){
+                            if ((roomId.startsWith("#") && room.canonical_alias == roomId) || (roomId.startsWith("!") && room.room_id == roomId)) {
                                 room.avatar = tempMatrixClient.mxcUrlToHttp(room.avatar_url, 80, 80, 'scale', true);
                                 return Promise.resolve(room);
                             }
                         }
                         if (response.next_batch) {
-                            return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", {limit:1000, since:response.next_batch})
-                            //return tempMatrixClient.publicRooms({limit:1,next_batch:response.next_batch})
-                            .then(response => {
-                                return _findOrGetMore(response);
-                            })
-                            .catch(err => {
-                                return Promise.reject("Failed to find room: " + err);
-                            });
+                            return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", { limit: 1000, since: response.next_batch })
+                                //return tempMatrixClient.publicRooms({limit:1,next_batch:response.next_batch})
+                                .then(response => {
+                                    return _findOrGetMore(response);
+                                })
+                                .catch(err => {
+                                    return Promise.reject("Failed to find room: " + err);
+                                });
                         } else {
                             return Promise.reject("No more data");
                         }
                     };
 
-                    return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", {limit:1000})
-                    //return tempMatrixClient.publicRooms({limit:1})
-                    .then(response => {
-                        return findOrGetMore(response);
-                    })
-                    .catch(err => {
-                        return Promise.reject("Failed to find room: " + err);
-                    });
+                    return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", { limit: 1000 })
+                        //return tempMatrixClient.publicRooms({limit:1})
+                        .then(response => {
+                            return findOrGetMore(response);
+                        })
+                        .catch(err => {
+                            return Promise.reject("Failed to find room: " + err);
+                        });
                 }
             }
         })

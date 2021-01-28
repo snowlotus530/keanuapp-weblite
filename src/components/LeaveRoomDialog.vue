@@ -1,9 +1,9 @@
 <template>
-  <v-dialog v-model="showDialog" v-show="room" class="ma-0 pa-0" width="50%">
+  <v-dialog v-model="showDialog" v-show="room" class="ma-0 pa-0" width="80%">
     <v-card>
-      <v-card-title>Are you sure you want to leave?</v-card-title>
+      <v-card-title class="dialog-title">Are you sure you want to leave?</v-card-title>
       <v-card-text>
-        <div>You may not be able to rejoin.</div>
+        <div class="dialog-text">You may not be able to rejoin.</div>
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
@@ -13,7 +13,7 @@
           color="primary"
           text
           @click="
-            doLeaveRoom();
+            onLeaveRoom();
             showDialog = false;
           "
           >Next</v-btn
@@ -58,19 +58,17 @@ export default {
   },
 
   methods: {
-    doLeaveRoom() {
+    onLeaveRoom() {
       //this.$matrix.matrixClient.forget(this.room.roomId, true, undefined)
       const roomId = this.room.roomId;
-      this.$matrix.matrixClient
-        .leave(roomId, undefined)
-        .then(() => {
-          console.log("Left room");
-          this.$matrix.matrixClient.store.removeRoom(roomId);
-          this.$navigation.push({ name: "Chat", params: { roomId: null } }, -1);
-        })
-        .catch((err) => {
-          console.log("Error leaving", err);
-        });
+      this.$matrix.leaveRoom(roomId)
+      .then(() => {
+        console.log("Left room");
+        this.$navigation.push({name:'Chat', params:{roomId:null}}, -1);
+      })
+      .catch(err => {
+        console.log("Error leaving", err);
+      });
     },
   },
 };

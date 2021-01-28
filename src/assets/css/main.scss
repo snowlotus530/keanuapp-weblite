@@ -53,3 +53,11 @@ $chat-button-height: 50px;
     margin-top: $chat-standard-padding-xs;
     margin-bottom: $chat-standard-padding-xs;
 }
+
+.dialog-title {
+    word-break: break-word;
+}
+
+.dialog-text {
+    word-break: break-word;
+}
