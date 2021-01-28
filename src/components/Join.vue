@@ -131,7 +131,6 @@ export default {
   name: "Join",
   data() {
     return {
-      roomId: null,
       roomName: null,
       roomAvatar: null,
       guestUser: new User("https://neo.keanu.im", "", "", true),
@@ -150,39 +149,6 @@ export default {
     this.$matrix.on("Room.myMembership", this.onMyMembership);
     this.availableAvatars = util.getDefaultAvatars();
     this.userAvatar = this.availableAvatars[0];
-
-    this.roomId = this.$matrix.currentRoomId;
-    this.roomName = this.roomId;
-    if (this.currentUser) {
-      this.waitingForMembership = true;
-      const self = this;
-      this.$matrix
-        .login(this.currentUser)
-        .then(() => {
-          self.$matrix.setCurrentRoomId(self.roomId); // Go to this room, now or when joined.
-
-          // Already joined?
-          const room = self.$matrix.getRoom(self.roomId);
-          if (
-            room &&
-            room.hasMembershipState(self.currentUser.user_id, "join")
-          ) {
-            // Yes, go to room
-            self.$navigation.push(
-              {
-                name: "Chat",
-                params: { roomId: util.sanitizeRoomId(self.roomId) },
-              },
-              -1
-            );
-            return;
-          }
-          this.waitingForMembership = false;
-        })
-        .catch((ignoredErr) => {
-          this.waitingForMembership = false;
-        });
-    }
     if (!this.currentUser || this.currentUser.is_guest) {
       var values = require("!!raw-loader!../assets/usernames.txt")
         .default.split("\n")
@@ -192,28 +158,6 @@ export default {
       this.displayName = values[Math.floor(Math.random() * values.length)];
       this.defaultDisplayNames = values;
     }
-
-    if (this.roomId.startsWith("#")) {
-      this.$matrix
-        .getPublicRoomInfo(this.roomId)
-        .then((room) => {
-          console.log("Found room:", room);
-          this.roomName = room.name;
-          this.roomAvatar = room.avatar;
-          this.waitingForInfo = false;
-        })
-        .catch((err) => {
-          console.log("Could not find room info", err);
-          this.waitingForInfo = false;
-        });
-    } else {
-      // Private room, try to get name
-      const room = this.$matrix.getRoom(this.roomId);
-      if (room) {
-        this.roomName = room.name || this.roomName;
-      }
-      this.waitingForInfo = false;
-    }
   },
   destroyed() {
     this.$matrix.off("Room.myMembership", this.onMyMembership);
@@ -222,14 +166,98 @@ export default {
     currentUser() {
       return this.$store.state.auth.user;
     },
+    room() {
+      return this.$matrix.currentRoom;
+    },
+    roomId() {
+      if (this.room) {
+        return this.room.roomId;
+      }
+      return this.$matrix.currentRoomId;
+    },
+    roomAliasOrId() {
+      if (this.room) {
+        return this.room.getCanonicalAlias() || this.room.roomId;
+      }
+      return this.$matrix.currentRoomId;
+    },
   },
+  watch: {
+    roomId: {
+      immediate: true,
+      handler(val, oldVal) {
+        if (val && val == oldVal) {
+          return; // No change.
+        }
+        console.log("Join: Current room changed");
+        this.roomName = this.roomId;
+        if (this.currentUser) {
+          this.waitingForMembership = true;
+          const self = this;
+          this.$matrix
+            .login(this.currentUser)
+            .then(() => {
+              self.$matrix.setCurrentRoomId(self.roomAliasOrId); // Go to this room, now or when joined.
+              const room = self.$matrix.getRoom(self.roomAliasOrId);
+
+              // Already joined?
+              if (
+                room &&
+                room.hasMembershipState(self.currentUser.user_id, "join")
+              ) {
+                // Yes, go to room
+                self.$navigation.push(
+                  {
+                    name: "Chat",
+                    params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) },
+                  },
+                  -1
+                );
+                return;
+              }
+              this.waitingForMembership = false;
+            })
+            .catch((ignoredErr) => {
+              this.waitingForMembership = false;
+            });
+        }
+        if (this.roomId.startsWith("#")) {
+          this.$matrix
+            .getPublicRoomInfo(this.roomId)
+            .then((room) => {
+              console.log("Found room:", room);
+              this.roomName = room.name;
+              this.roomAvatar = room.avatar;
+              this.waitingForInfo = false;
+            })
+            .catch((err) => {
+              console.log("Could not find room info", err);
+              this.waitingForInfo = false;
+            });
+        } else {
+          // Private room, try to get name
+          const room = this.$matrix.getRoom(this.roomId);
+          if (room) {
+            this.roomName = room.name || this.roomName;
+          }
+          this.waitingForInfo = false;
+        }
+      },
+    },
+  },
+
   methods: {
     onMyMembership(room, membership, ignoredprevMembership) {
       if (room && room.roomId == this.roomId && membership == "join") {
-        this.$navigation.push(
-          { name: "Chat", params: { roomId: this.roomId } },
-          -1
-        );
+        this.$nextTick(() => {
+          this.$navigation.push(
+            {
+              name: "Chat",
+              params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) },
+            },
+            -1
+          );
+        });
       }
     },
 
@@ -290,12 +318,15 @@ export default {
             return this.$matrix.matrixClient.joinRoom(this.roomId);
           }.bind(this)
         )
-        .then((room) => {
+        .then((ignoredRoom) => {
           this.loading = false;
           this.loadingMessage = null;
           this.$nextTick(() => {
             this.$navigation.push(
-              { name: "Chat", params: { roomId: room.roomId } },
+              {
+                name: "Chat",
+                params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) },
+              },
               -1
             );
           });

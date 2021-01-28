@@ -90,20 +90,6 @@ export default {
     leaveRoom() {
       this.showLeaveConfirmation = true;
     },
-
-    doLeaveRoom() {
-      //this.$matrix.matrixClient.forget(this.room.roomId, true, undefined)
-      const roomId = this.room.roomId;
-      this.$matrix.matrixClient.leave(roomId, undefined)
-      .then(() => {
-        console.log("Left room");
-        this.$matrix.matrixClient.store.removeRoom(roomId);
-        this.$navigation.push({name:'Chat', params:{roomId:null}}, -1);
-      })
-      .catch(err => {
-        console.log("Error leaving", err);
-      });
-    }
   },
 };
 </script>

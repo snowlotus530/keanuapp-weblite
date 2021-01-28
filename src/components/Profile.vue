@@ -30,7 +30,8 @@
             <div class="h1">{{ displayName }}</div>
             <div v-if="$matrix.currentUser.is_guest">
               This identity is temporary. Set a password to use it again.
-          </div>
+            </div>
+            <v-btn block class="outlined-button" @click.stop="logout">Logout</v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -175,6 +176,14 @@ export default {
         );
       }
       return null;
+    },
+
+    logout() {
+      //TODO - For guest accounts, show warning about not being able to rejoin.
+      this.$store.dispatch("auth/logout");
+      this.$nextTick(() => {
+        this.$navigation.push({path: "/login"}, -1);
+      })
     },
 
     setDisplayName(name) {
