@@ -81,6 +81,20 @@ export default {
     },
   },
   watch: {
+    '$route' (to, ignoredFrom) {
+      var title = "Keanu Weblite";
+      if (to.meta.title) {
+        title += "  - " + to.meta.title;
+      }
+      if (to.meta.includeRoom) {
+        if (this.$matrix.currentRoom) {
+          title += " - " + (this.$matrix.currentRoom.summary.info.title || this.$matrix.currentRoom.roomId);
+        } else if (this.$matrix.currentRoomId) {
+          title += " - " + (this.$matrix.currentRoomId);
+        }
+      }
+      document.title = title;
+    },
     currentUser: {
       immediate: true,
       handler(ignorednewVal, ignoredoldVal) {

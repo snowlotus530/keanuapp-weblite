@@ -13,13 +13,13 @@ export default {
         })
 
         router.beforeEach((to, from, next) => {
-            if (this.nextRoutes) {
-                console.log("Nav: next routes set, going:", this.routes, this.nextRoutes);
-                this.routes = this.nextRoutes;
-                this.nextRoutes = null;
-                if (this.routes.length > 0) {
-                    console.log("Redirecting to", this.routes.lastItem());
-                    next(this.routes.lastItem());
+            if (nextRoutes) {
+                console.log("Nav: next routes set, going:", routes, nextRoutes);
+                routes = nextRoutes;
+                nextRoutes = null;
+                if (routes.length > 0) {
+                    console.log("Redirecting to", routes[routes.length - 1]);
+                    next(routes[routes.length - 1]);
                     return;
                 }
             }
@@ -35,22 +35,28 @@ export default {
                     mode = 1;
                 }
                 if (mode == -1) {
-                    const i = routes.length - 1;
                     nextRoutes = [route];
-                    if (i > 0) {
-                        router.go(-i);
-                    } else {
-                        router.replace(route).catch((ignoredErr) => {});
-                    }
                 } else if (mode == 0) {
                     // Replace
                     nextRoutes = [...routes];
                     nextRoutes.pop();
                     nextRoutes.push(route);
-                    router.replace(route).catch((ignoredErr) => {});
                 } else {
                     nextRoutes = [...routes];
                     nextRoutes.push(route);
+                }
+
+                const index = nextRoutes.length - routes.length;
+                const targetIndex = nextRoutes.length - 1;
+                console.log("Nav - index " + index + " Target " + targetIndex);
+                if (index < 0) {
+                    console.log("Nav - go " + index);
+                    router.go(index);
+                } else if (index == 0) {
+                    console.log("Nav - replace");
+                    router.replace(route).catch((ignoredErr) => {});
+                } else {
+                    console.log("Nav - push");
                     router.push(route).catch((ignoredErr) => {});
                 }
             },
@@ -63,8 +69,7 @@ export default {
             },
 
             pop() {
-                nextRoutes = [...routes];
-                nextRoutes.pop();
+                routes.pop();
                 router.go(-1);
             }
         }

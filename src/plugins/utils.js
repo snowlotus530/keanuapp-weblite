@@ -405,7 +405,7 @@ class Util {
                     matrixClient.uploadContent(response.data, opts)
                         .then((response) => {
                             const uri = response.content_uri;
-                            return matrixClient.setProfileInfo('avatar_url', { avatar_url: uri });
+                            return matrixClient.setAvatarUrl(uri);
                         })
                         .then(result => {
                             resolve(result);
