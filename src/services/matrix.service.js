@@ -25,6 +25,8 @@ export default {
                     matrixClient: null,
                     matrixClientReady: false,
                     rooms: [],
+                    userDisplayName: null,
+                    userAvatar: null,
                     currentRoom: null,
                 }
             },
@@ -149,6 +151,15 @@ export default {
                     this.reloadRooms();
                     this.matrixClientReady = true;
                     this.matrixClient.emit('Matrix.initialized', this.matrixClient);
+                    this.matrixClient.getProfileInfo(this.currentUserId)
+                    .then(info => {
+                        console.log("Got user profile: " + JSON.stringify(info));
+                        this.userDisplayName = info.displayname;
+                        this.userAvatar = info.avatar_url;
+                    })
+                    .catch(err => {
+                        console.log("Failed to get user profile: ", err);
+                    })
                 },
 
                 async getMatrixClient(user) {
@@ -266,6 +277,7 @@ export default {
                 },
 
                 onRoom(ignoredroom) {
+                    console.log("Got room: " + ignoredroom);
                     this.reloadRooms();
                 },
 
@@ -300,8 +312,9 @@ export default {
                             Vue.set(room, "avatar", room.getAvatarUrl(this.matrixClient.getHomeserverUrl(), 80, 80, "scale", true));
                         }
                     });
+                    console.log("Reload rooms", updatedRooms);
                     Vue.set(this, "rooms", updatedRooms);
-                    const currentRoom = this.getRoom(this.currentRoomId);
+                    const currentRoom = this.getRoom(this.$store.state.currentRoomId);
                     if (this.currentRoom != currentRoom) {
                         this.currentRoom = currentRoom;
                     }

@@ -383,7 +383,7 @@ export default {
         if (value && value == oldValue) {
           return; // No change.
         }
-        console.log("Chat: Current room changed");
+        console.log("Chat: Current room changed to " + (value ? value : "null"));
 
         // Clear old events
         this.events = [];

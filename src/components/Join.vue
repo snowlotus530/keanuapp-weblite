@@ -25,7 +25,7 @@
         <v-row>
           <v-col class="flex-grow-0 flex-shrink-0">
             <v-avatar @click="showAvatarPicker = true">
-              <v-img v-if="userAvatar" :src="userAvatar.image" />
+              <v-img v-if="avatar" :src="avatar.image" />
             </v-avatar>
           </v-col>
           <v-col class="flex-shrink-1 flex-grow-1">
@@ -33,7 +33,7 @@
               v-if="!currentUser || currentUser"
               @update:search-input="updateDisplayName"
               :items="defaultDisplayNames"
-              :value="displayName"
+              :value="userDisplayName || displayName"
               label="User name"
               outlined
               dense
@@ -109,7 +109,7 @@
                     size="48"
                     @click="selectAvatar(avatar)"
                     class="avatar-picker-avatar"
-                    :class="{ current: avatar === userAvatar }"
+                    :class="{ current: avatar === selectedAvatar }"
                   >
                     <img :src="avatar.image" />
                   </v-avatar>
@@ -138,17 +138,18 @@ export default {
       loadingMessage: null,
       waitingForInfo: true,
       waitingForMembership: false,
-      userAvatar: null,
+      selectedAvatar: null,
       displayName: null,
       defaultDisplayNames: [],
       availableAvatars: [],
       showAvatarPicker: false,
+      shouldSetAvatar: false,
     };
   },
   mounted() {
     this.$matrix.on("Room.myMembership", this.onMyMembership);
     this.availableAvatars = util.getDefaultAvatars();
-    this.userAvatar = this.availableAvatars[0];
+    this.selectedAvatar = this.userAvatar || this.availableAvatars[0];
     if (!this.currentUser || this.currentUser.is_guest) {
       var values = require("!!raw-loader!../assets/usernames.txt")
         .default.split("\n")
@@ -181,15 +182,30 @@ export default {
       }
       return this.$matrix.currentRoomId;
     },
+    userDisplayName() {
+      return this.$matrix.userDisplayName;
+    },
+    userAvatar() {
+      if (!this.$matrix.userAvatar) {
+        return null;
+      }
+      return { id: 'user', image: this.$matrix.matrixClient.mxcUrlToHttp(this.$matrix.userAvatar, 80, 80, 'scale', true) };
+    },
+    avatar() {
+      if (!this.shouldSetAvatar) {
+        return this.userAvatar || this.selectedAvatar; // TODO - Use random
+      }
+      return this.selectedAvatar;
+    }
   },
   watch: {
     roomId: {
       immediate: true,
-      handler(val, oldVal) {
-        if (val && val == oldVal) {
+      handler(value, oldVal) {
+        if (!value || (value && value == oldVal)) {
           return; // No change.
         }
-        console.log("Join: Current room changed");
+        console.log("Join: Current room changed to " + (value ? value : "null"));
         this.roomName = this.roomId;
         if (this.currentUser) {
           this.waitingForMembership = true;
@@ -283,7 +299,7 @@ export default {
           function (user) {
             if (
               (this.currentUser && !this.currentUser.is_guest) ||
-              !this.displayName
+              !this.displayName || this.displayName == this.userDisplayName /* No change */
             ) {
               return Promise.resolve(user);
             } else {
@@ -298,13 +314,13 @@ export default {
           function () {
             if (
               (this.currentUser && !this.currentUser.is_guest) ||
-              !this.userAvatar
+              !this.shouldSetAvatar
             ) {
               return Promise.resolve("no avatar");
             } else {
               return util.setAvatar(
                 this.$matrix.matrixClient,
-                this.userAvatar.image,
+                this.selectedAvatar.image,
                 function (progress) {
                   console.log("Progress: " + JSON.stringify(progress));
                 }
@@ -344,7 +360,10 @@ export default {
     },
 
     selectAvatar(avatar) {
-      this.userAvatar = avatar;
+      if (avatar && (!this.userAvatar || this.userAvatar.image != avatar.image)) {
+        this.selectedAvatar = avatar;
+        this.shouldSetAvatar = true;
+      }
       this.showAvatarPicker = false;
     },
   },

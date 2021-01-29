@@ -18,18 +18,28 @@ const routes = [
   {
     path: '/room/:roomId?',
     name: 'Chat',
-    component: Chat
+    component: Chat,
+    meta: {
+      includeRoom: true
+    }
   },
   {
     path: '/info',
     name: 'RoomInfo',
     component: () => import('../components/RoomInfo.vue'),
     props: true,
+    meta: {
+      title: 'Info',
+      includeRoom: true
+    }
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: Profile
+    component: Profile,
+    meta: {
+      title: 'Profile'
+    }
   },
   {
     path: '/login',
