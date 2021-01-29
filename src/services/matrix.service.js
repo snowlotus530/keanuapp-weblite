@@ -348,7 +348,8 @@ export default {
                             this.rooms = this.rooms.filter(room => {
                                 room.roomId != roomId;
                             });
-                            this.matrixClient.forget(roomId, true, undefined);
+                            this.matrixClient.store.removeRoom(roomId);
+                            //this.matrixClient.forget(roomId, true, undefined);
                         })
                 },
 
