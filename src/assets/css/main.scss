@@ -61,3 +61,14 @@ $chat-button-height: 50px;
 .dialog-text {
     word-break: break-word;
 }
+
+.build-version {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 117%;
+    text-align: center;
+    letter-spacing: 0.4px;
+    color: rgba(0, 0, 0, 0.6);
+}
