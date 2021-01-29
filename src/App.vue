@@ -40,7 +40,7 @@
       <v-btn icon x-small @click.stop="openDrawer = !openDrawer">
         <v-icon>menu</v-icon>
       </v-btn>
-      Powered by Guardian Project. Version: {{ buildVersion }}</v-footer
+      </v-footer
     >
   </v-app>
 </template>
@@ -54,14 +54,10 @@ export default {
     RoomList,
   },
   data: () => ({
-    buildVersion: "",
     openDrawer: false,
   }),
   mounted() {
     //this.$router.replace("/");
-    const version = require("!!raw-loader!./assets/version.txt").default;
-    console.log("Version", version);
-    this.buildVersion = version;
   },
   methods: {
     loggedIn() {

@@ -106,6 +106,8 @@
       </v-card-text>
     </v-card>
 
+    <div class="build-version">Powered by Guardian Project. Version: {{ buildVersion }}</div>
+
     <LeaveRoomDialog
       :show="showLeaveConfirmation"
       :room="room"
@@ -130,6 +132,7 @@ export default {
       displayName: "",
       showAllMembers: false,
       showLeaveConfirmation: false,
+      buildVersion: "",
     };
   },
   mounted() {
@@ -140,6 +143,11 @@ export default {
 
     // Set QR code
     this.updateQRCode();
+
+    // Display build version
+    const version = require("!!raw-loader!../assets/version.txt").default;
+    console.log("Version", version);
+    this.buildVersion = version;
   },
 
   destroyed() {
