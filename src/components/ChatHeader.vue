@@ -10,8 +10,12 @@
       </v-col>
 
       <v-col class="flex-grow-1 flex-shrink-1 ma-0 pa-0">
-        <div class="room-name" @click.stop="showRoomInfo">{{ room.summary.info.title }}</div>
+        <div class="room-name" @click.stop="showRoomList = true">{{ room.summary.info.title }} <v-icon>expand_more</v-icon></div>
+        <RoomList v-if="showRoomList" v-click-outside="hideRoomList" @close="hideRoomList" />
         <div class="num-members">{{ memberCount }}{{ memberCount > 1 ? " members" : " member" }}</div>
+      </v-col>
+      <v-col class="text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
+        <v-btn text class="info-button" @click.stop="showRoomInfo"><v-icon color="black">info</v-icon></v-btn>
       </v-col>
       <v-col class="text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
         <v-btn text class="leave-button" @click.stop="leaveRoom">Leave</v-btn>
@@ -26,15 +30,18 @@
 
 <script>
 import LeaveRoomDialog from '../components/LeaveRoomDialog';
+import RoomList from "../components/RoomList";
 
 export default {
   name: "ChatHeader",
   components: {
-    LeaveRoomDialog
+    LeaveRoomDialog,
+    RoomList
   },
   data() {
     return {
       memberCount: null,
+      showRoomList: false,
       showLeaveConfirmation: false
     };
   },
@@ -90,6 +97,10 @@ export default {
     leaveRoom() {
       this.showLeaveConfirmation = true;
     },
+
+    hideRoomList() {
+      this.showRoomList = false;
+    }
   },
 };
 </script>

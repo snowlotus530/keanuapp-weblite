@@ -1,9 +1,9 @@
 <template>
-  <v-list dense>
+  <v-list dense class="room-list">
     <v-subheader>ROOMS</v-subheader>
     <v-list-item-group v-model="currentRoomId" color="primary">
       <v-list-item v-for="room in $matrix.rooms" :key="room.roomId" :value="room.roomId">
-        <v-list-item-avatar>
+        <v-list-item-avatar color="#e0e0e0">
           <v-img :src="room.avatar" />
         </v-list-item-avatar>
         <v-list-item-content>
