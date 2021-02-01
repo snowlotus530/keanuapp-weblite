@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import util from "../plugins/utils";
+
 export default {
   name: "RoomList",
 
@@ -26,7 +28,7 @@ export default {
   watch: {
     currentRoomId() {
       this.$emit("close");
-      this.$navigation.push({name: 'Chat', params: { roomId: this.currentRoomId }}, -1);
+      this.$navigation.push({name: 'Chat', params: { roomId: util.sanitizeRoomId(this.currentRoomId) }}, -1);
     },
   },
 };
