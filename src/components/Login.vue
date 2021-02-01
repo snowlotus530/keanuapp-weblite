@@ -8,7 +8,7 @@
       <div class="h2">Login</div>
       <v-form v-model="isValid">
         <v-text-field
-          v-model="user.username"
+          v-model="user.user_id"
           label="Username"
           color="black"
           background-color="white"
@@ -108,7 +108,7 @@ export default {
   },
   methods: {
     handleLogin() {
-      if (this.user.username && this.user.password) {
+      if (this.user.user_id && this.user.password) {
 
       // Reset errors
       this.message = null;
