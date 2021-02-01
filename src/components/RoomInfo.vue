@@ -80,10 +80,13 @@
     <v-card class="account ma-3" flat>
       <v-card-title class="h2">My Profile</v-card-title>
       <v-card-text>
-        <div v-if="$matrix.currentUser.is_guest">
-          <div>
+        <div>
+          <div v-if="$matrix.currentUser.is_guest">
             Your identity <b>{{ displayName }}</b> is temporary. You can change
             your name or set a password to keep it.
+          </div>
+          <div v-else>
+            Your are logged in as <b>{{ displayName }}</b>.
           </div>
           <v-btn block class="outlined-button" @click.stop="viewProfile"
             >View</v-btn
