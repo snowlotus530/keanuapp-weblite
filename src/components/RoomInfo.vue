@@ -59,6 +59,7 @@
           v-for="(member, index) in joinedMembers"
           :key="member.userId"
           v-show="showAllMembers || index < 5"
+          @click="toggleMemberExpanded(member)"
         >
           <v-avatar class="avatar" size="32" color="grey">
             <img v-if="memberAvatar(member)" :src="memberAvatar(member)" />
@@ -68,6 +69,7 @@
           </v-avatar>
           {{ member.user ? member.user.displayName : member.name
           }}{{ member.userId == $matrix.currentUserId ? " (you)" : "" }}
+          <DeviceList v-if="expandedMembers.includes(member)" :member="member" />
         </div>
         <div class="show-all" @click="showAllMembers = !showAllMembers">
           {{ showAllMembers ? "Hide" : "Show all" }}
@@ -118,12 +120,14 @@
 
 <script>
 import LeaveRoomDialog from "../components/LeaveRoomDialog";
+import DeviceList from "../components/DeviceList";
 import QRCode from "qrcode";
 
 export default {
   name: "RoomInfo",
   components: {
     LeaveRoomDialog,
+    DeviceList
   },
   data() {
     return {
@@ -132,6 +136,7 @@ export default {
       displayName: "",
       showAllMembers: false,
       showLeaveConfirmation: false,
+      expandedMembers: [],
       buildVersion: "",
     };
   },
@@ -309,6 +314,15 @@ export default {
         }, function (e) {
           console.log(e)
         });    
+      },
+
+      toggleMemberExpanded(member) {
+        const index = this.expandedMembers.indexOf(member);
+        if (index > -1) {
+          this.expandedMembers.splice(index, 1);
+        } else {
+          this.expandedMembers.push(member);
+        }
       }
   },
 };
