@@ -88,7 +88,7 @@ export default {
                             })
                     } else if (!user.is_guest && user.access_token) {
                         // Logged in on "real" account
-                        promiseLogin = Promise.resolve("Already logged in");
+                        promiseLogin = Promise.resolve(user);
                     } else {
                         var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password" };
                         if (user.device_id) {
