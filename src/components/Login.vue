@@ -49,6 +49,7 @@
 
 <script>
 import User from "../models/user";
+import util from "../plugins/utils";
 
 export default {
   name: "Login",
@@ -75,7 +76,7 @@ export default {
   },
   created() {
     if (this.loggedIn) {
-      this.$navigation.push({name: "Chat", params: { roomId: this.$matrix.currentRoomId }}, -1);
+      this.$navigation.push({name: "Chat", params: { roomId: util.sanitizeRoomId(this.$matrix.currentRoomId) }}, -1);
     }
   },
   watch: {
@@ -120,7 +121,7 @@ export default {
         this.loading = true;
         this.$store.dispatch("auth/login", user).then(
           () => {
-            this.$navigation.push({name: "Chat", params: { roomId: this.$matrix.currentRoomId }}, -1);
+            this.$navigation.push({name: "Chat", params: { roomId: util.sanitizeRoomId(this.$matrix.currentRoomId) }}, -1);
           },
           (error) => {
             this.loading = false;
