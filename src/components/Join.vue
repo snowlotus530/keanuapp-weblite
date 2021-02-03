@@ -24,20 +24,32 @@
       <v-container class="join-user-info">
         <v-row>
           <v-col class="flex-grow-0 flex-shrink-0">
-            <v-avatar @click="showAvatarPicker = true">
-              <v-img v-if="avatar" :src="avatar.image" />
+            <v-avatar @click="showAvatarPickerList">
+              <v-img v-if="profile" :src="profile.image" />
             </v-avatar>
           </v-col>
           <v-col class="flex-shrink-1 flex-grow-1">
-            <v-combobox
-              v-if="!currentUser || currentUser"
-              @update:search-input="updateDisplayName"
-              :items="defaultDisplayNames"
-              :value="userDisplayName || displayName"
+            <v-select
+              ref="avatar"
+              :items="availableAvatars"
+              cache-items
               label="User name"
               outlined
               dense
-            ></v-combobox>
+              @change="selectAvatar"
+              :value="availableAvatars[0]"
+              single-line
+            >
+              <template v-slot:selection>
+                <v-text-field background-color="transparent" solo flat hide-details @click.native.stop="{}" v-model="profile.name"></v-text-field>
+              </template>
+              <template v-slot:item="data">
+                <v-avatar size="32">
+                  <v-img :src="data.item.image" />
+                </v-avatar>
+                <div class="ml-2">{{ data.item.name }}</div>
+              </template>
+            </v-select>
           </v-col>
         </v-row>
       </v-container>
@@ -78,48 +90,6 @@
 
       <div v-if="loadingMessage">{{ loadingMessage }}</div>
     </div>
-
-    <v-dialog
-      scrollable
-      :fullscreen="$vuetify.breakpoint.xs"
-      width="500"
-      transition="dialog-bottom-transition"
-      v-model="showAvatarPicker"
-    >
-      <v-card>
-        <v-toolbar dark flat color="primary">
-          <v-btn icon dark @click="showAvatarPicker = false">
-            <v-icon>close</v-icon>
-          </v-btn>
-          <v-toolbar-title>Select an Avatar</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-        <v-card-text>
-          <v-container row wrap>
-            <v-col
-              v-for="avatar in availableAvatars"
-              :key="avatar.id"
-              xs4
-              sm3
-              d-flex
-            >
-              <v-card tile flat class="d-flex">
-                <v-card-text class="d-flex">
-                  <v-avatar
-                    size="48"
-                    @click="selectAvatar(avatar)"
-                    class="avatar-picker-avatar"
-                    :class="{ current: avatar === selectedAvatar }"
-                  >
-                    <img :src="avatar.image" />
-                  </v-avatar>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-container>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -138,27 +108,15 @@ export default {
       loadingMessage: null,
       waitingForInfo: true,
       waitingForMembership: false,
-      selectedAvatar: null,
-      displayName: null,
-      defaultDisplayNames: [],
       availableAvatars: [],
-      showAvatarPicker: false,
-      shouldSetAvatar: false,
+      randomProfile: null,
+      selectedProfile: null,
     };
   },
   mounted() {
     this.$matrix.on("Room.myMembership", this.onMyMembership);
     this.availableAvatars = util.getDefaultAvatars();
-    this.selectedAvatar = this.userAvatar || this.availableAvatars[0];
-    if (!this.currentUser || this.currentUser.is_guest) {
-      var values = require("!!raw-loader!../assets/usernames.txt")
-        .default.split("\n")
-        .filter((item) => {
-          return item.length > 0;
-        });
-      this.displayName = values[Math.floor(Math.random() * values.length)];
-      this.defaultDisplayNames = values;
-    }
+    this.randomProfile = this.availableAvatars[Math.floor(Math.random() * this.availableAvatars.length)];
   },
   destroyed() {
     this.$matrix.off("Room.myMembership", this.onMyMembership);
@@ -182,21 +140,38 @@ export default {
       }
       return this.$matrix.currentRoomId;
     },
+
+    profile() {
+      return {
+        image: (this.selectedProfile ? this.selectedProfile.image : null) || this.userAvatar || this.randomProfile.image,
+        name: (this.selectedProfile ? this.selectedProfile.name : null) || this.userDisplayName || this.randomProfile.name
+      }
+    },
+
+    hasChangedAvatar() {
+      return this.userAvatar != this.profile.image;
+    },
+
+    hasChangedDisplayName() {
+      return this.userDisplayName != this.profile.name;
+    },
+
     userDisplayName() {
       return this.$matrix.userDisplayName;
     },
+
     userAvatar() {
       if (!this.$matrix.userAvatar) {
         return null;
       }
-      return { id: 'user', image: this.$matrix.matrixClient.mxcUrlToHttp(this.$matrix.userAvatar, 80, 80, 'scale', true) };
+      return this.$matrix.matrixClient.mxcUrlToHttp(
+          this.$matrix.userAvatar,
+          80,
+          80,
+          "scale",
+          true
+        );
     },
-    avatar() {
-      if (!this.shouldSetAvatar) {
-        return this.userAvatar || this.selectedAvatar; // TODO - Use random
-      }
-      return this.selectedAvatar;
-    }
   },
   watch: {
     roomId: {
@@ -205,7 +180,9 @@ export default {
         if (!value || (value && value == oldVal)) {
           return; // No change.
         }
-        console.log("Join: Current room changed to " + (value ? value : "null"));
+        console.log(
+          "Join: Current room changed to " + (value ? value : "null")
+        );
         this.roomName = this.roomId;
         if (this.currentUser) {
           this.waitingForMembership = true;
@@ -299,12 +276,12 @@ export default {
           function (user) {
             if (
               (this.currentUser && !this.currentUser.is_guest) ||
-              !this.displayName || this.displayName == this.userDisplayName /* No change */
+              !this.hasChangedDisplayName /* No change */
             ) {
               return Promise.resolve(user);
             } else {
               return this.$matrix.matrixClient.setDisplayName(
-                this.displayName,
+                this.profile.name,
                 undefined
               );
             }
@@ -314,13 +291,13 @@ export default {
           function () {
             if (
               (this.currentUser && !this.currentUser.is_guest) ||
-              !this.shouldSetAvatar
+              !this.hasChangedAvatar /* No change */
             ) {
               return Promise.resolve("no avatar");
             } else {
               return util.setAvatar(
                 this.$matrix.matrixClient,
-                this.selectedAvatar.image,
+                this.profile.image,
                 function (progress) {
                   console.log("Progress: " + JSON.stringify(progress));
                 }
@@ -355,17 +332,13 @@ export default {
         });
     },
 
-    updateDisplayName(value) {
-      this.displayName = value;
+    selectAvatar(value) {
+      this.selectedProfile = Object.assign({}, value); // Make a copy, so editing does not destroy data
     },
 
-    selectAvatar(avatar) {
-      if (avatar && (!this.userAvatar || this.userAvatar.image != avatar.image)) {
-        this.selectedAvatar = avatar;
-        this.shouldSetAvatar = true;
-      }
-      this.showAvatarPicker = false;
-    },
+    showAvatarPickerList() {
+      this.$refs.avatar.$refs.input.click();
+    }
   },
 };
 </script>

@@ -376,14 +376,11 @@ class Util {
         r.keys().forEach(res => {
             console.log("Avatar", res);
             // // Remove"./"
-            // const parts = res.split("/");
-            // const pack = parts[1];
-            // const sticker = parts[2].split(".")[0];
+            var name = res.split("_")[1];
+            name = name.slice(0, name.indexOf("."));
+            name = name.charAt(0).toUpperCase() + name.slice(1);
             const image = r(res);
-            images.push({ id: res, image: image });
-            // if (stickerPacks[pack] !== undefined) {
-            //     stickerPacks[pack].push({ image: image, name: sticker });
-            // }
+            images.push({ id: res, image: image, name: "Guest " + name });
         });
         return images;
     }
