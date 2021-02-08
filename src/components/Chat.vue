@@ -16,6 +16,7 @@
               v-on:addreaction="addReaction"
               v-on:addreply="addReply(selectedEvent)"
               v-on:edit="edit(selectedEvent)"
+              v-on:redact="redact(selectedEvent)"
               v-on:download="download(selectedEvent)"
               :event="selectedEvent"
               :incoming="selectedEvent.getSender() != $matrix.currentUserId"
@@ -821,6 +822,16 @@ export default {
       this.editedEvent = event;
       this.currentInput = event.getContent().body;
       this.$refs.messageInput.focus();
+    },
+
+    redact(event) {
+      this.$matrix.matrixClient.redactEvent(event.getRoomId(), event.getId())
+      .then(() => {
+        console.log("Message redacted");
+      })
+      .catch(err => {
+        console.log("Redaction failed: ", err);
+      })
     },
 
     download(event) {
