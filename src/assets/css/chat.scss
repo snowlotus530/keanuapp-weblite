@@ -150,6 +150,7 @@ $admin-fg: white;
     font-size: 15 * $chat-text-size;
     color: #1c242a;
     text-align: center;
+    user-select: text;
 }
 
 .messageIn {
@@ -286,6 +287,7 @@ $admin-fg: white;
     .from-admin & {
         color: $admin-fg;
     }
+    user-select: text;
 }
 
 .original-message {
@@ -297,6 +299,7 @@ $admin-fg: white;
     overflow-x: hidden;
     overflow-y: auto;
     margin-bottom: 8px;
+    user-select: text;
     .original-message-sender {
         font-family: 'Inter', sans-serif;
         font-weight: 700;
@@ -331,6 +334,7 @@ $admin-fg: white;
     color: #1c242a;
     text-align: center;
     margin: 20px;
+    user-select: text;
 }
 
 .message-operations-strut {
