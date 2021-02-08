@@ -9,6 +9,9 @@
     <v-btn v-if="isEditable" icon @click.stop="edit" class="ma-0 pa-0">
       <v-icon>edit</v-icon>
     </v-btn>
+    <v-btn v-if="isRedactable" icon @click.stop="redact" class="ma-0 pa-0">
+      <v-icon>delete</v-icon>
+    </v-btn>
     <v-btn v-if="isDownloadable" icon @click.stop="download" class="ma-0 pa-0">
       <v-icon>get_app</v-icon>
     </v-btn>
@@ -43,6 +46,13 @@ export default {
     isDownloadable() {
       const msgtype = this.event.getContent().msgtype;
       return ['m.video','m.audio','m.image','m.file'].includes(msgtype);
+    },
+    isRedactable() {
+      const room = this.$matrix.matrixClient.getRoom(this.event.getRoomId());
+      if (room && room.currentState && room.currentState.maySendRedactionForEvent(this.event, this.$matrix.currentUserId)) {
+        return true;
+      }
+      return false;
     }
   },
 
@@ -58,6 +68,10 @@ export default {
     edit() {
       this.$emit("close");
       this.$emit("edit", {event:this.event});
+    },
+    redact() {
+      this.$emit("close");
+      this.$emit("redact", {event:this.event});
     },
     download() {
       this.$emit("close");
