@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-//import Home from '../components/Home.vue'
+import Home from '../components/Home.vue'
 import Chat from '../components/Chat.vue'
 import Join from '../components/Join.vue'
 import Login from '../components/Login.vue'
@@ -13,7 +13,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Chat
+    component: Home
   },
   {
     path: '/room/:roomId?',

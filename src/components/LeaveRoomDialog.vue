@@ -64,7 +64,7 @@ export default {
       this.$matrix.leaveRoom(roomId)
       .then(() => {
         console.log("Left room");
-        this.$navigation.push({name:'Chat', params:{roomId:null}}, -1);
+        this.$navigation.push({name:'Home', params:{roomId:null}}, -1);
       })
       .catch(err => {
         console.log("Error leaving", err);

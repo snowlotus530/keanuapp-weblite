@@ -291,10 +291,6 @@ export default {
       this.$navigation.push({ name: "Profile" }, 1);
     },
 
-    leaveRoom() {
-      console.log("Leave");
-    },
-
     upgradeAccount() {
       this.$matrix
         .upgradeGuestAccount()
