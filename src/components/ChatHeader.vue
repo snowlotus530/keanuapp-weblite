@@ -1,23 +1,24 @@
 <template>
   <v-container fluid v-if="room">
-    <v-row class="chat-header-row">
+    <v-row class="chat-header-row flex-nowrap">
       <v-col
-        class="chat-header-members text-center flex-grow-0 flex-shrink-1 ma-0 pa-0"
+      cols="auto"
+        class="chat-header-members text-start ma-0 pa-0"
       >
-        <v-avatar size="40">
+        <v-avatar size="40" class="mr-2">
           <v-img :src="room.avatar" />
         </v-avatar>
       </v-col>
 
-      <v-col class="flex-grow-1 flex-shrink-1 ma-0 pa-0">
-        <div class="room-name" @click.stop="showRoomList = true">{{ room.summary.info.title }} <v-icon>expand_more</v-icon></div>
+      <v-col class="ma-0 pa-0 flex-shrink-1 flex-nowrap" style="overflow:hidden">
+        <div class="d-flex flex-nowrap room-name" @click.stop="showRoomList = true">{{ room.summary.info.title }} <v-icon>expand_more</v-icon></div>
         <RoomList v-if="showRoomList" v-click-outside="hideRoomList" @close="hideRoomList" />
         <div class="num-members">{{ memberCount }}{{ memberCount > 1 ? " members" : " member" }}</div>
       </v-col>
-      <v-col class="text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
+      <v-col cols="auto" class="text-end ma-0 pa-0">
         <v-btn text class="info-button" @click.stop="showRoomInfo"><v-icon color="black">info</v-icon></v-btn>
       </v-col>
-      <v-col class="text-center flex-grow-0 flex-shrink-1 ma-0 pa-0">
+      <v-col cols="auto" class="text-end ma-0 pa-0">
         <v-btn text class="leave-button" @click.stop="leaveRoom">Leave</v-btn>
       </v-col>
     </v-row>

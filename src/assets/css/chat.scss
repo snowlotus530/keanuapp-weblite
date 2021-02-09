@@ -361,11 +361,15 @@ $admin-fg: white;
     border: 2px solid white;
     border-radius: 13px;
     height: 26px;
-    width: fit-content;
-    right: 10px;
+    width: max-content;
     top: -15px;
     padding: 0px 6px;
+    .messageOut & {
+        right: 10px;
+    }
     .quick-reaction {
+        position: relative;
+        top: -2px;
         margin: 0px 0px;
         padding: 1px;
         font-size: 10px;
