@@ -121,7 +121,11 @@ export default {
         this.loading = true;
         this.$store.dispatch("auth/login", user).then(
           () => {
-            this.$navigation.push({name: "Chat", params: { roomId: util.sanitizeRoomId(this.$matrix.currentRoomId) }}, -1);
+            if (this.$matrix.currentRoomId) {
+              this.$navigation.push({name: "Chat", params: { roomId: util.sanitizeRoomId(this.$matrix.currentRoomId) }}, -1);
+            } else {
+              this.$navigation.push({name: "Home"}, -1);            
+            }
           },
           (error) => {
             this.loading = false;
