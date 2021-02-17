@@ -163,7 +163,7 @@
     </div>
 
     <div v-if="showEmojiPicker">
-      <v-dialog v-model="showEmojiPicker" class="ma-0 pa-0" width="50%">
+      <v-dialog v-model="showEmojiPicker" class="ma-0 pa-0">
         <VEmojiPicker style="width: 100%" @select="emojiSelected" />
       </v-dialog>
     </div>
