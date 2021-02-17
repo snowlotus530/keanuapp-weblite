@@ -24,6 +24,7 @@
           }}</span>
         </v-avatar>
         <div class="h1">{{ roomName }}</div>
+        <div class="h3">{{ roomTopic }}</div>
         <div class="small">Created by {{ creator }}</div>
         <canvas class="qr" id="room-qr"></canvas>
       </div>
@@ -187,6 +188,13 @@ export default {
     roomName() {
       if (this.room) {
         return this.room.name;
+      }
+      return "";
+    },
+
+    roomTopic() {
+      if (this.room) {
+        return this.room.topic;
       }
       return "";
     },
