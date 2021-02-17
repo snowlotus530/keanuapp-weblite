@@ -38,11 +38,29 @@ $admin-fg: white;
         background-color: white;
         border: 1px solid #e0e0e0;
         position: absolute;
+        max-height: 60%;
+        overflow-y: auto;
         z-index: 2;
         .v-subheader {
             display: none;
         }
     }
+}
+
+.room-list-notification-count {
+    position: absolute;
+    top: 10px;
+    left: 40px;
+    color: white;
+    background-color: black;
+    font-size: 10px;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    border: 2px solid white;
+    text-align: center;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .chat-root {
