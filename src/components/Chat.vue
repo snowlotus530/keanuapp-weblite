@@ -238,6 +238,18 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Loading indicator -->
+    <v-container fluid fill-height style="position: absolute" v-if="!initialLoadDone">
+      <v-row align="center" justify="center">
+        <v-col class="text-center">
+          <v-progress-circular
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -379,6 +391,9 @@ export default {
       return this.$matrix.currentRoom;
     },
     roomId() {
+      if (!this.$matrix.ready) {
+        return null; // Not ready yet...
+      }
       if (this.room) {
         return this.room.roomId;
       }
