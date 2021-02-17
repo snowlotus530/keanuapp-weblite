@@ -25,20 +25,26 @@ export default {
     currentUser() {
       return this.$store.state.auth.user;
     },
-  },
-  watch: {
-    '$route' (to, ignoredFrom) {
+    title() {
       var title = "Keanu Weblite";
-      if (to.meta.title) {
-        title += "  - " + to.meta.title;
+      if (this.$matrix.notificationCount > 0) {
+        title += " [" + this.$matrix.notificationCount + "]";
       }
-      if (to.meta.includeRoom) {
+      if (this.$route.meta.title) {
+        title += "  - " + this.$route.meta.title;
+      }
+      if (this.$route.meta.includeRoom) {
         if (this.$matrix.currentRoom) {
           title += " - " + (this.$matrix.currentRoom.summary.info.title || this.$matrix.currentRoom.roomId);
         } else if (this.$matrix.currentRoomId) {
           title += " - " + (this.$matrix.currentRoomId);
         }
       }
+      return title;
+    }
+  },
+  watch: {
+    title(title) {
       document.title = title;
     },
     currentUser: {

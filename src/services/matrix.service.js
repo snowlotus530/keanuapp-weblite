@@ -28,6 +28,7 @@ export default {
                     userDisplayName: null,
                     userAvatar: null,
                     currentRoom: null,
+                    notificationCount: 0
                 }
             },
             mounted() {
@@ -59,7 +60,7 @@ export default {
                     handler(roomId) {
                         this.currentRoom = this.getRoom(roomId);
                     }
-                }
+                },
             },
 
             methods: {
@@ -274,11 +275,13 @@ export default {
                         }
                             break;
                     }
+                    this.updateNotificationCount();
                 },
 
                 onRoom(ignoredroom) {
                     console.log("Got room: " + ignoredroom);
                     this.reloadRooms();
+                    this.updateNotificationCount();
                 },
 
                 onSessionLoggedOut() {
@@ -411,7 +414,16 @@ export default {
                         .catch(err => {
                             return Promise.reject("Failed to find room: " + err);
                         });
+                },
+
+                updateNotificationCount() {
+                    var count = 0;
+                    this.rooms.forEach(room => {
+                        count += room.getUnreadNotificationCount('total') || 0;
+                    });
+                    this.notificationCount = count;
                 }
+
             }
         })
 

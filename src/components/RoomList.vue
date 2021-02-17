@@ -3,9 +3,10 @@
     <v-subheader>ROOMS</v-subheader>
     <v-list-item-group v-model="currentRoomId" color="primary">
       <v-list-item v-for="room in $matrix.rooms" :key="room.roomId" :value="room.roomId">
-        <v-list-item-avatar color="#e0e0e0">
+        <v-list-item-avatar size="40" color="#e0e0e0">
           <v-img :src="room.avatar" />
         </v-list-item-avatar>
+        <div class="room-list-notification-count">{{ notificationCount(room) }}</div>
         <v-list-item-content>
           <v-list-item-title>{{ room.summary.info.title }}</v-list-item-title>
           <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
@@ -22,8 +23,14 @@ export default {
   name: "RoomList",
 
   data: () => ({
-    currentRoomId: -1,
+    currentRoomId: null,
   }),
+
+  methods: {
+    notificationCount(room) {
+      return room.getUnreadNotificationCount('total') || 0;
+    }
+  },
 
   watch: {
     currentRoomId() {
@@ -33,3 +40,7 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+@import "@/assets/css/chat.scss";
+</style>
