@@ -9,19 +9,19 @@
       @click.prevent="closeContextMenuIfOpen"
     >
       <div ref="messageOperationsStrut" class="message-operations-strut">
-      <message-operations
-        :style="opStyle"
-              v-on:close="showContextMenu = false"
-              v-if="selectedEvent && showContextMenu"
-              v-on:addreaction="addReaction"
-              v-on:addreply="addReply(selectedEvent)"
-              v-on:edit="edit(selectedEvent)"
-              v-on:redact="redact(selectedEvent)"
-              v-on:download="download(selectedEvent)"
-              :event="selectedEvent"
-              :incoming="selectedEvent.getSender() != $matrix.currentUserId"
-            />
-    </div>
+        <message-operations
+          :style="opStyle"
+          v-on:close="showContextMenu = false"
+          v-if="selectedEvent && showContextMenu"
+          v-on:addreaction="addReaction"
+          v-on:addreply="addReply(selectedEvent)"
+          v-on:edit="edit(selectedEvent)"
+          v-on:redact="redact(selectedEvent)"
+          v-on:download="download(selectedEvent)"
+          :event="selectedEvent"
+          :incoming="selectedEvent.getSender() != $matrix.currentUserId"
+        />
+      </div>
 
       <!-- Handle resizes, e.g. when soft keyboard is shown/hidden -->
       <resize-observer
@@ -29,11 +29,18 @@
         @notify="handleChatContainerResize"
       />
 
-      <div v-for="(event,index) in events" :key="event.getId()" :eventId="event.getId()">
-       
-       <!-- DAY Marker, shown for every new day in the timeline -->
-        <div v-if="showDayMarkerBeforeEvent(event)" class="day-marker" :title="dayForEvent(event)" />
-        
+      <div
+        v-for="(event, index) in events"
+        :key="event.getId()"
+        :eventId="event.getId()"
+      >
+        <!-- DAY Marker, shown for every new day in the timeline -->
+        <div
+          v-if="showDayMarkerBeforeEvent(event)"
+          class="day-marker"
+          :title="dayForEvent(event)"
+        />
+
         <div
           v-if="
             !event.isRelation() && !event.isRedacted() && !event.isRedaction()
@@ -68,7 +75,11 @@
               v-on:context-menu="showContextMenuForEvent($event)"
             />
             <!-- <div>EventID: {{ event.getId() }}</div> -->
-            <div v-if="event.getId() == readMarker && index < (events.length - 1)" class="read-marker" title="Unread messages" />
+            <div
+              v-if="event.getId() == readMarker && index < events.length - 1"
+              class="read-marker"
+              title="Unread messages"
+            />
           </div>
         </div>
       </div>
@@ -76,8 +87,23 @@
 
     <!-- Input area -->
     <v-container v-if="room" fluid class="input-area-outer">
+      <!-- "Scroll to end"-button -->
+      <v-btn
+        class="scroll-to-end"
+        v-show="showScrollToEnd"
+        fab
+        small
+        elevation="0"
+        color="black"
+        @click.stop="smoothScrollToEnd"
+      >
+        <v-icon color="white">arrow_downward</v-icon>
+      </v-btn>
+
       <v-row class="ma-0 pa-0">
-        <div v-if="replyToEvent">REPLYING TO EVENT: {{ replyToEvent.getContent().body }}</div>
+        <div v-if="replyToEvent">
+          REPLYING TO EVENT: {{ replyToEvent.getContent().body }}
+        </div>
 
         <!-- CONTACT IS TYPING -->
         <div class="typing">
@@ -87,7 +113,13 @@
       <v-row class="input-area-inner align-center">
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
           <label icon flat ref="attachmentLabel">
-            <v-btn icon large color="black" @click="showAttachmentPicker" :disabled="attachButtonDisabled">
+            <v-btn
+              icon
+              large
+              color="black"
+              @click="showAttachmentPicker"
+              :disabled="attachButtonDisabled"
+            >
               <v-icon x-large>add_circle_outline</v-icon>
             </v-btn>
             <input
@@ -114,18 +146,40 @@
             placeholder="Send message"
             hide-details
             background-color="white"
-            v-on:keydown.enter.prevent="() => { sendMessage() }"
+            v-on:keydown.enter.prevent="
+              () => {
+                sendMessage();
+              }
+            "
           />
         </v-col>
 
-        <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1" v-if="editedEvent || replyToEvent">
-          <v-btn fab small elevation="0" color="black" @click.stop="cancelEditReply">
+        <v-col
+          class="input-area-button text-center flex-grow-0 flex-shrink-1"
+          v-if="editedEvent || replyToEvent"
+        >
+          <v-btn
+            fab
+            small
+            elevation="0"
+            color="black"
+            @click.stop="cancelEditReply"
+          >
             <v-icon color="white">cancel</v-icon>
           </v-btn>
         </v-col>
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
-          <v-btn fab small elevation="0" color="black" @click.stop="sendMessage" :disabled="sendButtonDisabled">
-            <v-icon color="white">{{ editedEvent ? 'save' : 'arrow_upward' }}</v-icon>
+          <v-btn
+            fab
+            small
+            elevation="0"
+            color="black"
+            @click.stop="sendMessage"
+            :disabled="sendButtonDisabled"
+          >
+            <v-icon color="white">{{
+              editedEvent ? "save" : "arrow_upward"
+            }}</v-icon>
           </v-btn>
         </v-col>
       </v-row>
@@ -169,19 +223,21 @@
     </div>
 
     <!-- "NOT ALLOWED FOR GUEST ACCOUNTS" dialog -->
-      <v-dialog v-model="showNotAllowedForGuests" class="ma-0 pa-0" width="50%">
-        <v-card>
-          <v-card-title>You are logged in as a guest</v-card-title>
-          <v-card-text>
-            <div>Unfortunately guests are not allowed to upload files.</div>
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="showNotAllowedForGuests = false">Ok</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+    <v-dialog v-model="showNotAllowedForGuests" class="ma-0 pa-0" width="50%">
+      <v-card>
+        <v-card-title>You are logged in as a guest</v-card-title>
+        <v-card-text>
+          <div>Unfortunately guests are not allowed to upload files.</div>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="showNotAllowedForGuests = false"
+            >Ok</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -281,6 +337,12 @@ export default {
        */
       chatContainerSize: 0,
 
+      /**
+       * True if we should show the "scroll to end" marker in the chat. For now at least, we use a simple
+       * method here, basically just "if we can scroll, show it".
+       */
+      showScrollToEnd: false,
+
       /** Shows a dialog with info about an operation being disallowed for guests */
       showNotAllowedForGuests: false,
 
@@ -333,17 +395,24 @@ export default {
         // If we have sent a RR, use that as read marker (so we don't have to wait for server round trip)
         return this.lastRR.getId();
       }
-      return this.fullyReadMarker || this.room.getEventReadUpTo(this.$matrix.currentUserId, false);
+      return (
+        this.fullyReadMarker ||
+        this.room.getEventReadUpTo(this.$matrix.currentUserId, false)
+      );
     },
     fullyReadMarker() {
-      const readEvent = this.room.getAccountData('m.fully_read');
+      const readEvent = this.room.getAccountData("m.fully_read");
       if (readEvent) {
         return readEvent.getContent().event_id;
       }
       return null;
     },
     attachButtonDisabled() {
-      return this.editedEvent != null || this.replyToEvent != null || this.currentInput.length > 0;
+      return (
+        this.editedEvent != null ||
+        this.replyToEvent != null ||
+        this.currentInput.length > 0
+      );
     },
     sendButtonDisabled() {
       return this.currentInput.length == 0;
@@ -373,8 +442,7 @@ export default {
         }
       }
       return "top:" + top + "px;left:" + left + "px";
-    }
-
+    },
   },
 
   watch: {
@@ -384,7 +452,9 @@ export default {
         if (value && value == oldValue) {
           return; // No change.
         }
-        console.log("Chat: Current room changed to " + (value ? value : "null"));
+        console.log(
+          "Chat: Current room changed to " + (value ? value : "null")
+        );
 
         // Clear old events
         this.events = [];
@@ -398,76 +468,84 @@ export default {
 
         if (!this.room) {
           // Public room?
-          if (this.roomId && this.roomId.startsWith('#')) {
+          if (this.roomId && this.roomId.startsWith("#")) {
             this.onRoomNotJoined();
           }
           return; // no room
         }
 
-          // Joined?
-          if (this.room.hasMembershipState(this.currentUser.user_id, "join")) {
-            // Yes, load everything
-            this.onRoomJoined();
-          } else {
-            this.onRoomNotJoined();
-          }
-      }
+        // Joined?
+        if (this.room.hasMembershipState(this.currentUser.user_id, "join")) {
+          // Yes, load everything
+          this.onRoomJoined();
+        } else {
+          this.onRoomNotJoined();
+        }
+      },
     },
   },
 
   methods: {
     onRoomJoined() {
-
       var initialEventId = this.readMarker;
       console.log("Read up to " + initialEventId);
 
       //initialEventId = null;
-      
+
       this.timelineWindow = new TimelineWindow(
-          this.$matrix.matrixClient,
-          this.room.getUnfilteredTimelineSet(),
-          {}
+        this.$matrix.matrixClient,
+        this.room.getUnfilteredTimelineSet(),
+        {}
       );
       const self = this;
       this.timelineWindow.load(initialEventId, 20).then(() => {
         console.log("This is", self);
-          self.events = self.timelineWindow.getEvents();
+        self.events = self.timelineWindow.getEvents();
 
-          const getMoreIfNeeded = function _getMoreIfNeeded() {
-            const container = self.$refs.chatContainer;
-            if (container.scrollHeight <= container.clientHeight && 
-              self.timelineWindow &&
-              self.timelineWindow.canPaginate(EventTimeline.BACKWARDS)) {
-                return self.timelineWindow.paginate(EventTimeline.BACKWARDS, 10, true)
-                  .then(success => {
-                    if (success) {
-                      self.events = self.timelineWindow.getEvents();
-                      return _getMoreIfNeeded.call(self);
-                    } else {
-                        return Promise.reject("Failed to paginate");
-                      }
-                    });
-            } else {
-              return Promise.resolve("Done");
-            }            
-          }.bind(self);
+        const getMoreIfNeeded = function _getMoreIfNeeded() {
+          const container = self.$refs.chatContainer;
+          if (
+            container.scrollHeight <= container.clientHeight &&
+            self.timelineWindow &&
+            self.timelineWindow.canPaginate(EventTimeline.BACKWARDS)
+          ) {
+            return self.timelineWindow
+              .paginate(EventTimeline.BACKWARDS, 10, true)
+              .then((success) => {
+                if (success) {
+                  self.events = self.timelineWindow.getEvents();
+                  return _getMoreIfNeeded.call(self);
+                } else {
+                  return Promise.reject("Failed to paginate");
+                }
+              });
+          } else {
+            return Promise.resolve("Done");
+          }
+        }.bind(self);
 
-          getMoreIfNeeded()
-          .catch(err => {
+        getMoreIfNeeded()
+          .catch((err) => {
             console.log("ERROR " + err);
           })
           .finally(() => {
             self.initialLoadDone = true;
-          if (initialEventId) {
-            self.scrollToEvent(initialEventId);
-          }
-          self.restartRRTimer();
+            if (initialEventId) {
+              self.scrollToEvent(initialEventId);
+            }
+            self.restartRRTimer();
           });
-        });
+      });
     },
 
     onRoomNotJoined() {
-      this.$navigation.push({ name: "Join", params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) }}, 0);
+      this.$navigation.push(
+        {
+          name: "Join",
+          params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) },
+        },
+        0
+      );
     },
 
     touchX(event) {
@@ -594,6 +672,10 @@ export default {
       ) {
         this.handleScrolledToBottom(false);
       }
+      this.showScrollToEnd =
+        container.scrollHeight - container.scrollTop.toFixed(0) >
+        container.clientHeight;
+
       this.restartRRTimer();
     },
     onEvent(event) {
@@ -631,7 +713,7 @@ export default {
       } else {
         const index = this.typingMembers.indexOf(member);
         if (index > -1) {
-          this.typingMembers.splice(index, 1);   
+          this.typingMembers.splice(index, 1);
         }
       }
       console.log("Typing: ", this.typingMembers);
@@ -669,7 +751,7 @@ export default {
       //   this.showNotAllowedForGuests = true;
       //   return;
       // }
-      this.$refs.attachment.click()
+      this.$refs.attachment.click();
     },
 
     /**
@@ -776,8 +858,8 @@ export default {
     },
 
     /**
-    * Scroll so that the given event is at the middle of the chat view (if more events) or else at the bottom.
-    */
+     * Scroll so that the given event is at the middle of the chat view (if more events) or else at the bottom.
+     */
     scrollToEvent(eventId) {
       const container = this.$refs.chatContainer;
       const ref = this.$refs[eventId];
@@ -825,13 +907,14 @@ export default {
     },
 
     redact(event) {
-      this.$matrix.matrixClient.redactEvent(event.getRoomId(), event.getId())
-      .then(() => {
-        console.log("Message redacted");
-      })
-      .catch(err => {
-        console.log("Redaction failed: ", err);
-      })
+      this.$matrix.matrixClient
+        .redactEvent(event.getRoomId(), event.getId())
+        .then(() => {
+          console.log("Message redacted");
+        })
+        .catch((err) => {
+          console.log("Redaction failed: ", err);
+        });
     },
 
     download(event) {
@@ -906,10 +989,10 @@ export default {
         this.rrTimer = null;
       }
     },
-    
+
     /**
-    * Start/restart the timer to Read Receipts.
-    */
+     * Start/restart the timer to Read Receipts.
+     */
     restartRRTimer() {
       this.stopRRTimer();
       this.rrTimer = setInterval(this.rrTimerElapsed, READ_RECEIPT_TIMEOUT);
@@ -919,30 +1002,33 @@ export default {
       const container = this.$refs.chatContainer;
       const el = util.getLastVisibleElement(container);
       if (el) {
-        const eventId = el.getAttribute('eventId');
+        const eventId = el.getAttribute("eventId");
         if (eventId && this.room) {
           const event = this.room.findEventById(eventId);
           if (event && (!this.lastRR || event.getTs() > this.lastRR.getTs())) {
-            
             // Disable timer while we are sending
             clearInterval(this.rrTimer);
             this.rrTimer = null;
 
             // Send read receipt
-            this.$matrix.matrixClient.sendReadReceipt(event)
-            .then(() => {
-              this.$matrix.matrixClient.setRoomReadMarkers(this.room.roomId, eventId)
-            })
-            .then(() => {
-              console.log("RR sent for event: " + eventId);
-              this.lastRR = event;             
-            })
-            .catch(err => {
-              console.log("Failed to update read marker: ", err);
-            })
-            .finally(() => {
-              this.restartRRTimer();
-            });
+            this.$matrix.matrixClient
+              .sendReadReceipt(event)
+              .then(() => {
+                this.$matrix.matrixClient.setRoomReadMarkers(
+                  this.room.roomId,
+                  eventId
+                );
+              })
+              .then(() => {
+                console.log("RR sent for event: " + eventId);
+                this.lastRR = event;
+              })
+              .catch((err) => {
+                console.log("Failed to update read marker: ", err);
+              })
+              .finally(() => {
+                this.restartRRTimer();
+              });
           }
         }
       }
@@ -959,7 +1045,7 @@ export default {
 
     dayForEvent(event) {
       return util.formatDay(event.getTs());
-    }
+    },
   },
 };
 </script>
