@@ -32,6 +32,13 @@ Vue.use((Vue) => {
   };
 });
 
+// Register a global custom directive called `v-blur` that prevents focus
+Vue.directive('blur', {
+  inserted: function (el) {
+    el.onfocus = (ev) => ev.target.blur()
+  }
+});
+
 Vue.use(navigation, router);
 
 new Vue({
