@@ -8,6 +8,8 @@ var base64Url = require('json-web-key/lib/base64url');
 // Install extended localized format
 var localizedFormat = require('dayjs/plugin/localizedFormat')
 dayjs.extend(localizedFormat)
+var duration = require('dayjs/plugin/duration')
+dayjs.extend(duration);
 
 class Util {
     getAttachment(matrixClient, event) {
@@ -442,6 +444,15 @@ class Util {
         } else {
             return then.format('L');
         }
+    }
+
+    formatRecordDuration(ms) {
+        return dayjs.duration(ms).format("HH:mm:ss");
+    }
+
+    formatRecordStartTime(timestamp) {
+        var then = dayjs(timestamp);
+        return then.format('lll');
     }
 }
 export default new Util();

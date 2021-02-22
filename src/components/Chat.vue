@@ -156,6 +156,21 @@
 
         <v-col
           class="input-area-button text-center flex-grow-0 flex-shrink-1"
+        >
+          <v-btn
+            fab
+            small
+            elevation="0"
+            color="transparent"
+            v-blur
+            style="z-index:10"
+            @mousedown.stop="startRecording"
+          >
+            <v-icon :color="showRecorder ? 'white' : 'black'">mic</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col
+          class="input-area-button text-center flex-grow-0 flex-shrink-1"
           v-if="editedEvent || replyToEvent"
         >
           <v-btn
@@ -183,6 +198,7 @@
           </v-btn>
         </v-col>
       </v-row>
+      <VoiceRecorder :show="showRecorder" v-on:close="showRecorder = false" v-on:file="onVoiceRecording" />
     </v-container>
 
     <div v-if="currentImageInput">
@@ -271,6 +287,7 @@ import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
 import ChatHeader from "./ChatHeader";
+import VoiceRecorder from "./VoiceRecorder";
 
 const READ_RECEIPT_TIMEOUT = 5000; /* How long a message must have been visible before the read marker is updated */
 
@@ -320,6 +337,7 @@ export default {
     RoomAvatarChanged,
     DebugEvent,
     MessageOperations,
+    VoiceRecorder
   },
 
   data() {
@@ -341,6 +359,7 @@ export default {
       showContextMenu: false,
       showContextMenuAnchor: null,
       initialLoadDone: false,
+      showRecorder: false,
 
       /**
        * Current chat container size. We need to keep track of this so that if and when
@@ -1061,6 +1080,19 @@ export default {
     dayForEvent(event) {
       return util.formatDay(event.getTs());
     },
+
+    startRecording() {
+      this.showRecorder = true;
+    },
+
+    onVoiceRecording(event) {
+      util.sendImage(
+          this.$matrix.matrixClient,
+          this.roomId,
+          event.file,
+          undefined
+        );
+    }
   },
 };
 </script>
