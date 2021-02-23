@@ -111,6 +111,78 @@
         </div>
       </v-row>
       <v-row class="input-area-inner align-center">
+        <v-col class="flex-grow-1 flex-shrink-1 ma-0 pa-0">
+          <v-textarea
+            height="undefined"
+            ref="messageInput"
+            full-width
+            auto-grow
+            rows="1"
+            v-model="currentInput"
+            no-resize
+            class="input-area-text"
+            placeholder="Your message..."
+            hide-details
+            background-color="white"
+            v-on:keydown.enter.prevent="
+              () => {
+                sendMessage();
+              }
+            "
+          />
+        </v-col>
+
+        <v-col
+          class="input-area-button text-center flex-grow-0 flex-shrink-1"
+          v-if="editedEvent || replyToEvent"
+        >
+          <v-btn
+            fab
+            small
+            elevation="0"
+            color="black"
+            @click.stop="cancelEditReply"
+          >
+            <v-icon color="white">cancel</v-icon>
+          </v-btn>
+        </v-col>
+
+        <v-col
+          class="input-area-button text-center flex-grow-0 flex-shrink-1"
+            v-if="!currentInput || currentInput.length == 0"
+        >
+          <v-btn
+            ref="mic_button"
+            fab
+            small
+            elevation="0"
+            color="transparent"
+            v-blur
+            style="z-index:10"
+            @touchstart.native.stop="startRecording"
+            @mousedown.native.stop="startRecording"
+          >
+            <v-icon :color="showRecorder ? 'white' : 'black'">mic</v-icon>
+          </v-btn>
+        </v-col>
+
+        <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1"
+        v-else
+        >
+          <v-btn
+            fab
+            small
+            elevation="0"
+            color="black"
+            @click.stop="sendMessage"
+            :disabled="sendButtonDisabled"
+          >
+            <v-icon color="white">{{
+              editedEvent ? "save" : "arrow_upward"
+            }}</v-icon>
+          </v-btn>
+        </v-col>
+
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
           <label icon flat ref="attachmentLabel">
             <v-btn
@@ -133,72 +205,8 @@
           </label>
         </v-col>
 
-        <v-col class="flex-grow-1 flex-shrink-1 ma-0 pa-0">
-          <v-textarea
-            height="undefined"
-            ref="messageInput"
-            full-width
-            auto-grow
-            rows="1"
-            v-model="currentInput"
-            no-resize
-            class="input-area-text"
-            placeholder="Send message"
-            hide-details
-            background-color="white"
-            v-on:keydown.enter.prevent="
-              () => {
-                sendMessage();
-              }
-            "
-          />
-        </v-col>
-
-        <v-col
-          class="input-area-button text-center flex-grow-0 flex-shrink-1"
-        >
-          <v-btn
-            fab
-            small
-            elevation="0"
-            color="transparent"
-            v-blur
-            style="z-index:10"
-            @mousedown.stop="startRecording"
-          >
-            <v-icon :color="showRecorder ? 'white' : 'black'">mic</v-icon>
-          </v-btn>
-        </v-col>
-        <v-col
-          class="input-area-button text-center flex-grow-0 flex-shrink-1"
-          v-if="editedEvent || replyToEvent"
-        >
-          <v-btn
-            fab
-            small
-            elevation="0"
-            color="black"
-            @click.stop="cancelEditReply"
-          >
-            <v-icon color="white">cancel</v-icon>
-          </v-btn>
-        </v-col>
-        <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
-          <v-btn
-            fab
-            small
-            elevation="0"
-            color="black"
-            @click.stop="sendMessage"
-            :disabled="sendButtonDisabled"
-          >
-            <v-icon color="white">{{
-              editedEvent ? "save" : "arrow_upward"
-            }}</v-icon>
-          </v-btn>
-        </v-col>
       </v-row>
-      <VoiceRecorder :show="showRecorder" v-on:close="showRecorder = false" v-on:file="onVoiceRecording" />
+      <VoiceRecorder :micButtonRef="$refs.mic_button" :show="showRecorder" v-on:close="showRecorder = false" v-on:file="onVoiceRecording" />
     </v-container>
 
     <div v-if="currentImageInput">
