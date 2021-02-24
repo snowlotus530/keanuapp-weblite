@@ -96,6 +96,7 @@
 <script>
 import User from "../models/user";
 import util from "../plugins/utils";
+import config from "../assets/config";
 
 export default {
   name: "Join",
@@ -103,7 +104,7 @@ export default {
     return {
       roomName: null,
       roomAvatar: null,
-      guestUser: new User("https://neo.keanu.im", "", "", true),
+      guestUser: new User(config.defaultServer, "", "", true),
       loading: false,
       loadingMessage: null,
       waitingForInfo: true,

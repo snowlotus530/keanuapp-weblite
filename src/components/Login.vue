@@ -50,12 +50,13 @@
 <script>
 import User from "../models/user";
 import util from "../plugins/utils";
+import config from "../assets/config";
 
 export default {
   name: "Login",
   data() {
     return {
-      user: new User("https://neo.keanu.im", "", ""),
+      user: new User(config.defaultServer, "", ""),
       isValid: true,
       loading: false,
       message: "",
