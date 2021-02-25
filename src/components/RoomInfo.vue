@@ -52,7 +52,7 @@
     <v-card class="members ma-3" flat>
       <v-card-title class="h2"
         >Members<v-spacer></v-spacer>
-        <div>{{ room.getJoinedMemberCount() }}</div></v-card-title
+        <div>{{ memberCount }}</div></v-card-title
       >
       <v-card-text>
         <div
@@ -241,10 +241,9 @@ export default {
 
   watch: {
     room: {
-      handler(newVal, ignoredOldVal) {
+      handler(ignoredNewVal, ignoredOldVal) {
         console.log("RoomInfo: Current room changed");
-        this.memberCount = newVal.getJoinedMemberCount();
-
+        this.updateMemberCount();
         this.updateQRCode();
       },
     },
@@ -261,7 +260,11 @@ export default {
     },
 
     updateMemberCount() {
-      this.memberCount = this.room.getJoinedMemberCount();
+      if (this.room) {
+          this.memberCount = this.room.getJoinedMemberCount();
+        } else {
+          this.memberCount = null;
+        }
     },
 
     updateQRCode() {

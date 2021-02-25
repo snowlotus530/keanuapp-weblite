@@ -418,7 +418,9 @@ export default {
       return this.$matrix.currentRoom;
     },
     roomId() {
-      if (!this.$matrix.ready) {
+      if (!this.$matrix.ready && this.currentUser) {
+        // If we have a user already, wait for ready state. If not, we
+        // dont want to return here, because we want to redirect to "join".
         return null; // Not ready yet...
       }
       if (this.room) {
