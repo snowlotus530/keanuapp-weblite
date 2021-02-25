@@ -11,11 +11,11 @@
         <div class="original-message-sender">
           {{ inReplyToSender || "Someone" }} said:
         </div>
-        <div class="original-message-text">{{ inReplyToText }}</div>
+        <div class="original-message-text" v-html="linkify($sanitize(inReplyToText))" />
       </div>
 
       <div class="message">
-        {{ messageText }}
+        <span v-html="linkify($sanitize(messageText))" />
         <span class="edit-marker" v-if="event.replacingEventId()"
           >(edited)</span
         >

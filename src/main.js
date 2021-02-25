@@ -11,7 +11,13 @@ import VEmojiPicker from 'v-emoji-picker';
 import VueResize from 'vue-resize';
 import 'vue-resize/dist/vue-resize.css';
 import VueClipboard from 'vue-clipboard2'
- 
+import VueSanitize from "vue-sanitize";
+
+var defaultOptions = VueSanitize.defaults;
+defaultOptions.disallowedTagsMode = "recursiveEscape";
+defaultOptions.allowedTags = [];
+Vue.use(VueSanitize, defaultOptions);
+
 Vue.config.productionTip = false
 
 Vue.use(VueResize);

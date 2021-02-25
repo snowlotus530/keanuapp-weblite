@@ -1,4 +1,7 @@
 import QuickReactions from './QuickReactions.vue';
+var linkify = require('linkifyjs');
+var linkifyHtml = require('linkifyjs/html');
+linkify.options.defaults.className = "link";
 
 export default {
   components: {
@@ -192,5 +195,9 @@ export default {
       }
       return date.toLocaleString();
     },
+
+    linkify(text) {
+      return linkifyHtml(text);
+    }
   },
 }
