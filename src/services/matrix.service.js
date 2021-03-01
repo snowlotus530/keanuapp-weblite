@@ -329,7 +329,7 @@ export default {
                     // each time!
                     var updatedRooms = this.matrixClient.getVisibleRooms();
                     updatedRooms = updatedRooms.filter(room => {
-                        return room._selfMembership;
+                        return room._selfMembership && (room._selfMembership == "invite" || room._selfMembership == "join");
                     });
                     updatedRooms.forEach(room => {
                         if (!room.avatar) {
