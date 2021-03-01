@@ -1,5 +1,5 @@
 <template>
-  <div v-if="room" class="profile">
+  <div v-if="user" class="profile">
     <div class="chat-header">
       <v-container fluid>
         <div class="room-name">My Profile</div>
@@ -91,30 +91,20 @@
 
 <script>
 export default {
-  name: "RoomInfo",
+  name: "Profile",
   data() {
     return {
-      memberCount: null,
       showEditPasswordDialog: false,
       showEditDisplaynameDialog: false,
       editValue: null,
     };
   },
-  mounted() {
-    this.$matrix.on("Room.timeline", this.onEvent);
-    this.updateMemberCount();
-  },
-
-  destroyed() {
-    this.$matrix.off("Room.timeline", this.onEvent);
-  },
 
   computed: {
-    room() {
-      return this.$matrix.currentRoom;
-    },
-
     user() {
+      if (!this.$matrix.matrixClient) {
+        return null;
+      }
       return this.$matrix.matrixClient.getUser(this.$matrix.currentUserId);
     },
 
@@ -140,44 +130,7 @@ export default {
     }
   },
 
-  watch: {
-    room: {
-      handler(newVal, ignoredOldVal) {
-        console.log("RoomInfo: Current room changed");
-        this.memberCount = newVal.getJoinedMemberCount();
-      },
-    },
-  },
-
   methods: {
-    onEvent(event) {
-      if (event.getRoomId() !== this.roomId) {
-        return; // Not for this room
-      }
-      if (event.getType() == "m.room.member") {
-        this.updateMemberCount();
-      }
-    },
-
-    updateMemberCount() {
-      this.memberCount = this.room.getJoinedMemberCount();
-    },
-
-    showRoomInfo() {},
-
-    memberAvatar(member) {
-      if (member) {
-        return member.getAvatarUrl(
-          this.$matrix.matrixClient.getHomeserverUrl(),
-          40,
-          40,
-          "scale",
-          true
-        );
-      }
-      return null;
-    },
-
     logout() {
       //TODO - For guest accounts, show warning about not being able to rejoin.
       this.$store.dispatch("auth/logout");
