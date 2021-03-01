@@ -521,7 +521,7 @@ export default {
         // Joined?
         if (this.room.hasMembershipState(this.currentUser.user_id, "join")) {
           // Yes, load everything
-          this.onRoomJoined();
+          this.onRoomJoined(this.readMarker);
         } else {
           this.onRoomNotJoined();
         }
@@ -530,8 +530,7 @@ export default {
   },
 
   methods: {
-    onRoomJoined() {
-      var initialEventId = this.readMarker;
+    onRoomJoined(initialEventId) {
       console.log("Read up to " + initialEventId);
 
       //initialEventId = null;
@@ -542,7 +541,8 @@ export default {
         {}
       );
       const self = this;
-      this.timelineWindow.load(initialEventId, 20).then(() => {
+      this.timelineWindow.load(initialEventId, 20)
+      .then(() => {
         console.log("This is", self);
         self.events = self.timelineWindow.getEvents();
 
@@ -579,7 +579,17 @@ export default {
             }
             self.restartRRTimer();
           });
-      });
+      })
+      .catch(err => {
+        console.log("Error fetching events!", err, this);
+        if (err.errcode == 'M_UNKNOWN' && initialEventId) {
+          // Try again without initial event!
+          this.onRoomJoined(null);
+        } else {
+          // Error. Done loading.
+          this.initialLoadDone = true;
+        }
+      })
     },
 
     onRoomNotJoined() {
