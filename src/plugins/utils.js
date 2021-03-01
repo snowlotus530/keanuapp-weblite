@@ -188,7 +188,7 @@ class Util {
                         Promise.all(setAsKnownPromises)
                             .then(() => {
                                 // All devices now marked as "known", try to resend
-                                matrixClient.resendEvent(err.event)
+                                matrixClient.resendEvent(err.event, matrixClient.getRoom(err.event.getRoomId()))
                                     .then((result) => {
                                         console.log("Message sent: ", result);
                                         resolve(true);

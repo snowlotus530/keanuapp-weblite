@@ -114,13 +114,34 @@ export default {
                         })
                 },
 
+                clearCryptoStore() {
+                    // Clear crypto related data 
+                    // TODO - for some reason "clearStores" called in "logout" only clears the "account" crypto
+                    // data item, not all sessions etc. Why? We need to do that manually here!
+                    const toRemove = [];
+                    for (let i = 0; i < localStorage.length; ++i) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith("crypto.")) toRemove.push(key);
+                    }
+                    for (const key of toRemove) {
+                        localStorage.removeItem(key);
+                    }
+                },
+
                 logout() {
                     if (this.matrixClient) {
                         this.removeMatrixClientListeners(this.matrixClient);
                         this.matrixClient.stopClient();
+                        this.matrixClient.clearStores().then(() => {
+                            this.clearCryptoStore()
+                        })
                         this.matrixClient = null;
                         this.matrixClientReady = false;
+                    } else {
+                        this.clearCryptoStore();
                     }
+
+
                     localStorage.removeItem('user');
                     this.$store.commit("setCurrentRoomId", null);
                 },
