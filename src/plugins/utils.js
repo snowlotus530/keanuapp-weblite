@@ -348,9 +348,17 @@ class Util {
         return null;
     }
 
+    getFirstVisibleElement(parentNode) {
+        const y = parentNode.scrollTop;
+        return this.getElementAtY(parentNode, y);
+    }
+
     getLastVisibleElement(parentNode) {
         const y = parentNode.scrollTop + parentNode.clientHeight;
+        return this.getElementAtY(parentNode, y);
+    }
 
+    getElementAtY(parentNode, y) {
         let start = 0;
         let end = parentNode.children.length - 1;
 

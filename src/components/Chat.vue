@@ -149,7 +149,7 @@
 
         <v-col
           class="input-area-button text-center flex-grow-0 flex-shrink-1"
-            v-if="!currentInput || currentInput.length == 0"
+          v-if="!currentInput || currentInput.length == 0"
         >
           <v-btn
             ref="mic_button"
@@ -158,7 +158,7 @@
             elevation="0"
             color="transparent"
             v-blur
-            style="z-index:10"
+            style="z-index: 10"
             @touchstart.native.stop="startRecording"
             @mousedown.native.stop="startRecording"
           >
@@ -166,8 +166,9 @@
           </v-btn>
         </v-col>
 
-        <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1"
-        v-else
+        <v-col
+          class="input-area-button text-center flex-grow-0 flex-shrink-1"
+          v-else
         >
           <v-btn
             fab
@@ -204,9 +205,13 @@
             />
           </label>
         </v-col>
-
       </v-row>
-      <VoiceRecorder :micButtonRef="$refs.mic_button" :show="showRecorder" v-on:close="showRecorder = false" v-on:file="onVoiceRecording" />
+      <VoiceRecorder
+        :micButtonRef="$refs.mic_button"
+        :show="showRecorder"
+        v-on:close="showRecorder = false"
+        v-on:file="onVoiceRecording"
+      />
     </v-container>
 
     <div v-if="currentImageInput">
@@ -264,7 +269,12 @@
     </v-dialog>
 
     <!-- Loading indicator -->
-    <v-container fluid fill-height style="position: absolute" v-if="!initialLoadDone">
+    <v-container
+      fluid
+      fill-height
+      style="position: absolute"
+      v-if="!initialLoadDone"
+    >
       <v-row align="center" justify="center">
         <v-col class="text-center">
           <v-progress-circular
@@ -291,6 +301,7 @@ import ContactInvited from "./messages/ContactInvited.vue";
 import RoomNameChanged from "./messages/RoomNameChanged.vue";
 import RoomTopicChanged from "./messages/RoomTopicChanged.vue";
 import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
+import RoomHistoryVisibility from "./messages/RoomHistoryVisibility.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
@@ -343,6 +354,7 @@ export default {
     RoomNameChanged,
     RoomTopicChanged,
     RoomAvatarChanged,
+    RoomHistoryVisibility,
     DebugEvent,
     MessageOperations,
     VoiceRecorder
@@ -533,7 +545,7 @@ export default {
     onRoomJoined(initialEventId) {
       console.log("Read up to " + initialEventId);
 
-      //initialEventId = null;
+      initialEventId = null;
 
       this.timelineWindow = new TimelineWindow(
         this.$matrix.matrixClient,
@@ -554,10 +566,10 @@ export default {
             self.timelineWindow.canPaginate(EventTimeline.BACKWARDS)
           ) {
             return self.timelineWindow
-              .paginate(EventTimeline.BACKWARDS, 10, true)
+              .paginate(EventTimeline.BACKWARDS, 10, true, 5)
               .then((success) => {
+                self.events = self.timelineWindow.getEvents();
                 if (success) {
-                  self.events = self.timelineWindow.getEvents();
                   return _getMoreIfNeeded.call(self);
                 } else {
                   return Promise.reject("Failed to paginate");
@@ -587,6 +599,7 @@ export default {
           this.onRoomJoined(null);
         } else {
           // Error. Done loading.
+          this.events = this.timelineWindow.getEvents();
           this.initialLoadDone = true;
         }
       })
@@ -700,6 +713,9 @@ export default {
 
         case "m.room.avatar":
           return RoomAvatarChanged;
+
+        case "m.room.history_visibility":
+          return RoomHistoryVisibility;
       }
       return DebugEvent;
     },
@@ -1039,7 +1055,7 @@ export default {
     /** Stop Read Receipt timer */
     stopRRTimer() {
       if (this.rrTimer) {
-        clearInterval(this.rrTimer);
+        clearTimeout(this.rrTimer);
         this.rrTimer = null;
       }
     },
@@ -1049,32 +1065,48 @@ export default {
      */
     restartRRTimer() {
       this.stopRRTimer();
-      this.rrTimer = setInterval(this.rrTimerElapsed, READ_RECEIPT_TIMEOUT);
+      this.rrTimer = setTimeout(this.rrTimerElapsed, READ_RECEIPT_TIMEOUT);
     },
 
     rrTimerElapsed() {
-      const container = this.$refs.chatContainer;
-      const el = util.getLastVisibleElement(container);
-      if (el) {
-        const eventId = el.getAttribute("eventId");
-        if (eventId && this.room) {
-          const event = this.room.findEventById(eventId);
-          if (event && (!this.lastRR || event.getTs() > this.lastRR.getTs())) {
-            // Disable timer while we are sending
-            clearInterval(this.rrTimer);
-            this.rrTimer = null;
+      this.rrTimer = null;
 
-            // Send read receipt
+      const container = this.$refs.chatContainer;
+      const elFirst = util.getFirstVisibleElement(container);
+      const elLast = util.getLastVisibleElement(container);
+      if (elFirst && elLast) {
+        const eventIdFirst = elFirst.getAttribute("eventId");
+        const eventIdLast = elLast.getAttribute("eventId");
+        if (eventIdLast && this.room) {
+          var event = this.room.findEventById(eventIdLast);
+          const index = this.events.indexOf(event);
+
+          // Walk backwards through visible events to the first one that is incoming
+          //
+          var lastTimestamp = 0;
+          if (this.lastRR) {
+            lastTimestamp = this.lastRR.getTs();
+          }
+
+          for (var i = index; i >= 0; i--) {
+            event = this.events[i];
+            if (event == this.lastRR || event.getTs() <= lastTimestamp) {
+              // Already sent this or too old...
+              break;
+            }
+            // Is it an incoming event?
+            if (event.getSender() !== this.$matrix.currentUserId) {
+                          // Send read receipt
             this.$matrix.matrixClient
               .sendReadReceipt(event)
               .then(() => {
                 this.$matrix.matrixClient.setRoomReadMarkers(
                   this.room.roomId,
-                  eventId
+                  event.getId()
                 );
               })
               .then(() => {
-                console.log("RR sent for event: " + eventId);
+                console.log("RR sent for event: " + event.getId());
                 this.lastRR = event;
               })
               .catch((err) => {
@@ -1083,9 +1115,17 @@ export default {
               .finally(() => {
                 this.restartRRTimer();
               });
+              return; // Bail out here
+            }
+
+            // Stop iterating at first visible
+            if (event.getId() == eventIdFirst) {
+              break;
+            }
           }
         }
       }
+      this.restartRRTimer();
     },
 
     showDayMarkerBeforeEvent(event) {
