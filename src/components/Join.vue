@@ -22,7 +22,7 @@
         <!-- Join the group chat in a web browser or with the Keanu app. -->
       </div>
       <v-container class="join-user-info">
-        <v-row>
+        <v-row v-if="canEditProfile">
           <v-col class="flex-grow-0 flex-shrink-0">
             <v-avatar @click="showAvatarPickerList">
               <v-img v-if="profile" :src="profile.image" />
@@ -41,7 +41,17 @@
               single-line
             >
               <template v-slot:selection>
-                <v-text-field background-color="transparent" solo flat hide-details @click.native.stop="{}" v-model="profile.name"></v-text-field>
+                <v-text-field
+                  background-color="transparent"
+                  solo
+                  flat
+                  hide-details
+                  @click.native.stop="
+                    {
+                    }
+                  "
+                  v-model="profile.name"
+                ></v-text-field>
               </template>
               <template v-slot:item="data">
                 <v-avatar size="32">
@@ -50,6 +60,20 @@
                 <div class="ml-2">{{ data.item.name }}</div>
               </template>
             </v-select>
+          </v-col>
+        </v-row>
+        <v-row v-else>
+          <v-col>
+            You are joining as:
+            <div style="display:inline-block">
+            <v-avatar color="#e0e0e0" style="">
+              <v-img v-if="userAvatar" :src="userAvatar" />
+              <span v-else class="white--text headline">{{
+                userAvatarLetter
+              }}</span>
+            </v-avatar>
+            </div>
+            {{ userDisplayName }}
           </v-col>
         </v-row>
       </v-container>
@@ -117,7 +141,9 @@ export default {
   mounted() {
     this.$matrix.on("Room.myMembership", this.onMyMembership);
     this.availableAvatars = util.getDefaultAvatars();
-    this.randomProfile = this.availableAvatars[Math.floor(Math.random() * this.availableAvatars.length)];
+    this.randomProfile = this.availableAvatars[
+      Math.floor(Math.random() * this.availableAvatars.length)
+    ];
   },
   destroyed() {
     this.$matrix.off("Room.myMembership", this.onMyMembership);
@@ -144,9 +170,23 @@ export default {
 
     profile() {
       return {
-        image: (this.selectedProfile ? this.selectedProfile.image : null) || this.userAvatar || this.randomProfile.image,
-        name: (this.selectedProfile ? this.selectedProfile.name : null) || this.userDisplayName || this.randomProfile.name
+        image:
+          (this.selectedProfile ? this.selectedProfile.image : null) ||
+          this.userAvatar ||
+          this.randomProfile.image,
+        name:
+          (this.selectedProfile ? this.selectedProfile.name : null) ||
+          this.userDisplayName ||
+          this.randomProfile.name,
+      };
+    },
+
+    canEditProfile() {
+      // If we have an account already, we can't edit profile here (need to go into profile view)
+      if (this.currentUser) {
+        return false;
       }
+      return true;
     },
 
     hasChangedAvatar() {
@@ -166,13 +206,20 @@ export default {
         return null;
       }
       return this.$matrix.matrixClient.mxcUrlToHttp(
-          this.$matrix.userAvatar,
-          80,
-          80,
-          "scale",
-          true
-        );
+        this.$matrix.userAvatar,
+        80,
+        80,
+        "scale",
+        true
+      );
     },
+
+    userAvatarLetter() {
+      if (!this.currentUser) {
+        return null;
+      }
+      return (this.userDisplayName || this.currentUser.userId.substring(1)).substring(0, 1).toUpperCase();
+    }
   },
   watch: {
     roomId: {
@@ -275,12 +322,11 @@ export default {
       return clientPromise
         .then(
           function (user) {
-            if (
-              (this.currentUser && !this.currentUser.is_guest) ||
-              !this.hasChangedDisplayName /* No change */
-            ) {
+            if (!this.hasChangedDisplayName) {
+              console.log("Join: No display name change");
               return Promise.resolve(user);
             } else {
+              console.log("Join: Set display name to: " + this.profile.name);
               return this.$matrix.matrixClient.setDisplayName(
                 this.profile.name,
                 undefined
@@ -290,12 +336,11 @@ export default {
         )
         .then(
           function () {
-            if (
-              (this.currentUser && !this.currentUser.is_guest) ||
-              !this.hasChangedAvatar /* No change */
-            ) {
+            if (!this.hasChangedAvatar) {
+              console.log("Join: No avatar change");
               return Promise.resolve("no avatar");
             } else {
+              console.log("Join: Updating avatar");
               return util.setAvatar(
                 this.$matrix.matrixClient,
                 this.profile.image,
@@ -308,6 +353,7 @@ export default {
         )
         .then(
           function (ignoreduser) {
+            console.log("Join: joining room");
             this.loadingMessage = "Joining room...";
             return this.$matrix.matrixClient.joinRoom(this.roomId);
           }.bind(this)
@@ -339,7 +385,7 @@ export default {
 
     showAvatarPickerList() {
       this.$refs.avatar.$refs.input.click();
-    }
+    },
   },
 };
 </script>
