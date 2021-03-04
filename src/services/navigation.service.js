@@ -54,6 +54,8 @@ export default {
                     router.go(index);
                 } else if (index == 0) {
                     console.log("Nav - replace");
+                    routes = nextRoutes;
+                    nextRoutes = null;
                     router.replace(route).catch((ignoredErr) => {});
                 } else {
                     console.log("Nav - push");
