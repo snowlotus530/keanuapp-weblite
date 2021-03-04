@@ -299,6 +299,7 @@ import MessageOutgoingAudio from "./messages/MessageOutgoingAudio.vue";
 import ContactJoin from "./messages/ContactJoin.vue";
 import ContactLeave from "./messages/ContactLeave.vue";
 import ContactInvited from "./messages/ContactInvited.vue";
+import ContactChanged from "./messages/ContactChanged.vue";
 import RoomNameChanged from "./messages/RoomNameChanged.vue";
 import RoomTopicChanged from "./messages/RoomTopicChanged.vue";
 import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
@@ -352,6 +353,7 @@ export default {
     ContactJoin,
     ContactLeave,
     ContactInvited,
+    ContactChanged,
     RoomNameChanged,
     RoomTopicChanged,
     RoomAvatarChanged,
@@ -691,7 +693,12 @@ export default {
       switch (event.getType()) {
         case "m.room.member":
           if (event.getContent().membership == "join") {
-            return ContactJoin;
+            if (event.getPrevContent() && event.getPrevContent().membership == "join") {
+              // We we already joined, so this must be a display name and/or avatar update!
+              return ContactChanged;
+            } else {
+              return ContactJoin;
+            }
           } else if (event.getContent().membership == "leave") {
             return ContactLeave;
           } else if (event.getContent().membership == "invite") {
