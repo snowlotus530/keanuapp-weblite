@@ -349,27 +349,59 @@ class Util {
     }
 
     getFirstVisibleElement(parentNode) {
-        const y = parentNode.scrollTop;
-        return this.getElementAtY(parentNode, y);
+        const visible = this.findVisibleElements(parentNode);
+        if (visible && visible.length > 0) {
+            return visible[0];
+        }
+        return null;
     }
 
     getLastVisibleElement(parentNode) {
-        const y = parentNode.scrollTop + parentNode.clientHeight;
-        return this.getElementAtY(parentNode, y);
+        const visible = this.findVisibleElements(parentNode);
+        if (visible && visible.length > 0) {
+            return visible[visible.length - 1];
+        }
+        return null;
     }
 
-    getElementAtY(parentNode, y) {
+    findVisibleElements(parentNode) {
+        const middle = this.findOneVisibleElement(parentNode);
+        if (middle) {
+            var nodes = [parentNode.children[middle]];
+            var i = middle - 1;
+                while (i >= 0 && this.isChildVisible(parentNode, parentNode.children[i])) {
+                    nodes.splice(0,0,parentNode.children[i]);
+                    i-=1;
+                }
+            i = middle + 1;
+            while (i < parentNode.children.length && this.isChildVisible(parentNode, parentNode.children[i])) {
+                nodes.push(parentNode.children[i]);
+                i+=1;
+            }
+            return nodes;
+        }
+        return null; // No visible found
+    }
+
+    isChildVisible(parentNode, childNode) {
+        let top = parentNode.scrollTop;
+        let bottom = top + parentNode.clientHeight;
+        const childTop = childNode.offsetTop;
+        const childBottom = childTop + childNode.clientHeight;
+        return ((childTop >= top && childTop < bottom) || (childBottom > top && childBottom <= bottom));
+    }
+
+    findOneVisibleElement(parentNode) {
         let start = 0;
         let end = parentNode.children.length - 1;
-
+        let top = parentNode.scrollTop;
         while (start <= end) {
             let middle = Math.floor((start + end) / 2);
-            const yMiddleTop = parentNode.children[middle].offsetTop;
-            const yMiddleBottom = yMiddleTop + parentNode.children[middle].clientHeight;
-            if (yMiddleTop <= y && yMiddleBottom >= y) {
+            let childNode = parentNode.children[middle];
+            if (this.isChildVisible(parentNode, childNode)) {
                 // found the key
-                return parentNode.children[middle];
-            } else if (yMiddleBottom < y) {
+                return middle;
+            } else if (childNode.offsetTop < top) {
                 // continue searching to the right
                 start = middle + 1;
             } else {
