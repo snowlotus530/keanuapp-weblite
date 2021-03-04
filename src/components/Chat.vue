@@ -358,7 +358,7 @@ export default {
     RoomHistoryVisibility,
     DebugEvent,
     MessageOperations,
-    VoiceRecorder
+    VoiceRecorder,
   },
 
   data() {
@@ -563,56 +563,57 @@ export default {
         {}
       );
       const self = this;
-      this.timelineWindow.load(initialEventId, 20)
-      .then(() => {
-        console.log("This is", self);
-        self.events = self.timelineWindow.getEvents();
+      this.timelineWindow
+        .load(initialEventId, 20)
+        .then(() => {
+          console.log("This is", self);
+          self.events = self.timelineWindow.getEvents();
 
-        const getMoreIfNeeded = function _getMoreIfNeeded() {
-          const container = self.$refs.chatContainer;
-          if (
-            container.scrollHeight <= container.clientHeight &&
-            self.timelineWindow &&
-            self.timelineWindow.canPaginate(EventTimeline.BACKWARDS)
-          ) {
-            return self.timelineWindow
-              .paginate(EventTimeline.BACKWARDS, 10, true, 5)
-              .then((success) => {
-                self.events = self.timelineWindow.getEvents();
-                if (success) {
-                  return _getMoreIfNeeded.call(self);
-                } else {
-                  return Promise.reject("Failed to paginate");
-                }
-              });
-          } else {
-            return Promise.resolve("Done");
-          }
-        }.bind(self);
-
-        getMoreIfNeeded()
-          .catch((err) => {
-            console.log("ERROR " + err);
-          })
-          .finally(() => {
-            self.initialLoadDone = true;
-            if (initialEventId) {
-              self.scrollToEvent(initialEventId);
+          const getMoreIfNeeded = function _getMoreIfNeeded() {
+            const container = self.$refs.chatContainer;
+            if (
+              container.scrollHeight <= container.clientHeight &&
+              self.timelineWindow &&
+              self.timelineWindow.canPaginate(EventTimeline.BACKWARDS)
+            ) {
+              return self.timelineWindow
+                .paginate(EventTimeline.BACKWARDS, 10, true, 5)
+                .then((success) => {
+                  self.events = self.timelineWindow.getEvents();
+                  if (success) {
+                    return _getMoreIfNeeded.call(self);
+                  } else {
+                    return Promise.reject("Failed to paginate");
+                  }
+                });
+            } else {
+              return Promise.resolve("Done");
             }
-            self.restartRRTimer();
-          });
-      })
-      .catch(err => {
-        console.log("Error fetching events!", err, this);
-        if (err.errcode == 'M_UNKNOWN' && initialEventId) {
-          // Try again without initial event!
-          this.onRoomJoined(null);
-        } else {
-          // Error. Done loading.
-          this.events = this.timelineWindow.getEvents();
-          this.initialLoadDone = true;
-        }
-      })
+          }.bind(self);
+
+          getMoreIfNeeded()
+            .catch((err) => {
+              console.log("ERROR " + err);
+            })
+            .finally(() => {
+              self.initialLoadDone = true;
+              if (initialEventId) {
+                self.scrollToEvent(initialEventId);
+              }
+              self.restartRRTimer();
+            });
+        })
+        .catch((err) => {
+          console.log("Error fetching events!", err, this);
+          if (err.errcode == "M_UNKNOWN" && initialEventId) {
+            // Try again without initial event!
+            this.onRoomJoined(null);
+          } else {
+            // Error. Done loading.
+            this.events = this.timelineWindow.getEvents();
+            this.initialLoadDone = true;
+          }
+        });
     },
 
     onRoomNotJoined() {
@@ -1108,27 +1109,27 @@ export default {
               // Already sent this or too old...
               break;
             }
-            // Is it an incoming event?
-            if (event.getSender() !== this.$matrix.currentUserId) {
-                          // Send read receipt
-            this.$matrix.matrixClient
-              .sendReadReceipt(event)
-              .then(() => {
-                this.$matrix.matrixClient.setRoomReadMarkers(
-                  this.room.roomId,
-                  event.getId()
-                );
-              })
-              .then(() => {
-                console.log("RR sent for event: " + event.getId());
-                this.lastRR = event;
-              })
-              .catch((err) => {
-                console.log("Failed to update read marker: ", err);
-              })
-              .finally(() => {
-                this.restartRRTimer();
-              });
+            // Make sure it's not a local echo event...
+            if (!event.getId().startsWith("~")) {
+              // Send read receipt
+              this.$matrix.matrixClient
+                .sendReadReceipt(event)
+                .then(() => {
+                  this.$matrix.matrixClient.setRoomReadMarkers(
+                    this.room.roomId,
+                    event.getId()
+                  );
+                })
+                .then(() => {
+                  console.log("RR sent for event: " + event.getId());
+                  this.lastRR = event;
+                })
+                .catch((err) => {
+                  console.log("Failed to update read marker: ", err);
+                })
+                .finally(() => {
+                  this.restartRRTimer();
+                });
               return; // Bail out here
             }
 
@@ -1161,12 +1162,12 @@ export default {
 
     onVoiceRecording(event) {
       util.sendImage(
-          this.$matrix.matrixClient,
-          this.roomId,
-          event.file,
-          undefined
-        );
-    }
+        this.$matrix.matrixClient,
+        this.roomId,
+        event.file,
+        undefined
+      );
+    },
   },
 };
 </script>
