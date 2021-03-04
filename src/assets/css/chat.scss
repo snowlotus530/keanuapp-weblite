@@ -269,6 +269,13 @@ $admin-fg: white;
             border-radius: 10px 10px 0 10px;
         }
     }
+    .avatar {
+        display: inline-block;
+        vertical-align: bottom !important;
+        margin-left: 10px;
+        bottom: 0;
+        border: 2px solid white;
+    }
     .senderAndTime {
         display: block;
     }
