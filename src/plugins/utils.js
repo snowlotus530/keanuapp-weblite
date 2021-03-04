@@ -384,11 +384,13 @@ class Util {
     }
 
     isChildVisible(parentNode, childNode) {
-        let top = parentNode.scrollTop;
-        let bottom = top + parentNode.clientHeight;
-        const childTop = childNode.offsetTop;
-        const childBottom = childTop + childNode.clientHeight;
-        return ((childTop >= top && childTop < bottom) || (childBottom > top && childBottom <= bottom));
+        const rect1 = parentNode.getBoundingClientRect();
+        const rect2 = childNode.getBoundingClientRect();
+        var overlap = !(rect1.right < rect2.left || 
+            rect1.left > rect2.right || 
+            rect1.bottom < rect2.top || 
+            rect1.top > rect2.bottom)
+        return overlap;
     }
 
     findOneVisibleElement(parentNode) {
