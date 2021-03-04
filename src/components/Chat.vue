@@ -408,8 +408,6 @@ export default {
   mounted() {
     const container = this.$refs.chatContainer;
     this.scrollPosition = new ScrollPosition(container);
-    this.$matrix.on("Room.timeline", this.onEvent);
-    this.$matrix.on("RoomMember.typing", this.onUserTyping);
     this.chatContainerSize = this.$refs.chatContainerResizer.$el.clientHeight;
   },
 
@@ -513,6 +511,9 @@ export default {
         );
 
         // Clear old events
+        this.$matrix.off("Room.timeline", this.onEvent);
+        this.$matrix.off("RoomMember.typing", this.onUserTyping);
+
         this.events = [];
         this.timelineWindow = null;
         this.typingMembers = [];
@@ -526,7 +527,11 @@ export default {
           // Public room?
           if (this.roomId && this.roomId.startsWith("#")) {
             this.onRoomNotJoined();
+          } else if (this.roomId) {
+            this.onRoomNotJoined(); // Private room we are not joined to. What to do? We redirect to join
+            // screen, maybe the user has an invite already?
           }
+          this.initialLoadDone = true;
           return; // no room
         }
 
@@ -543,9 +548,13 @@ export default {
 
   methods: {
     onRoomJoined(initialEventId) {
+      // Listen to events
+      this.$matrix.on("Room.timeline", this.onEvent);
+      this.$matrix.on("RoomMember.typing", this.onUserTyping);
+
       console.log("Read up to " + initialEventId);
 
-      initialEventId = null;
+      //initialEventId = null;
 
       this.timelineWindow = new TimelineWindow(
         this.$matrix.matrixClient,
