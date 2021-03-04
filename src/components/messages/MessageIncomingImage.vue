@@ -7,7 +7,7 @@
       }}</span>
     </v-avatar>
     <div class="bubble image-bubble">
-      <v-img :aspect-ratio="16 / 9" ref="image" :src="src" cover />
+      <v-img :aspect-ratio="16 / 9" ref="image" :src="src" :cover="cover" :contain="contain" />
       <QuickReactions :event="event" :reactions="reactions" />
     </div>
     <div class="op-button" ref="opbutton">
@@ -33,6 +33,8 @@ export default {
   data() {
     return {
       src: null,
+      cover: true,
+      contain: false
     };
   },
   mounted() {
@@ -42,6 +44,16 @@ export default {
     util
       .getThumbnail(this.$matrix.matrixClient, this.event, width, height)
       .then((url) => {
+        const info = this.event.getContent().info;
+        // JPEGs use cover, PNG and GIF ect contain. This is because PNG and GIF are expected to
+        // be stickers and small emoji type things.
+        if (info && info.mimetype && info.mimetype.startsWith("image/jp")) {
+          this.cover = true;
+          this.contain = false;
+        } else {
+          this.cover = false;
+          this.contain = true;
+        }
         this.src = url;
       })
       .catch((err) => {
