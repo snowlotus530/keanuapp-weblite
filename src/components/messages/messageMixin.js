@@ -124,9 +124,33 @@ export default {
   
     messageClasses() {
       return {'messageIn':true,'from-admin':this.senderIsAdminOrModerator(this.event)}
+    },
+
+    userAvatar() {
+      if (!this.$matrix.userAvatar) {
+        return null;
+      }
+      return this.$matrix.matrixClient.mxcUrlToHttp(
+        this.$matrix.userAvatar,
+        80,
+        80,
+        "scale",
+        true
+      );
+    },
+
+    userAvatarLetter() {
+      if (!this.$matrix.currentUser) {
+        return null;
+      }
+      return (this.$matrix.userDisplayName || this.$matrix.currentUser.userId.substring(1)).substring(0, 1).toUpperCase();
     }
   },
   methods: {
+    ownAvatarClicked() {
+      this.$emit("own-avatar-clicked", {event: this.event});
+    },
+
     showContextMenu(buttonRef) {
       this.$emit("context-menu", {event: this.event,anchor: buttonRef});
     },

@@ -9,6 +9,10 @@
       <audio controls :src="src">Audio file</audio>
       <QuickReactions :event="event" :reactions="reactions" />
     </div>
+    <v-avatar class="avatar" size="32" color="#ededed" @click.stop="ownAvatarClicked">
+      <img v-if="userAvatar" :src="userAvatar" />
+      <span v-else class="white--text headline">{{ userAvatarLetter }}</span>
+    </v-avatar>
     <div class="senderAndTime">
       <!-- <div class="sender">{{ "You" }}</div> -->
       <div class="time">

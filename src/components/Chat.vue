@@ -73,6 +73,7 @@
               :timelineSet="timelineWindow._timelineSet"
               v-on:send-quick-reaction="sendQuickReaction"
               v-on:context-menu="showContextMenuForEvent($event)"
+              v-on:own-avatar-clicked="viewProfile"
             />
             <!-- <div>EventID: {{ event.getId() }}</div> -->
             <div
@@ -1052,6 +1053,10 @@ export default {
       this.selectedEvent = event;
       this.showContextMenu = true;
       this.showContextMenuAnchor = e.anchor;
+    },
+
+    viewProfile() {
+      this.$navigation.push({ name: "Profile" }, 1);
     },
 
     closeContextMenuIfOpen(e) {
