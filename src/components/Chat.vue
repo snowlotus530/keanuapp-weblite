@@ -153,15 +153,14 @@
           v-if="!currentInput || currentInput.length == 0"
         >
           <v-btn
+            class="mic-button"
             ref="mic_button"
             fab
             small
             elevation="0"
-            color="transparent"
             v-blur
             style="z-index: 10"
-            @touchstart.native.stop="startRecording"
-            @mousedown.native.stop="startRecording"
+            v-longTap:500="[showRecordingUI,startRecording]"
           >
             <v-icon :color="showRecorder ? 'white' : 'black'">mic</v-icon>
           </v-btn>
@@ -209,6 +208,7 @@
       </v-row>
       <VoiceRecorder
         :micButtonRef="$refs.mic_button"
+        :ptt="showRecorderPTT"
         :show="showRecorder"
         v-on:close="showRecorder = false"
         v-on:file="onVoiceRecording"
@@ -383,6 +383,7 @@ export default {
       showContextMenuAnchor: null,
       initialLoadDone: false,
       showRecorder: false,
+      showRecorderPTT: false, // True to open the voice recorder in push-to-talk mode.
 
       /**
        * Current chat container size. We need to keep track of this so that if and when
@@ -668,7 +669,7 @@ export default {
     },
 
     /**
-     * Triggered when out "long tap" timer hits.
+     * Triggered when our "long tap" timer hits.
      */
     touchTimerElapsed() {
       this.showContextMenu = true;
@@ -1163,7 +1164,13 @@ export default {
       return util.formatDay(event.getTs());
     },
 
+    showRecordingUI() {
+      this.showRecorderPTT = false;
+      this.showRecorder = true;
+    },
+
     startRecording() {
+      this.showRecorderPTT = true;
       this.showRecorder = true;
     },
 
