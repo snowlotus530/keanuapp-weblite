@@ -613,13 +613,26 @@ $admin-fg: white;
     }
 }
 
+.mic-button {
+    background-color: transparent !important;
+    &.waiting-for-long-tap {
+        transition: background-color 0.5s;
+        background-color: black !important;
+        .v-icon {
+            color: white !important;
+        }
+    }
+}
+
 .voice-recorder {
     position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    //top: 0;
+    left: 10px;
+    bottom: 0px;
+    right: 10px;
+    border-radius: 10px;
     background-color: black;
+    overflow: hidden;
     .will-cancel {
         background-color: #ff3300;
     }

@@ -1,80 +1,132 @@
 <template>
-  <div v-show="show" class="voice-recorder" ref="vrroot">
-    <v-container fluid fill-height>
-      <v-row align="center">
-        <v-col cols="3">
-          <div class="recording-time">
-            {{ recordingTime }}
-          </div>
-        </v-col>
-        <v-col cols="6">
-          <div class="swipe-info">&lt;&lt; Swipe to cancel</div>
-        </v-col>
-      </v-row>
-    </v-container>
-    <transition name="fade" mode="out-in">
-      <div
-        v-if="willCancel"
-        class="will-cancel"
-        style="position: absolute; top: 0; left: 0; right: 0; bottom: 0"
-      >
-        <v-container fluid fill-height>
-          <v-row align="center">
-            <v-col cols="3">
-              <v-icon color="white">delete_outline</v-icon>
-            </v-col>
-            <v-col cols="6">
-              <div class="swipe-info">Release to cancel</div>
-            </v-col>
-          </v-row>
-        </v-container>
-      </div>
-    </transition>
-
-    <transition name="fade" mode="out-in">
-      <div
-        v-if="recordingLocked"
-        class="locked"
-        style="position: absolute; top: 0; left: 0; right: 0; bottom: 0"
-      >
-        <v-container fluid fill-height>
-          <v-row align="center">
-            <v-col cols="3">
-              <div class="recording-time">
-                {{ recordingTime }}
-              </div>
-            </v-col>
-            <v-col cols="3">
-              <v-btn @click.stop="cancelRecording" text class="swipe-info"
-                >Cancel</v-btn
-              >
-            </v-col>
-            <v-col cols="3">
-              <v-btn @click.stop="stopRecording" icon class="swipe-info"
-                ><v-icon color="white">stop</v-icon></v-btn
-              >
-            </v-col>
-          </v-row>
-        </v-container>
-      </div>
-    </transition>
-
-    <div
-      v-if="state == states.ERROR"
-      class="error"
-      style="position: absolute; top: 0; left: 0; right: 0; bottom: 0"
-    >
-      <v-container fluid fill-height>
+  <transition name="grow" mode="out-in">
+    <div v-show="show" class="voice-recorder" ref="vrroot">
+      <!-- <div style="background-color:red;height:60px;width:100%"/> -->
+      <v-container v-if="!ptt" fluid fill-height>
         <v-row align="center">
-          <v-col>
-            <div class="swipe-info">Failed to record audio</div>
+          <v-col cols="4" align="center">
+            <v-icon v-show="false" color="white">delete_outline</v-icon>
+          </v-col>
+          <v-col cols="4" align="center">
+            <v-btn
+              v-if="state == states.RECORDING"
+              style="background-color: white; padding: 30px"
+              icon
+              @click.stop="pauseRecording"
+            >
+              <v-icon color="black">stop</v-icon>
+            </v-btn>
+            <v-btn
+              v-else-if="state == states.RECORDED"
+              style="background-color: green; padding: 30px"
+              icon
+              :disabled="!recordedFile"
+              @click.stop="send"
+            >
+              <v-icon color="white">arrow_upward</v-icon>
+            </v-btn>
+            <v-btn
+              v-else
+              style="background-color: red; padding: 30px"
+              icon
+              @click.stop="startRecording"
+            >
+              <v-icon color="white">fiber_manual_record</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="4" align="center">
+            <v-btn icon @click.stop="cancelRecording">
+              <v-icon color="white">close</v-icon>
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
-    </div>
 
-    <VoiceRecorderLock v-show="state == states.RECORDING" :style="lockButtonStyle" :isLocked="recordingLocked" />
-  </div>
+      <v-container fluid fill-height>
+        <v-row align="center">
+          <v-col cols="3">
+            <div class="recording-time">
+              {{ recordingTime }}
+            </div>
+          </v-col>
+          <v-col cols="6" v-if="ptt">
+            <div class="swipe-info">&lt;&lt; Swipe to cancel</div>
+          </v-col>
+        </v-row>
+      </v-container>
+      <transition name="fade" mode="out-in">
+        <div
+          v-if="willCancel"
+          class="will-cancel"
+          style="position: absolute; top: 0; left: 0; right: 0; bottom: 0"
+        >
+          <v-container fluid fill-height>
+            <v-row align="center">
+              <v-col cols="3">
+                <v-icon color="white">delete_outline</v-icon>
+              </v-col>
+              <v-col cols="6">
+                <div class="swipe-info">Release to cancel</div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
+      </transition>
+
+      <transition name="fade" mode="out-in">
+        <div
+          v-if="recordingLocked"
+          class="locked"
+          style="position: absolute; top: 0; left: 0; right: 0; bottom: 0"
+        >
+          <v-container fluid fill-height>
+            <v-row align="center">
+              <v-col cols="3">
+                <div class="recording-time">
+                  {{ recordingTime }}
+                </div>
+              </v-col>
+              <v-col cols="3">
+                <v-btn @click.stop="cancelRecording" text class="swipe-info"
+                  >Cancel</v-btn
+                >
+              </v-col>
+              <v-col cols="3">
+                <v-btn @click.stop="stopRecording" icon class="swipe-info"
+                  ><v-icon color="white">stop</v-icon></v-btn
+                >
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
+      </transition>
+
+      <div
+        v-if="state == states.ERROR"
+        class="error"
+        style="position: absolute; top: 0; left: 0; right: 0; bottom: 0"
+      >
+        <v-container fluid fill-height>
+          <v-row align="center">
+            <v-col>
+              <div class="swipe-info">Failed to record audio</div>
+            </v-col>
+            <v-col align="right">
+              <v-btn icon @click.stop="cancelRecording">
+                <v-icon color="white">close</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </div>
+
+      <VoiceRecorderLock
+        v-show="state == states.RECORDING && ptt"
+        :style="lockButtonStyle"
+        :isLocked="recordingLocked"
+      />
+    </div>
+  </transition>
 </template>
 <script>
 const State = {
@@ -98,6 +150,12 @@ export default {
         return false;
       },
     },
+    ptt: {
+      type: Boolean,
+      default: function () {
+        return false;
+      },
+    },
     micButtonRef: {
       type: Object,
       default: function () {
@@ -114,21 +172,59 @@ export default {
       states: State,
       state: State.INITIAL,
       recordStartedAt: null,
-      recordingTime: null,
+      recordingTime: String.fromCharCode(160), // nbsp!
       recordTimer: null,
       recordingLocked: false,
+      recordedFile: null,
     };
   },
   watch: {
+    micButtonRef(buttonRef) {
+      if (buttonRef) {
+        var r = buttonRef.$el.getBoundingClientRect();
+        var left = r.left;
+        var width = r.right - r.left;
+        r = this.$refs.vrroot.parentElement.getBoundingClientRect();
+        var widthParent = r.right - r.left;
+        document.documentElement.style.setProperty(
+          "--v-mic-button-left",
+          left + "px"
+        );
+        document.documentElement.style.setProperty(
+          "--v-mic-button-width",
+          width + "px"
+        );
+        document.documentElement.style.setProperty(
+          "--v-mic-button-container-width",
+          widthParent + "px"
+        );
+        var initialScale = width / widthParent;
+        document.documentElement.style.setProperty(
+          "--v-mic-button-initial-scale",
+          initialScale
+        );
+        var initialTranslate = left + width / 2 - widthParent / 2;
+        document.documentElement.style.setProperty(
+          "--v-mic-button-initial-translate",
+          initialTranslate + "px"
+        );
+      }
+    },
     show(val) {
       if (val) {
         // Add listeners
         this.state = State.INITIAL;
-        document.addEventListener("mouseup", this.mouseUp, false);
-        document.addEventListener("mousemove", this.mouseMove, false);
-        document.addEventListener("touchend", this.mouseUp, false);
-        document.addEventListener("touchmove", this.mouseMove, false);
-        this.startRecording();
+        this.recordedFile = null;
+        if (this.ptt) {
+          document.addEventListener("mouseup", this.mouseUp, false);
+          document.addEventListener("mousemove", this.mouseMove, false);
+          document.addEventListener("touchend", this.mouseUp, false);
+          document.addEventListener("touchmove", this.mouseMove, false);
+          this.startRecording();
+        } else {
+          console.log("Not PTT");
+          this.micButtonRef.$el.style.display = "none";
+        }
       } else {
         // Remove listeners
         document.removeEventListener("mouseup", this.mouseUp, false);
@@ -141,6 +237,7 @@ export default {
         this.startCoordinateX = null;
         this.startCoordinateY = null;
         this.recordingLocked = false;
+        this.micButtonRef.$el.style.display = "block";
       }
     },
   },
@@ -169,6 +266,7 @@ export default {
   methods: {
     close() {
       this.stopRecordTimer();
+      this.recorder = null;
       this.$emit("close");
     },
     mouseUp(ignoredEvent) {
@@ -230,21 +328,37 @@ export default {
     },
     cancelRecording() {
       this.state = State.INITIAL;
-      this.recorder.stop();
+      if (this.recorder) {
+        this.recorder.stop();
+      }
       this.stopRecordTimer();
       this.close();
+    },
+    pauseRecording() {
+      this.state = State.RECORDED;
+      this.stopRecordTimer();
+      this.getFile(false);
     },
     stopRecording() {
       this.state = State.RECORDED;
       this.stopRecordTimer();
       this.close();
+      this.getFile(true);
+    },
+    send() {
+      console.log("Send:", this.recordedFile);
+      //this.$emit("file", {file: file});
+      // const player = new Audio(URL.createObjectURL(file));
+      // player.play();
+    },
+    getFile(send) {
       this.recorder
         .stop()
         .getMp3()
         .then(([buffer, blob]) => {
           // do what ever you want with buffer and blob
           // Example: Create a mp3 file and play
-          const file = new File(
+          this.recordedFile = new File(
             buffer,
             util.formatRecordStartTime(this.recordStartedAt) + ".mp3",
             {
@@ -252,10 +366,9 @@ export default {
               lastModified: Date.now(),
             }
           );
-          //console.log(file);
-          this.$emit("file", {file: file});
-          // const player = new Audio(URL.createObjectURL(file));
-          // player.play();
+          if (send) {
+            this.send();
+          }
         })
         .catch((e) => {
           alert("We could not retrieve your message");
@@ -275,7 +388,7 @@ export default {
       if (this.recordTimer) {
         clearInterval(this.recordTimer);
         this.recordTimer = null;
-        this.recordingTime = null;
+        this.recordingTime = String.fromCharCode(160); // nbsp;
       }
     },
   },
@@ -286,6 +399,19 @@ export default {
 @import "@/assets/css/chat.scss";
 </style>
 <style>
+.grow-enter-active,
+.grow-leave-active {
+  transition-timing-function: ease-out;
+  transition: opacity 0.5s, border-radius 0.7s, transform 0.7s;
+}
+.grow-enter,
+.grow-leave-to {
+  transform: translateX(var(--v-mic-button-initial-translate))
+    scaleX(var(--v-mic-button-initial-scale));
+  opacity: 0;
+  border-radius: 25px !important;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;
