@@ -266,7 +266,6 @@ export default {
   methods: {
     close() {
       this.stopRecordTimer();
-      this.recorder = null;
       this.$emit("close");
     },
     mouseUp(ignoredEvent) {
@@ -312,7 +311,7 @@ export default {
       const MicRecorder = require("mic-recorder-to-mp3");
       // Start recording. Browser will request permission to use your microphone.
       this.recorder = new MicRecorder({
-        bitRate: 128,
+        bitRate: 32,
       });
       this.recorder
         .start()
@@ -346,8 +345,8 @@ export default {
       this.getFile(true);
     },
     send() {
-      console.log("Send:", this.recordedFile);
-      //this.$emit("file", {file: file});
+      //console.log("Send:", this.recordedFile);
+      this.$emit("file", {file: this.recordedFile});
       // const player = new Audio(URL.createObjectURL(file));
       // player.play();
     },
