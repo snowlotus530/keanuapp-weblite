@@ -1,11 +1,13 @@
 <template>
   <transition name="grow" mode="out-in">
-    <div v-show="show" class="voice-recorder" ref="vrroot">
+    <div v-show="show" :class="{'voice-recorder':true,'ptt':ptt,'row':!ptt}" ref="vrroot">
       <!-- <div style="background-color:red;height:60px;width:100%"/> -->
       <v-container v-if="!ptt" fluid fill-height>
-        <v-row align="center">
+        <v-row align="center" class="mt-3">
           <v-col cols="4" align="center">
-            <v-icon v-show="false" color="white">delete_outline</v-icon>
+            <v-btn v-show="state == states.RECORDED" icon @click.stop="redo">
+              <v-icon color="white">undo</v-icon>
+            </v-btn>
           </v-col>
           <v-col cols="4" align="center">
             <v-btn
@@ -18,12 +20,12 @@
             </v-btn>
             <v-btn
               v-else-if="state == states.RECORDED"
-              style="background-color: green; padding: 30px"
+              style="background-color: #3ae17d; padding: 30px"
               icon
               :disabled="!recordedFile"
               @click.stop="send"
             >
-              <v-icon color="white">arrow_upward</v-icon>
+              <v-icon color="black">arrow_upward</v-icon>
             </v-btn>
             <v-btn
               v-else
@@ -266,6 +268,7 @@ export default {
   methods: {
     close() {
       this.stopRecordTimer();
+      this.recordingTime = String.fromCharCode(160); // nbsp;
       this.$emit("close");
     },
     mouseUp(ignoredEvent) {
@@ -331,6 +334,7 @@ export default {
         this.recorder.stop();
       }
       this.stopRecordTimer();
+      this.recordingTime = String.fromCharCode(160); // nbsp;
       this.close();
     },
     pauseRecording() {
@@ -341,8 +345,14 @@ export default {
     stopRecording() {
       this.state = State.RECORDED;
       this.stopRecordTimer();
+      this.recordingTime = String.fromCharCode(160); // nbsp;
       this.close();
       this.getFile(true);
+    },
+    redo() {
+      this.state = State.INITIAL;
+      this.recordedFile = null;
+      this.recordingTime = String.fromCharCode(160); // nbsp;
     },
     send() {
       //console.log("Send:", this.recordedFile);
@@ -376,6 +386,7 @@ export default {
     },
     startRecordTimer() {
       this.stopRecordTimer();
+      this.recordingTime = String.fromCharCode(160); // nbsp;
       this.recordTimer = setInterval(() => {
         const now = Date.now();
         this.recordingTime = util.formatRecordDuration(
@@ -387,7 +398,6 @@ export default {
       if (this.recordTimer) {
         clearInterval(this.recordTimer);
         this.recordTimer = null;
-        this.recordingTime = String.fromCharCode(160); // nbsp;
       }
     },
   },
@@ -401,7 +411,7 @@ export default {
 .grow-enter-active,
 .grow-leave-active {
   transition-timing-function: ease-out;
-  transition: opacity 0.5s, border-radius 0.7s, transform 0.7s;
+  transition: opacity 0.3s, border-radius 0.5s, transform 0.5s;
 }
 .grow-enter,
 .grow-leave-to {
