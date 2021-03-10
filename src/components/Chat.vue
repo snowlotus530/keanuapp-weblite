@@ -868,7 +868,7 @@ export default {
 
     sendAttachment() {
       if (this.currentImageInputPath) {
-        this.currentSendProgress = 0;
+        this.currentSendProgress = null;
         this.currentSendOperation = util.sendImage(
           this.$matrix.matrixClient,
           this.roomId,
@@ -879,12 +879,12 @@ export default {
           .then(() => {
             this.currentSendOperation = null;
             this.currentImageInput = null;
-            this.currentSendProgress = 0;
+            this.currentSendProgress = null;
           })
           .catch((err) => {
             this.currentSendError = err.toLocaleString();
             this.currentSendOperation = null;
-            this.currentSendProgress = 0;
+            this.currentSendProgress = null;
           });
       }
     },
@@ -895,7 +895,7 @@ export default {
       }
       this.currentSendOperation = null;
       this.currentImageInput = null;
-      this.currentSendProgress = 0;
+      this.currentSendProgress = null;
       this.currentSendError = null;
     },
 
