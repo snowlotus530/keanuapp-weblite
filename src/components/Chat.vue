@@ -127,7 +127,7 @@
             background-color="white"
             v-on:keydown.enter.prevent="
               () => {
-                sendMessage();
+                sendCurrentTextMessage();
               }
             "
           />
@@ -150,7 +150,7 @@
 
         <v-col
           class="input-area-button text-center flex-grow-0 flex-shrink-1"
-          v-if="!currentInput || currentInput.length == 0"
+          v-if="!currentInput || currentInput.length == 0 || showRecorder"
         >
           <v-btn
             class="mic-button"
@@ -160,7 +160,7 @@
             elevation="0"
             v-blur
             style="z-index: 10"
-            v-longTap:500="[showRecordingUI,startRecording]"
+            v-longTap:250="[showRecordingUI,startRecording]"
           >
             <v-icon :color="showRecorder ? 'white' : 'black'">mic</v-icon>
           </v-btn>
@@ -175,7 +175,7 @@
             small
             elevation="0"
             color="black"
-            @click.stop="sendMessage"
+            @click.stop="sendCurrentTextMessage"
             :disabled="sendButtonDisabled"
           >
             <v-icon color="white">{{
@@ -187,6 +187,7 @@
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
           <label icon flat ref="attachmentLabel">
             <v-btn
+              v-if="!showRecorder"
               icon
               large
               color="black"
@@ -215,11 +216,12 @@
       />
     </v-container>
 
-    <div v-if="currentImageInput">
-      <v-dialog v-model="currentImageInput" class="ma-0 pa-0" width="50%">
+    <div v-if="currentImageInputPath">
+      <v-dialog v-model="currentImageInputPath" class="ma-0 pa-0" width="50%">
         <v-card class="ma-0 pa-0">
           <v-card-text class="ma-0 pa-0">
             <v-img
+              v-if="currentImageInput"
               :aspect-ratio="1"
               :src="currentImageInput"
               contain
@@ -238,6 +240,7 @@
               color="primary"
               text
               @click="sendAttachment"
+              v-if="currentSendShowSendButton"
               :disabled="currentSendOperation != null"
               >Send</v-btn
             >
@@ -374,6 +377,7 @@ export default {
       currentImageInputPath: null,
       currentSendOperation: null,
       currentSendProgress: null,
+      currentSendShowSendButton: true,
       currentSendError: null,
       showEmojiPicker: false,
       selectedEvent: null,
@@ -808,13 +812,23 @@ export default {
       console.log("Typing: ", this.typingMembers);
     },
 
-    sendMessage() {
-      if (this.currentInput.length > 0) {
+    sendCurrentTextMessage() {
+      // DOn't have "enter" send messages while in recorder.
+      if (this.currentInput.length > 0 && !this.showRecorder) {
+        this.sendMessage(this.currentInput);
+        this.currentInput = "";
+        this.editedEvent = null; //TODO - Is this a good place to reset this?
+        this.replyToEvent = null;
+      }
+    },
+
+    sendMessage(text) {
+      if (text && text.length > 0) {
         util
           .sendTextMessage(
             this.$matrix.matrixClient,
             this.roomId,
-            this.currentInput,
+            text,
             this.editedEvent,
             this.replyToEvent
           )
@@ -824,9 +838,6 @@ export default {
           .catch((err) => {
             console.log("Failed to send:", err);
           });
-        this.currentInput = "";
-        this.editedEvent = null; //TODO - Is this a good place to reset this?
-        this.replyToEvent = null;
       }
     },
 
@@ -850,6 +861,7 @@ export default {
       if (event.target.files && event.target.files[0]) {
         var reader = new FileReader();
         reader.onload = (e) => {
+          this.currentSendShowSendButton = true;
           this.currentImageInput = e.target.result;
           this.currentImageInputPath = event.target.files[0];
         };
@@ -866,7 +878,7 @@ export default {
       }
     },
 
-    sendAttachment() {
+    sendAttachment(withText) {
       if (this.currentImageInputPath) {
         this.currentSendProgress = null;
         this.currentSendOperation = util.sendImage(
@@ -879,7 +891,11 @@ export default {
           .then(() => {
             this.currentSendOperation = null;
             this.currentImageInput = null;
+            this.currentImageInputPath = null;
             this.currentSendProgress = null;
+            if (withText) {
+              this.sendMessage(withText);
+            }
           })
           .catch((err) => {
             this.currentSendError = err.toLocaleString();
@@ -895,6 +911,7 @@ export default {
       }
       this.currentSendOperation = null;
       this.currentImageInput = null;
+      this.currentImageInputPath = null;
       this.currentSendProgress = null;
       this.currentSendError = null;
     },
@@ -1175,12 +1192,15 @@ export default {
     },
 
     onVoiceRecording(event) {
-      util.sendImage(
-        this.$matrix.matrixClient,
-        this.roomId,
-        event.file,
-        undefined
-      );
+      this.currentSendShowSendButton = false;
+      this.currentImageInputPath = event.file;
+      var text = undefined;
+      if (this.currentInput && this.currentInput.length > 0) {
+        text = this.currentInput;
+        this.currentInput = "";
+      }
+      this.sendAttachment(text);
+      this.showRecorder = false;
     },
   },
 };

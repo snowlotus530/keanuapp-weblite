@@ -625,11 +625,14 @@ $admin-fg: white;
 }
 
 .voice-recorder {
-    position: absolute;
-    //top: 0;
-    left: 10px;
-    bottom: 0px;
-    right: 10px;
+    position: relative;
+    margin-top: 14px !important;
+    &.ptt {
+        position: absolute;
+        left: 10px;
+        bottom: 0px;
+        right: 10px;
+    }
     border-radius: 10px;
     background-color: black;
     overflow: hidden;
