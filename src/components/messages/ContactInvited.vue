@@ -1,7 +1,7 @@
 <template>
   <!-- Contact invited to the chat -->
   <div class="messageJoin">
-    {{ stateEventDisplayName(event) }} was invited to the chat...
+    {{ event.getContent().displayname || stateEventDisplayName(event) }} was invited to the chat...
   </div>
 </template>
 

@@ -276,7 +276,7 @@ class Util {
 
                 const jwk = {
                     kty: 'oct',
-                    key_opts: ['encrypt', 'decrypt'],
+                    key_ops: ['encrypt', 'decrypt'],
                     alg: 'A256CTR',
                     k: base64Url.encode(key),
                     ext: true

@@ -34,7 +34,7 @@ export default {
     return {
       src: null,
       cover: true,
-      contain: false
+      contain: false,
     };
   },
   mounted() {

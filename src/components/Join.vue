@@ -215,7 +215,7 @@ export default {
     },
 
     userAvatarLetter() {
-      if (!this.currentUser) {
+      if (!this.currentUser || !this.currentUser.userId) {
         return null;
       }
       return (this.userDisplayName || this.currentUser.userId.substring(1)).substring(0, 1).toUpperCase();
