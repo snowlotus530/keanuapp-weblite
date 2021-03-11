@@ -1,6 +1,6 @@
 <template>
   <v-list dense class="room-list">
-    <v-subheader>ROOMS</v-subheader>
+    <div class="h4">{{title}}</div>
     <v-list-item-group v-model="currentRoomId" color="primary">
       <v-list-item v-for="room in $matrix.rooms" :key="room.roomId" :value="room.roomId">
         <v-list-item-avatar size="40" color="#e0e0e0">
@@ -21,6 +21,13 @@ import util from "../plugins/utils";
 
 export default {
   name: "RoomList",
+
+  props: {
+    title: {
+      type: String,
+      default: "Rooms"
+    }
+  },
 
   data: () => ({
     currentRoomId: null,

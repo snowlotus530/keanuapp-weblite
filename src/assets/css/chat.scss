@@ -678,3 +678,30 @@ $admin-fg: white;
         }
     }
 }
+
+.bottom-sheet .card {
+    z-index: 10; /* Above mic button etc. */
+    background-color: white;
+    padding: 10px;
+}
+
+.room-info-sheet {
+    background-color: white;
+    
+    .current-room {
+        padding: 25px;
+        background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%), #F5F5F7;
+        box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.15);
+        border-radius: 18px;
+    }
+
+    .room-avatar {
+        background-color: #ededed;
+        width: 44px !important;
+        height: 44px !important;
+        margin-bottom: 20px;
+        .headline {
+            font-size: 70 * $chat-text-size !important;
+        }
+    }
+}
