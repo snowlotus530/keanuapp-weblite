@@ -1,6 +1,9 @@
 <template>
   <div class="chat-root fill-height d-flex flex-column" ma-0 pa-0>
-    <ChatHeader class="chat-header flex-grow-1 flex-shrink-1" />
+    <ChatHeader
+      class="chat-header flex-grow-1 flex-shrink-1"
+      v-on:header-click="$refs.roomInfoSheet.open()"
+    />
     <div
       class="chat-content flex-grow-1 flex-shrink-1"
       ref="chatContainer"
@@ -160,7 +163,7 @@
             elevation="0"
             v-blur
             style="z-index: 10"
-            v-longTap:250="[showRecordingUI,startRecording]"
+            v-longTap:250="[showRecordingUI, startRecording]"
           >
             <v-icon :color="showRecorder ? 'white' : 'black'">mic</v-icon>
           </v-btn>
@@ -288,6 +291,9 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <RoomInfoBottomSheet ref="roomInfoSheet" />
+
   </div>
 </template>
 
@@ -312,6 +318,7 @@ import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
 import ChatHeader from "./ChatHeader";
 import VoiceRecorder from "./VoiceRecorder";
+import RoomInfoBottomSheet from "./RoomInfoBottomSheet";
 
 const READ_RECEIPT_TIMEOUT = 5000; /* How long a message must have been visible before the read marker is updated */
 
@@ -364,6 +371,7 @@ export default {
     DebugEvent,
     MessageOperations,
     VoiceRecorder,
+    RoomInfoBottomSheet
   },
 
   data() {
@@ -698,7 +706,10 @@ export default {
       switch (event.getType()) {
         case "m.room.member":
           if (event.getContent().membership == "join") {
-            if (event.getPrevContent() && event.getPrevContent().membership == "join") {
+            if (
+              event.getPrevContent() &&
+              event.getPrevContent().membership == "join"
+            ) {
               // We we already joined, so this must be a display name and/or avatar update!
               return ContactChanged;
             } else {

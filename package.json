@@ -29,6 +29,7 @@
     "vue-resize": "^0.5.0",
     "vue-router": "^3.2.0",
     "vue-sanitize": "^0.2.1",
+    "vue-swipeable-bottom-sheet": "^0.0.5",
     "vuetify": "^2.2.11",
     "vuex": "^3.5.1",
     "vuex-persist": "^3.1.3"

@@ -37,6 +37,14 @@ $chat-button-height: 50px;
     color: #505050;
 }
 
+.h4 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 11 * $chat-text-size;
+    color: black;
+    text-transform: uppercase;
+}
+
 .v-btn.outlined-button {
     font-family: 'Inter', sans-serif;
     font-weight: 700;

@@ -4,19 +4,16 @@
       <v-col
       cols="auto"
         class="chat-header-members text-start ma-0 pa-0"
+        style="overflow:hidden;cursor:pointer" @click.stop="onHeaderClicked"
       >
         <v-avatar size="40" class="mr-2">
           <v-img :src="room.avatar" />
         </v-avatar>
       </v-col>
 
-      <v-col class="ma-0 pa-0 flex-shrink-1 flex-nowrap" style="overflow:hidden">
-        <div class="d-flex flex-nowrap room-name" @click.stop="showRoomList = true">{{ room.summary.info.title }} <v-icon>expand_more</v-icon></div>
-        <RoomList v-if="showRoomList" v-click-outside="hideRoomList" @close="hideRoomList" />
+      <v-col class="ma-0 pa-0 flex-shrink-1 flex-nowrap" style="overflow:hidden;cursor:pointer" @click.stop="onHeaderClicked">
+        <div class="d-flex flex-nowrap room-name">{{ room.summary.info.title }} <!--<v-icon>expand_more</v-icon>--></div>
         <div class="num-members">{{ memberCount }}{{ memberCount > 1 ? " members" : " member" }}</div>
-      </v-col>
-      <v-col cols="auto" class="text-end ma-0 pa-0">
-        <v-btn text class="info-button" @click.stop="showRoomInfo"><v-icon color="black">info</v-icon></v-btn>
       </v-col>
       <v-col cols="auto" class="text-end ma-0 pa-0">
         <v-btn text class="leave-button" @click.stop="leaveRoom">Leave</v-btn>
@@ -31,18 +28,15 @@
 
 <script>
 import LeaveRoomDialog from '../components/LeaveRoomDialog';
-import RoomList from "../components/RoomList";
 
 export default {
   name: "ChatHeader",
   components: {
-    LeaveRoomDialog,
-    RoomList
+    LeaveRoomDialog
   },
   data() {
     return {
       memberCount: null,
-      showRoomList: false,
       showLeaveConfirmation: false
     };
   },
@@ -82,6 +76,10 @@ export default {
         this.updateMemberCount();
       }
     },
+    
+    onHeaderClicked() {
+      this.$emit("header-click", {event: this.event});
+    },
 
     updateMemberCount() {
       if (!this.room) {
@@ -91,17 +89,9 @@ export default {
       }
     },
 
-    showRoomInfo() {
-      this.$navigation.push({ name: "RoomInfo" });
-    },
-
     leaveRoom() {
       this.showLeaveConfirmation = true;
     },
-
-    hideRoomList() {
-      this.showRoomList = false;
-    }
   },
 };
 </script>
