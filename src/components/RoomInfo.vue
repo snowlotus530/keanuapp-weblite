@@ -126,9 +126,11 @@
 import LeaveRoomDialog from "../components/LeaveRoomDialog";
 import DeviceList from "../components/DeviceList";
 import QRCode from "qrcode";
+import roomInfoMixin from "./roomInfoMixin";
 
 export default {
   name: "RoomInfo",
+  mixins: [roomInfoMixin],
   components: {
     LeaveRoomDialog,
     DeviceList
@@ -164,10 +166,6 @@ export default {
   },
 
   computed: {
-    room() {
-      return this.$matrix.currentRoom;
-    },
-
     creator() {
       if (this.room) {
         const createEvent = this.room.currentState.getStateEvents("m.room.create", "");
@@ -185,20 +183,6 @@ export default {
       return "";
     },
 
-    roomName() {
-      if (this.room) {
-        return this.room.name;
-      }
-      return "";
-    },
-
-    roomTopic() {
-      if (this.room) {
-        return this.room.topic;
-      }
-      return "";
-    },
-
     anyoneCanJoin() {
       // TODO: fix this! For now, just return true of we have a canonical alias.
       if (this.room && this.room.getCanonicalAlias() && this.room.getCanonicalAlias().startsWith('#')) {
@@ -212,13 +196,6 @@ export default {
         return this.$router.getRoomLink(this.room.getCanonicalAlias() || this.room.roomId);
       }
       return null;
-    },
-
-    roomAvatar() {
-      if (this.room) {
-        return this.room.avatar;
-      }
-      return "";
     },
 
     joinedMembers() {
