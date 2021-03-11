@@ -2,6 +2,7 @@ import QuickReactions from './QuickReactions.vue';
 var linkify = require('linkifyjs');
 var linkifyHtml = require('linkifyjs/html');
 linkify.options.defaults.className = "link";
+linkify.options.defaults.target = null;
 
 export default {
   components: {

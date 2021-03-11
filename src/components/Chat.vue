@@ -9,7 +9,7 @@
       ref="chatContainer"
       style="overflow-x: hidden; overflow-y: auto"
       v-on:scroll="onScroll"
-      @click.prevent="closeContextMenuIfOpen"
+      @click="closeContextMenuIfOpen"
     >
       <div ref="messageOperationsStrut" class="message-operations-strut">
         <message-operations
