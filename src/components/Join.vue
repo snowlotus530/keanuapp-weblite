@@ -65,13 +65,13 @@
         <v-row v-else>
           <v-col>
             You are joining as:
-            <div style="display:inline-block">
-            <v-avatar color="#e0e0e0" style="">
-              <v-img v-if="userAvatar" :src="userAvatar" />
-              <span v-else class="white--text headline">{{
-                userAvatarLetter
-              }}</span>
-            </v-avatar>
+            <div style="display: inline-block">
+              <v-avatar color="#e0e0e0" style="">
+                <v-img v-if="userAvatar" :src="userAvatar" />
+                <span v-else class="white--text headline">{{
+                  userAvatarLetter
+                }}</span>
+              </v-avatar>
             </div>
             {{ userDisplayName }}
           </v-col>
@@ -218,8 +218,10 @@ export default {
       if (!this.currentUser || !this.currentUser.userId) {
         return null;
       }
-      return (this.userDisplayName || this.currentUser.userId.substring(1)).substring(0, 1).toUpperCase();
-    }
+      return (this.userDisplayName || this.currentUser.userId.substring(1))
+        .substring(0, 1)
+        .toUpperCase();
+    },
   },
   watch: {
     roomId: {
@@ -232,62 +234,83 @@ export default {
           "Join: Current room changed to " + (value ? value : "null")
         );
         this.roomName = this.roomId;
-        if (this.currentUser) {
-          this.waitingForMembership = true;
-          const self = this;
-          this.$matrix
-            .login(this.currentUser)
-            .then(() => {
-              self.$matrix.setCurrentRoomId(self.roomAliasOrId); // Go to this room, now or when joined.
-              const room = self.$matrix.getRoom(self.roomAliasOrId);
 
-              // Already joined?
-              if (
-                room &&
-                room.hasMembershipState(self.currentUser.user_id, "join")
-              ) {
-                // Yes, go to room
-                self.$navigation.push(
-                  {
-                    name: "Chat",
-                    params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) },
-                  },
-                  -1
-                );
-                return;
-              }
-              this.waitingForMembership = false;
-            })
-            .catch((ignoredErr) => {
-              this.waitingForMembership = false;
-            });
-        }
-        if (this.roomId.startsWith("#")) {
-          this.$matrix
-            .getPublicRoomInfo(this.roomId)
-            .then((room) => {
-              console.log("Found room:", room);
-              this.roomName = room.name;
-              this.roomAvatar = room.avatar;
-              this.waitingForInfo = false;
-            })
-            .catch((err) => {
-              console.log("Could not find room info", err);
-              this.waitingForInfo = false;
-            });
+        this.waitingForInfo = true;
+        const self = this;
+          this.waitingForMembership = true;
+        if (this.currentUser) {
+          this.getLoginPromise()
+          .then(() => {
+            self.$matrix.setCurrentRoomId(self.roomAliasOrId); // Go to this room, now or when joined.
+            const room = self.$matrix.getRoom(self.roomAliasOrId);
+
+            // Already joined?
+            if (
+              room &&
+              room.hasMembershipState(self.currentUser.user_id, "join")
+            ) {
+              // Yes, go to room
+              self.$navigation.push(
+                {
+                  name: "Chat",
+                  params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) },
+                },
+                -1
+              );
+              return;
+            }
+          })
+          .catch(err => {
+            console.log("Error logging in: ", err)
+          })
+          .finally(() => {
+            this.waitingForMembership = false;
+            this.getRoomInfo();
+          });
         } else {
-          // Private room, try to get name
-          const room = this.$matrix.getRoom(this.roomId);
-          if (room) {
-            this.roomName = room.name || this.roomName;
-          }
-          this.waitingForInfo = false;
+          this.waitingForMembership = false;
+          this.getRoomInfo();
         }
-      },
+      }
     },
   },
 
   methods: {
+    /**
+     * Returns a promise that will log us into the Matrix.
+     * 
+     * Will use a real account, if we have one, otherwise will create
+     * a random account.
+     */
+    getLoginPromise() {
+        return this.$store.dispatch("auth/login", this.currentUser || this.guestUser);
+    },
+
+    getRoomInfo() {
+      if (this.roomId.startsWith("#")) {
+        this.$matrix
+          .getPublicRoomInfo(this.roomId)
+          .then((room) => {
+            console.log("Found room:", room);
+            this.roomName = room.name;
+            this.roomAvatar = room.avatar;
+          })
+          .catch((err) => {
+            console.log("Could not find room info", err);
+          })
+          .finally(() => {
+            this.waitingForInfo = false;
+          });
+      } else {
+        // Private room, try to get name
+        const room = this.$matrix.getRoom(this.roomId);
+        if (room) {
+          this.roomName = room.name || this.roomName;
+        }
+        this.waitingForInfo = false;
+      }
+    },
+
     onMyMembership(room, membership, ignoredprevMembership) {
       if (room && room.roomId == this.roomId && membership == "join") {
         this.$nextTick(() => {
@@ -313,13 +336,7 @@ export default {
     handleJoin() {
       this.loading = true;
       this.loadingMessage = "Logging in...";
-      var clientPromise;
-      if (this.currentUser) {
-        clientPromise = this.$matrix.login(this.currentUser);
-      } else {
-        clientPromise = this.$store.dispatch("auth/login", this.guestUser);
-      }
-      return clientPromise
+      return this.getLoginPromise()
         .then(
           function (user) {
             if (!this.hasChangedDisplayName) {
