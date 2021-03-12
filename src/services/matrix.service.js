@@ -2,6 +2,7 @@ global.Olm = require("olm");
 import sdk from "matrix-js-sdk";
 import util from "../plugins/utils";
 import User from "../models/user";
+import config from "../assets/config";
 
 const LocalStorageCryptoStore = require("matrix-js-sdk/lib/crypto/store/localStorage-crypto-store")
     .LocalStorageCryptoStore;
@@ -174,14 +175,14 @@ export default {
                     this.matrixClientReady = true;
                     this.matrixClient.emit('Matrix.initialized', this.matrixClient);
                     this.matrixClient.getProfileInfo(this.currentUserId)
-                    .then(info => {
-                        console.log("Got user profile: " + JSON.stringify(info));
-                        this.userDisplayName = info.displayname;
-                        this.userAvatar = info.avatar_url;
-                    })
-                    .catch(err => {
-                        console.log("Failed to get user profile: ", err);
-                    })
+                        .then(info => {
+                            console.log("Got user profile: " + JSON.stringify(info));
+                            this.userDisplayName = info.displayname;
+                            this.userAvatar = info.avatar_url;
+                        })
+                        .catch(err => {
+                            console.log("Failed to get user profile: ", err);
+                        })
                 },
 
                 async getMatrixClient(user) {
@@ -402,22 +403,80 @@ export default {
                     if (parts.length != 2) {
                         return Promise.reject("Unknown room server");
                     }
-
                     const server = parts[1];
-                    const tempMatrixClient = sdk.createClient("https://" + server);
 
-                    const findOrGetMore = function _findOrGetMore(response) {
+                    var clientPromise;
+                    if (this.matrixClient) {
+                        clientPromise = this.getMatrixClient().then(() => {
+                            return this.matrixClient;
+                        })
+                    } else {
+                        const tempMatrixClient = sdk.createClient(config.defaultServer);
+                        var tempUserString = localStorage.getItem('tempuser');
+                        var tempUser = null;
+                        if (tempUserString) {
+                            tempUser = JSON.parse(tempUserString);
+                        }
+
+                        // Need to create an account?
+                        //
+                        if (tempUser) {
+                            clientPromise = Promise.resolve(tempUser);
+                        } else {
+                            const user = util.randomUser();
+                            const pass = util.randomPass();
+                            clientPromise = tempMatrixClient
+                                .register(user, pass, null, {
+                                    type: "m.login.dummy",
+                                })
+                                .then((response) => {
+                                    console.log("Response", response);
+                                    response.password = pass;
+                                    response.is_guest = true;
+                                    localStorage.setItem('tempuser', JSON.stringify(response));
+                                    return response;
+                                });
+                        }
+
+                        // Get an access token
+                        clientPromise = clientPromise.then(user => {
+                            var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password" };
+                            if (user.device_id) {
+                                data.device_id = user.device_id;
+                            }
+                            return tempMatrixClient.login("m.login.password", data)
+                        })
+
+                        // Then login
+                        //
+                        // Create a slimmed down client, without crypto. This one is
+                        // Only used to get public room info from.
+                        clientPromise = clientPromise.then(user => {
+                            var opts = {
+                                baseUrl: config.defaultServer,
+                                userId: user.user_id,
+                                accessToken: user.access_token,
+                                timelineSupport: false,
+                            }
+                            var matrixClient = sdk.createClient(opts);
+                            matrixClient.startClient();
+                            return matrixClient;
+                        });
+                    }
+
+                    const findOrGetMore = function _findOrGetMore(client, response) {
                         for (var room of response.chunk) {
                             if ((roomId.startsWith("#") && room.canonical_alias == roomId) || (roomId.startsWith("!") && room.room_id == roomId)) {
-                                room.avatar = tempMatrixClient.mxcUrlToHttp(room.avatar_url, 80, 80, 'scale', true);
+                                if (room.avatar_url) {
+                                    room.avatar = client.mxcUrlToHttp(room.avatar_url, 80, 80, 'scale', true);
+                                }
                                 return Promise.resolve(room);
                             }
                         }
                         if (response.next_batch) {
-                            return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", { limit: 1000, since: response.next_batch })
-                                //return tempMatrixClient.publicRooms({limit:1,next_batch:response.next_batch})
+                            return client.publicRooms({ server: server, limit: 1000, since: response.next_batch })
                                 .then(response => {
-                                    return _findOrGetMore(response);
+                                    return _findOrGetMore(client, response);
                                 })
                                 .catch(err => {
                                     return Promise.reject("Failed to find room: " + err);
@@ -427,10 +486,14 @@ export default {
                         }
                     };
 
-                    return tempMatrixClient._http.request(undefined, "GET", "/publicRooms", { limit: 1000 })
-                        //return tempMatrixClient.publicRooms({limit:1})
+                    var matrixClient;
+                    return clientPromise
+                        .then(client => {
+                            matrixClient = client;
+                            return matrixClient.publicRooms({ server: server, limit: 1000 })
+                        })
                         .then(response => {
-                            return findOrGetMore(response);
+                            return findOrGetMore(matrixClient, response);
                         })
                         .catch(err => {
                             return Promise.reject("Failed to find room: " + err);
