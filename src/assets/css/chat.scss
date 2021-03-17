@@ -260,12 +260,16 @@ $admin-fg: white;
         width: fit-content;
         max-width: 70%;
     }
+    .video2-bubble {
+        background-color: #e5e5e5;
+        border-radius: 10px 10px 0 10px;
+    }
     .bubble.image-bubble {
         padding: 0px;
         display: inline-block;
         width: 70%;
         max-width: 70%;
-        .v-image {
+        .v-image, video {
             border-radius: 10px 10px 0 10px;
         }
     }
@@ -425,6 +429,21 @@ $admin-fg: white;
         color: white;
         font-weight: 700;
         // background-color: palegreen;
+    }
+}
+
+.download-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width:100%;
+    height:100%;
+    background-color: rgba(0,0,0,0.4);
+    align-items: center;
+    display: flex;
+    .download-text {
+        width: 100%;
+        color: white;
     }
 }
 
