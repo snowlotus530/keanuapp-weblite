@@ -302,9 +302,11 @@ import { TimelineWindow, EventTimeline } from "matrix-js-sdk";
 import MessageIncomingText from "./messages/MessageIncomingText";
 import MessageIncomingImage from "./messages/MessageIncomingImage.vue";
 import MessageIncomingAudio from "./messages/MessageIncomingAudio.vue";
+import MessageIncomingVideo from "./messages/MessageIncomingVideo.vue";
 import MessageOutgoingText from "./messages/MessageOutgoingText";
 import MessageOutgoingImage from "./messages/MessageOutgoingImage.vue";
 import MessageOutgoingAudio from "./messages/MessageOutgoingAudio.vue";
+import MessageOutgoingVideo from "./messages/MessageOutgoingVideo.vue";
 import ContactJoin from "./messages/ContactJoin.vue";
 import ContactLeave from "./messages/ContactLeave.vue";
 import ContactInvited from "./messages/ContactInvited.vue";
@@ -357,9 +359,11 @@ export default {
     MessageIncomingText,
     MessageIncomingImage,
     MessageIncomingAudio,
+    MessageIncomingVideo,
     MessageOutgoingText,
     MessageOutgoingImage,
     MessageOutgoingAudio,
+    MessageOutgoingVideo,
     ContactJoin,
     ContactLeave,
     ContactInvited,
@@ -728,6 +732,8 @@ export default {
               return MessageIncomingImage;
             } else if (event.getContent().msgtype == "m.audio") {
               return MessageIncomingAudio;
+            } else if (event.getContent().msgtype == "m.video") {
+              return MessageIncomingVideo;
             }
             return MessageIncomingText;
           } else {
@@ -735,6 +741,8 @@ export default {
               return MessageOutgoingImage;
             } else if (event.getContent().msgtype == "m.audio") {
               return MessageOutgoingAudio;
+            } else if (event.getContent().msgtype == "m.video") {
+              return MessageOutgoingVideo;
             }
             return MessageOutgoingText;
           }

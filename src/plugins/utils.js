@@ -12,7 +12,7 @@ var duration = require('dayjs/plugin/duration')
 dayjs.extend(duration);
 
 class Util {
-    getAttachment(matrixClient, event) {
+    getAttachment(matrixClient, event, progressCallback) {
         return new Promise((resolve, reject) => {
             const content = event.getContent();
             if (content.url != null) {
@@ -31,7 +31,13 @@ class Util {
                 reject("No url found!");
             }
 
-            axios.get(url, { responseType: 'arraybuffer' })
+            axios.get(url, { responseType: 'arraybuffer', onDownloadProgress: progressEvent => {
+                let percentCompleted = Math.floor((progressEvent.loaded * 100) / progressEvent.total);
+                        if (progressCallback) {
+                            progressCallback(percentCompleted);
+                        }
+                    }
+                 })
                 .then(response => {
                     return this.decryptIfNeeded(file, response);
                 })
@@ -41,7 +47,12 @@ class Util {
                 .catch(err => {
                     console.log("Download error: ", err);
                     reject(err);
-                });
+                })
+                .finally(() => {
+                    if (progressCallback) {
+                        progressCallback(null);
+                    }
+                });   
         });
     }
 

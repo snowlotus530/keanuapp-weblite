@@ -3,13 +3,17 @@ import util from "../../plugins/utils";
 export default {
   data() {
     return {
-      src: null
+      src: null,
+      downloadProgress: null
     }
   },
   mounted() {
     console.log("Mounted with event:", JSON.stringify(this.event.getContent()))
     util
-      .getAttachment(this.$matrix.matrixClient, this.event)
+      .getAttachment(this.$matrix.matrixClient, this.event, (progress) => {
+        this.downloadProgress = progress;
+        console.log("Progress: " + progress);
+      })
       .then((url) => {
         this.src = url;
       })
