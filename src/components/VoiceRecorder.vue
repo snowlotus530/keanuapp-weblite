@@ -139,6 +139,7 @@ const State = {
 };
 import util from "../plugins/utils";
 import VoiceRecorderLock from "./VoiceRecorderLock";
+require('md-gum-polyfill');
 
 export default {
   name: "VoiceRecorder",

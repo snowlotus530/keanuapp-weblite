@@ -18,6 +18,7 @@
     "linkifyjs": "^2.1.9",
     "material-design-icons-iconfont": "^5.0.1",
     "matrix-js-sdk": "^9.4.1",
+    "md-gum-polyfill": "^1.0.0",
     "mic-recorder-to-mp3": "^2.2.2",
     "olm": "https://packages.matrix.org/npm/olm/olm-3.2.1.tgz",
     "qrcode": "^1.4.4",
