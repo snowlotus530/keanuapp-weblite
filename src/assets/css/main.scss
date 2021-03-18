@@ -10,6 +10,9 @@ $chat-standard-padding-xs: 8px;
 $chat-text-size: 1.0px;
 $chat-button-height: 50px;
 
+html { height:100%; }
+body { position:absolute; top:0; bottom:0; right:0; left:0; }
+
 .h1 {
     font-family: 'Poppins', sans-serif;
     font-weight: 800;

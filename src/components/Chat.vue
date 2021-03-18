@@ -1,7 +1,7 @@
 <template>
   <div class="chat-root fill-height d-flex flex-column" ma-0 pa-0>
     <ChatHeader
-      class="chat-header flex-grow-1 flex-shrink-1"
+      class="chat-header flex-grow-0 flex-shrink-0"
       v-on:header-click="$refs.roomInfoSheet.open()"
     />
     <div
