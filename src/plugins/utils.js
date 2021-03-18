@@ -11,6 +11,16 @@ dayjs.extend(localizedFormat)
 var duration = require('dayjs/plugin/duration')
 dayjs.extend(duration);
 
+// Store info about getUserMedia BEFORE we aply polyfill(s)!
+var _browserCanRecordAudioF = function() {
+    var legacyGetUserMedia = (navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia);
+    return legacyGetUserMedia !== undefined || (navigator.mediaDevices && navigator.mediaDevices.getUserMedia !== undefined);
+}
+var _browserCanRecordAudio = _browserCanRecordAudioF();
+
 class Util {
     getAttachment(matrixClient, event, progressCallback) {
         return new Promise((resolve, reject) => {
@@ -506,6 +516,10 @@ class Util {
     formatRecordStartTime(timestamp) {
         var then = dayjs(timestamp);
         return then.format('lll');
+    }
+
+    browserCanRecordAudio() {
+        return _browserCanRecordAudio;
     }
 }
 export default new Util();

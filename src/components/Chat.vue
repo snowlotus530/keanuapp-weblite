@@ -163,6 +163,7 @@
             elevation="0"
             v-blur
             style="z-index: 10"
+            :disabled="!canRecordAudio"
             v-longTap:250="[showRecordingUI, startRecording]"
           >
             <v-icon :color="showRecorder ? 'white' : 'black'">mic</v-icon>
@@ -517,6 +518,9 @@ export default {
       }
       return "top:" + top + "px;left:" + left + "px";
     },
+    canRecordAudio() {
+      return util.browserCanRecordAudio();
+    }
   },
 
   watch: {
