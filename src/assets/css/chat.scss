@@ -33,18 +33,6 @@ $admin-fg: white;
         margin-top: $chat-standard-padding-xs;
         margin-bottom: $chat-standard-padding-xs;
     }
-
-    .room-list {
-        background-color: white;
-        border: 1px solid #e0e0e0;
-        position: absolute;
-        max-height: 60%;
-        overflow-y: auto;
-        z-index: 2;
-        .v-subheader {
-            display: none;
-        }
-    }
 }
 
 .room-list-notification-count {
