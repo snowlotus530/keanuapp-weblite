@@ -1,6 +1,10 @@
 <template>
   <transition name="grow" mode="out-in">
-    <div v-show="show" :class="{'voice-recorder':true,'ptt':ptt,'row':!ptt}" ref="vrroot">
+    <div
+      v-show="show"
+      :class="{ 'voice-recorder': true, ptt: ptt, row: !ptt }"
+      ref="vrroot"
+    >
       <!-- <div style="background-color:red;height:60px;width:100%"/> -->
       <v-container v-if="!ptt" fluid fill-height>
         <v-row align="center" class="mt-3">
@@ -111,7 +115,9 @@
         <v-container fluid fill-height>
           <v-row align="center">
             <v-col>
-              <div class="swipe-info">{{ errorMessage || 'Failed to record audio' }}</div>
+              <div class="swipe-info">
+                {{ errorMessage || "Failed to record audio" }}
+              </div>
             </v-col>
             <v-col align="right">
               <v-btn icon @click.stop="cancelRecording">
@@ -139,7 +145,8 @@ const State = {
 };
 import util from "../plugins/utils";
 import VoiceRecorderLock from "./VoiceRecorderLock";
-require('md-gum-polyfill');
+require("md-gum-polyfill");
+import RecordRTC from "recordrtc";
 
 export default {
   name: "VoiceRecorder",
@@ -179,7 +186,7 @@ export default {
       recordTimer: null,
       recordingLocked: false,
       recordedFile: null,
-      errorMessage: null
+      errorMessage: null,
     };
   },
   watch: {
@@ -314,14 +321,17 @@ export default {
     },
 
     startRecording() {
-      const MicRecorder = require("mic-recorder-to-mp3");
-      // Start recording. Browser will request permission to use your microphone.
-      this.recorder = new MicRecorder({
-        bitRate: 128,
-      });
-      this.recorder
-        .start()
-        .then(() => {
+      navigator.mediaDevices
+        .getUserMedia({
+          video: false,
+          audio: true,
+        })
+        .then((stream) => {
+          this.recorder = RecordRTC(stream, {
+            type: "audio",
+            mimeType: "audio/webm"
+          });
+          this.recorder.startRecording();
           this.state = State.RECORDING;
           this.recordStartedAt = Date.now();
           this.startRecordTimer();
@@ -337,7 +347,9 @@ export default {
     cancelRecording() {
       this.state = State.INITIAL;
       if (this.recorder) {
-        this.recorder.stop();
+        this.recorder.stopRecording();
+        this.recorder.destroy();
+        this.recorder = null;
       }
       this.stopRecordTimer();
       this.recordingTime = String.fromCharCode(160); // nbsp;
@@ -362,33 +374,25 @@ export default {
     },
     send() {
       //console.log("Send:", this.recordedFile);
-      this.$emit("file", {file: this.recordedFile});
+      this.$emit("file", { file: this.recordedFile });
       // const player = new Audio(URL.createObjectURL(file));
       // player.play();
     },
     getFile(send) {
-      this.recorder
-        .stop()
-        .getMp3()
-        .then(([buffer, blob]) => {
-          // do what ever you want with buffer and blob
-          // Example: Create a mp3 file and play
-          this.recordedFile = new File(
-            buffer,
-            util.formatRecordStartTime(this.recordStartedAt) + ".mp3",
-            {
-              type: blob.type,
-              lastModified: Date.now(),
-            }
-          );
-          if (send) {
-            this.send();
+      this.recorder.stopRecording(function ()
+      {
+        this.recordedFile = new File(
+          [this.recorder.getBlob()],
+          util.formatRecordStartTime(this.recordStartedAt) + ".webm",
+          {
+            type: "audio/webm",
+            lastModified: Date.now()
           }
-        })
-        .catch((e) => {
-          alert("We could not retrieve your message");
-          console.log(e);
-        });
+        );
+        if (send) {
+          this.send();
+        }
+      }.bind(this));
     },
     startRecordTimer() {
       this.stopRecordTimer();
