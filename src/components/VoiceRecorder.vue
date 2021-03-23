@@ -381,11 +381,12 @@ export default {
     getFile(send) {
       this.recorder.stopRecording(function ()
       {
+        const blob = this.recorder.getBlob();
         this.recordedFile = new File(
-          [this.recorder.getBlob()],
+          [blob],
           util.formatRecordStartTime(this.recordStartedAt) + ".webm",
           {
-            type: "audio/webm",
+            type: blob.type,
             lastModified: Date.now()
           }
         );
