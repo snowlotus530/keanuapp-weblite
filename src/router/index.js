@@ -5,6 +5,8 @@ import Chat from '../components/Chat.vue'
 import Join from '../components/Join.vue'
 import Login from '../components/Login.vue'
 import Profile from '../components/Profile.vue'
+import CreateRoom from '../components/CreateRoom.vue'
+
 import util from '../plugins/utils'
 
 Vue.use(VueRouter)
@@ -39,6 +41,14 @@ const routes = [
     component: Profile,
     meta: {
       title: 'Profile'
+    }
+  },
+  {
+    path: '/createroom',
+    name: 'CreateRoom',
+    component: CreateRoom,
+    meta: {
+      title: 'Create'
     }
   },
   {

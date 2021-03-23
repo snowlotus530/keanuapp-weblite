@@ -25,6 +25,13 @@
         >
       </div>
       <room-list :title="'Other groups'" v-on:close="close" />
+      <v-btn
+          height="20px"
+          color="black"
+          class="outlined-button"
+          @click.stop="createRoom"
+          >Create group</v-btn
+        >
     </div>
   </SwipeableBottomSheet>
 </template>
@@ -72,7 +79,13 @@ export default {
     showDetails() {
       this.close();
       this.$navigation.push({ name: "RoomInfo" });
+    },
+
+    createRoom() {
+      this.close();
+      this.$navigation.push({ name: "CreateRoom" });
     }
+
   },
 };
 </script>
