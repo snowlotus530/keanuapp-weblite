@@ -111,7 +111,7 @@
         <v-container fluid fill-height>
           <v-row align="center">
             <v-col>
-              <div class="swipe-info">Failed to record audio</div>
+              <div class="swipe-info">{{ errorMessage || 'Failed to record audio' }}</div>
             </v-col>
             <v-col align="right">
               <v-btn icon @click.stop="cancelRecording">
@@ -179,6 +179,7 @@ export default {
       recordTimer: null,
       recordingLocked: false,
       recordedFile: null,
+      errorMessage: null
     };
   },
   watch: {
@@ -217,6 +218,7 @@ export default {
       if (val) {
         // Add listeners
         this.state = State.INITIAL;
+        this.errorMessage = null;
         this.recordedFile = null;
         if (this.ptt) {
           document.addEventListener("mouseup", this.mouseUp, false);
@@ -315,7 +317,7 @@ export default {
       const MicRecorder = require("mic-recorder-to-mp3");
       // Start recording. Browser will request permission to use your microphone.
       this.recorder = new MicRecorder({
-        bitRate: 32,
+        bitRate: 128,
       });
       this.recorder
         .start()
@@ -326,6 +328,9 @@ export default {
         })
         .catch((e) => {
           console.error(e);
+          if (e && e.name == "NotAllowedError") {
+            this.errorMessage = e.message;
+          }
           this.state = State.ERROR;
         });
     },
