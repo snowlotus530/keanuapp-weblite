@@ -12,7 +12,7 @@ var duration = require('dayjs/plugin/duration')
 dayjs.extend(duration);
 
 // Store info about getUserMedia BEFORE we aply polyfill(s)!
-var _browserCanRecordAudioF = function() {
+var _browserCanRecordAudioF = function () {
     var legacyGetUserMedia = (navigator.getUserMedia ||
         navigator.webkitGetUserMedia ||
         navigator.mozGetUserMedia ||
@@ -41,13 +41,14 @@ class Util {
                 reject("No url found!");
             }
 
-            axios.get(url, { responseType: 'arraybuffer', onDownloadProgress: progressEvent => {
-                let percentCompleted = Math.floor((progressEvent.loaded * 100) / progressEvent.total);
-                        if (progressCallback) {
-                            progressCallback(percentCompleted);
-                        }
+            axios.get(url, {
+                responseType: 'arraybuffer', onDownloadProgress: progressEvent => {
+                    let percentCompleted = Math.floor((progressEvent.loaded * 100) / progressEvent.total);
+                    if (progressCallback) {
+                        progressCallback(percentCompleted);
                     }
-                 })
+                }
+            })
                 .then(response => {
                     return this.decryptIfNeeded(file, response);
                 })
@@ -62,7 +63,7 @@ class Util {
                     if (progressCallback) {
                         progressCallback(null);
                     }
-                });   
+                });
         });
     }
 
@@ -390,14 +391,14 @@ class Util {
         if (middle) {
             var nodes = [parentNode.children[middle]];
             var i = middle - 1;
-                while (i >= 0 && this.isChildVisible(parentNode, parentNode.children[i])) {
-                    nodes.splice(0,0,parentNode.children[i]);
-                    i-=1;
-                }
+            while (i >= 0 && this.isChildVisible(parentNode, parentNode.children[i])) {
+                nodes.splice(0, 0, parentNode.children[i]);
+                i -= 1;
+            }
             i = middle + 1;
             while (i < parentNode.children.length && this.isChildVisible(parentNode, parentNode.children[i])) {
                 nodes.push(parentNode.children[i]);
-                i+=1;
+                i += 1;
             }
             return nodes;
         }
@@ -407,9 +408,9 @@ class Util {
     isChildVisible(parentNode, childNode) {
         const rect1 = parentNode.getBoundingClientRect();
         const rect2 = childNode.getBoundingClientRect();
-        var overlap = !(rect1.right < rect2.left || 
-            rect1.left > rect2.right || 
-            rect1.bottom < rect2.top || 
+        var overlap = !(rect1.right < rect2.left ||
+            rect1.left > rect2.right ||
+            rect1.bottom < rect2.top ||
             rect1.top > rect2.bottom)
         return overlap;
     }
@@ -481,6 +482,49 @@ class Util {
                 });
 
         })
+    }
+
+    setRoomAvatar(matrixClient, roomId, file, onUploadProgress) {
+        return new Promise((resolve, reject) => {
+            var reader = new FileReader();
+            reader.onload = (e) => {
+                const fileContents = e.target.result;
+                var data = new Uint8Array(fileContents);
+
+                const info = {
+                    mimetype: file.type,
+                    size: file.size
+                };
+
+                const opts = {
+                    type: file.type,
+                    name: "Room Avatar",
+                    progressHandler: onUploadProgress,
+                    onlyContentUri: false
+                };
+
+                var messageContent = {
+                    body: file.name,
+                    info: info
+                }
+
+                matrixClient.uploadContent(data, opts)
+                    .then((response) => {
+                        messageContent.url = response.content_uri;
+                        return matrixClient.sendStateEvent(roomId, "m.room.avatar", messageContent);
+                    })
+                    .then(result => {
+                        resolve(result);
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
+            }
+            reader.onerror = (err) => {
+                reject(err);
+            }
+            reader.readAsArrayBuffer(file);
+        });
     }
 
     /**
