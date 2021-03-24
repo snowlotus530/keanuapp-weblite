@@ -1,6 +1,8 @@
 # Keanu Weblite aka "Convene"
 
 * Private, instant group chat in a browser "No account, no app, no hassle!"
+* Bring everyone together in one place: "The one place people can be because it doesn’t require a specific app"
+" Connect just for now: "Groups are fleeting. They exist only as long as you need them, then disappear."
 * Demo instance is live at https://letsconvene.im
 
 ## Features
