@@ -147,6 +147,7 @@ import util from "../plugins/utils";
 import VoiceRecorderLock from "./VoiceRecorderLock";
 require("md-gum-polyfill");
 import RecordRTC from "recordrtc";
+import {Decoder, tools, Reader} from 'ts-ebml';
 
 export default {
   name: "VoiceRecorder",
@@ -321,15 +322,23 @@ export default {
     },
 
     startRecording() {
+      var constraints = {
+        audio: {
+          channelCount: 1,
+          sampleRate: 16000,
+          echoCancellation: false,
+          autoGainControl: true,
+          noiseSuppression: true,
+          volume: 1.0,
+        },
+        video: false,
+      };
       navigator.mediaDevices
-        .getUserMedia({
-          video: false,
-          audio: true,
-        })
+        .getUserMedia(constraints)
         .then((stream) => {
           this.recorder = RecordRTC(stream, {
             type: "audio",
-            mimeType: "audio/webm"
+            mimeType: "audio/webm",
           });
           this.recorder.startRecording();
           this.state = State.RECORDING;
@@ -373,27 +382,29 @@ export default {
       this.recordingTime = String.fromCharCode(160); // nbsp;
     },
     send() {
-      //console.log("Send:", this.recordedFile);
       this.$emit("file", { file: this.recordedFile });
-      // const player = new Audio(URL.createObjectURL(file));
-      // player.play();
     },
     getFile(send) {
-      this.recorder.stopRecording(function ()
-      {
-        const blob = this.recorder.getBlob();
-        this.recordedFile = new File(
-          [blob],
-          util.formatRecordStartTime(this.recordStartedAt) + ".webm",
-          {
-            type: blob.type,
-            lastModified: Date.now()
-          }
-        );
-        if (send) {
-          this.send();
-        }
-      }.bind(this));
+      this.recorder.stopRecording(
+        function () {
+          this.correctMetadata(this.recorder.getBlob()).then((blob) => {
+            this.recordedFile = new File(
+              [blob],
+              util.formatRecordStartTime(this.recordStartedAt) + ".webm",
+              {
+                type: blob.type,
+                lastModified: Date.now(),
+              }
+            );
+            //const player = new Audio(URL.createObjectURL(this.recordedFile));
+            //player.play();
+            if (send) {
+              //console.log("send");
+              this.send();
+            }
+          });
+        }.bind(this)
+      );
     },
     startRecordTimer() {
       this.stopRecordTimer();
@@ -409,6 +420,37 @@ export default {
       if (this.recordTimer) {
         clearInterval(this.recordTimer);
         this.recordTimer = null;
+      }
+    },
+
+    /*
+     * There is an issue with browsers not setting correct metadata in the generated webm file.
+     * See here: https://bugs.chromium.org/p/chromium/issues/detail?id=642012
+     * Use es-embl to try to update the cues section.
+     */
+    async correctMetadata(blob) {
+      try {
+        const decoder = new Decoder();
+        const reader = new Reader();
+        reader.logging = true;
+        reader.logGroup = "Raw WebM file";
+        reader.drop_default_duration = false;
+        const webMBuf = await blob.arrayBuffer();
+        const elms = decoder.decode(webMBuf);
+        elms.forEach((elm) => {
+          reader.read(elm);
+        });
+        reader.stop();
+        const refinedMetadataBuf = tools.makeMetadataSeekable(
+          reader.metadatas,
+          reader.duration,
+          reader.cues
+        );
+        const body = webMBuf.slice(reader.metadataSize);
+        return new Blob([refinedMetadataBuf, body], { type: blob.type });
+      } catch (err) {
+        console.err(err);
+        return blob;
       }
     },
   },

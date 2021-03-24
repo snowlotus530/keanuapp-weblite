@@ -24,6 +24,7 @@
     "raw-loader": "^4.0.2",
     "recordrtc": "^5.6.2",
     "roboto-fontface": "*",
+    "ts-ebml": "^2.0.2",
     "v-emoji-picker": "^2.3.1",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.1",
