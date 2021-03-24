@@ -314,8 +314,14 @@ class Util {
 
                 messageContent.file = encryptedFile;
 
+                // Encrypted data sent as octet-stream!
+                opts.type = "application/octet-stream";
+
                 matrixClient.uploadContent(data, opts)
                     .then((response) => {
+                        if (response.error) {
+                            return reject(response.error);
+                        }
                         encryptedFile.url = response.content_uri;
                         return this.sendMessage(matrixClient, roomId, "m.room.message", messageContent)
                     })
