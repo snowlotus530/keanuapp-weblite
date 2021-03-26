@@ -36,7 +36,7 @@
         <v-radio-group
           v-model="roomJoinRule"
           v-if="roomJoinRule"
-          :disabled="!userCanChangeJoinRules || updatingJoinRule"
+          :disabled="!userCanChangeJoinRule || updatingJoinRule"
         >
           <v-radio
             label="Room can be joined by invitation only"
@@ -183,7 +183,6 @@ export default {
 
     // Set QR code
     this.updateQRCode();
-    this.updatePermissions();
 
     // Display build version
     const version = require("!!raw-loader!../assets/version.txt").default;
@@ -251,14 +250,6 @@ export default {
         console.log("RoomInfo: Current room changed");
         this.updateMemberCount();
         this.updateQRCode();
-        this.updatePermissions();
-      },
-    },
-    roomJoinRule: {
-      handler(newVal, oldVal) {
-        if (newVal && oldVal && newVal != oldVal) {
-          this.setRoomJoinRule(newVal);
-        }
       },
     },
   },
@@ -270,11 +261,6 @@ export default {
       }
       if (event.getType() == "m.room.member") {
         this.updateMemberCount();
-      } else if (
-        event.getType() == "m.room.join_rules" ||
-        event.getType() == "m.room.guest_access"
-      ) {
-        this.updatePermissions();
       }
     },
 
@@ -302,36 +288,6 @@ export default {
           else console.log("success!");
         }
       );
-    },
-
-    getRoomJoinRule() {
-      if (this.room) {
-        const joinRules = this.room.currentState.getStateEvents(
-          "m.room.join_rules",
-          ""
-        );
-        return joinRules && joinRules.getContent().join_rule;
-      }
-      return null;
-    },
-
-    updatePermissions() {
-      if (this.room) {
-        this.roomJoinRule = this.getRoomJoinRule();
-        const canChangeAccess =
-          this.room.currentState.mayClientSendStateEvent(
-            "m.room.join_rules",
-            this.$matrix.matrixClient
-          ) &&
-          this.room.currentState.mayClientSendStateEvent(
-            "m.room.guest_access",
-            this.$matrix.matrixClient
-          );
-        this.userCanChangeJoinRules = canChangeAccess;
-      } else {
-        this.roomJoinRule = null;
-        this.userCanChangeJoinRules = false;
-      }
     },
 
     memberAvatar(member) {
