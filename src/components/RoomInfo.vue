@@ -33,19 +33,39 @@
     <v-card class="account ma-3" flat>
       <v-card-title class="h2">Permissions</v-card-title>
       <v-card-text>
-        <div v-if="anyoneCanJoin">
-          <div>
-            Anyone with a link can join.
-          </div>
+        <v-radio-group
+          v-model="roomJoinRule"
+          v-if="roomJoinRule"
+          :disabled="!userCanChangeJoinRules || updatingJoinRule"
+        >
+          <v-radio
+            label="Room can be joined by invitation only"
+            :value="'invite'"
+          />
+          <v-radio label="Anyone with the link can join" :value="'public'">
+          </v-radio>
           <v-text-field
-              :value="roomLink"
-              readonly
-              append-icon="content_copy"
-              filled
-              type="text"
-              @click:append="copyRoomLink"
-            ></v-text-field>
-        </div>
+            v-if="publicRoomLink"
+            :value="publicRoomLink"
+            readonly
+            append-icon="content_copy"
+            filled
+            type="text"
+            @click:append="copyRoomLink"
+          ></v-text-field>
+        </v-radio-group>
+
+        <!-- <div v-if="anyoneCanJoin">
+          <div>Anyone with a link can join.</div>
+          <v-text-field
+            :value="publicRoomLink"
+            readonly
+            append-icon="content_copy"
+            filled
+            type="text"
+            @click:append="copyRoomLink"
+          ></v-text-field>
+        </div> -->
       </v-card-text>
     </v-card>
 
@@ -70,7 +90,10 @@
           </v-avatar>
           {{ member.user ? member.user.displayName : member.name
           }}{{ member.userId == $matrix.currentUserId ? " (you)" : "" }}
-          <DeviceList v-if="expandedMembers.includes(member)" :member="member" />
+          <DeviceList
+            v-if="expandedMembers.includes(member)"
+            :member="member"
+          />
         </div>
         <div class="show-all" @click="showAllMembers = !showAllMembers">
           {{ showAllMembers ? "Hide" : "Show all" }}
@@ -87,7 +110,8 @@
             your name or set a password to keep it.
           </div>
           <div v-else>
-            Your are logged in as <b>{{ displayName }}</b>.
+            Your are logged in as <b>{{ displayName }}</b
+            >.
           </div>
           <v-btn block class="outlined-button" @click.stop="viewProfile"
             >View</v-btn
@@ -112,7 +136,9 @@
       </v-card-text>
     </v-card>
 
-    <div class="build-version">Powered by Guardian Project. Version: {{ buildVersion }}</div>
+    <div class="build-version">
+      Powered by Guardian Project. Version: {{ buildVersion }}
+    </div>
 
     <LeaveRoomDialog
       :show="showLeaveConfirmation"
@@ -133,7 +159,7 @@ export default {
   mixins: [roomInfoMixin],
   components: {
     LeaveRoomDialog,
-    DeviceList
+    DeviceList,
   },
   data() {
     return {
@@ -144,6 +170,9 @@ export default {
       showLeaveConfirmation: false,
       expandedMembers: [],
       buildVersion: "",
+      roomJoinRule: null,
+      userCanChangeJoinRules: false,
+      updatingJoinRule: false, // Flag if we are processing update curerntly
     };
   },
   mounted() {
@@ -154,6 +183,7 @@ export default {
 
     // Set QR code
     this.updateQRCode();
+    this.updatePermissions();
 
     // Display build version
     const version = require("!!raw-loader!../assets/version.txt").default;
@@ -168,10 +198,15 @@ export default {
   computed: {
     creator() {
       if (this.room) {
-        const createEvent = this.room.currentState.getStateEvents("m.room.create", "");
+        const createEvent = this.room.currentState.getStateEvents(
+          "m.room.create",
+          ""
+        );
         if (!createEvent) {
-          console.warn("Room " + this.roomId + " does not have an m.room.create event");
-          return '';
+          console.warn(
+            "Room " + this.roomId + " does not have an m.room.create event"
+          );
+          return "";
         }
         const creatorId = createEvent.getContent().creator;
         const member = this.room.getMember(creatorId);
@@ -183,17 +218,11 @@ export default {
       return "";
     },
 
-    anyoneCanJoin() {
-      // TODO: fix this! For now, just return true of we have a canonical alias.
-      if (this.room && this.room.getCanonicalAlias() && this.room.getCanonicalAlias().startsWith('#')) {
-        return true;
-      }
-      return false;
-    },
-
-    roomLink() {
-      if (this.room) {
-        return this.$router.getRoomLink(this.room.getCanonicalAlias() || this.room.roomId);
+    publicRoomLink() {
+      if (this.room && this.roomJoinRule == "public") {
+        return this.$router.getRoomLink(
+          this.room.getCanonicalAlias() || this.room.roomId
+        );
       }
       return null;
     },
@@ -222,6 +251,14 @@ export default {
         console.log("RoomInfo: Current room changed");
         this.updateMemberCount();
         this.updateQRCode();
+        this.updatePermissions();
+      },
+    },
+    roomJoinRule: {
+      handler(newVal, oldVal) {
+        if (newVal && oldVal && newVal != oldVal) {
+          this.setRoomJoinRule(newVal);
+        }
       },
     },
   },
@@ -233,15 +270,20 @@ export default {
       }
       if (event.getType() == "m.room.member") {
         this.updateMemberCount();
+      } else if (
+        event.getType() == "m.room.join_rules" ||
+        event.getType() == "m.room.guest_access"
+      ) {
+        this.updatePermissions();
       }
     },
 
     updateMemberCount() {
       if (this.room) {
-          this.memberCount = this.room.getJoinedMemberCount();
-        } else {
-          this.memberCount = null;
-        }
+        this.memberCount = this.room.getJoinedMemberCount();
+      } else {
+        this.memberCount = null;
+      }
     },
 
     updateQRCode() {
@@ -260,6 +302,36 @@ export default {
           else console.log("success!");
         }
       );
+    },
+
+    getRoomJoinRule() {
+      if (this.room) {
+        const joinRules = this.room.currentState.getStateEvents(
+          "m.room.join_rules",
+          ""
+        );
+        return joinRules && joinRules.getContent().join_rule;
+      }
+      return null;
+    },
+
+    updatePermissions() {
+      if (this.room) {
+        this.roomJoinRule = this.getRoomJoinRule();
+        const canChangeAccess =
+          this.room.currentState.mayClientSendStateEvent(
+            "m.room.join_rules",
+            this.$matrix.matrixClient
+          ) &&
+          this.room.currentState.mayClientSendStateEvent(
+            "m.room.guest_access",
+            this.$matrix.matrixClient
+          );
+        this.userCanChangeJoinRules = canChangeAccess;
+      } else {
+        this.roomJoinRule = null;
+        this.userCanChangeJoinRules = false;
+      }
     },
 
     memberAvatar(member) {
@@ -296,21 +368,69 @@ export default {
     },
 
     copyRoomLink() {
-      this.$copyText(this.roomLink).then(function (e) {
-          console.log(e)
-        }, function (e) {
-          console.log(e)
-        });    
-      },
-
-      toggleMemberExpanded(member) {
-        const index = this.expandedMembers.indexOf(member);
-        if (index > -1) {
-          this.expandedMembers.splice(index, 1);
-        } else {
-          this.expandedMembers.push(member);
+      this.$copyText(this.roomLink).then(
+        function (e) {
+          console.log(e);
+        },
+        function (e) {
+          console.log(e);
         }
+      );
+    },
+
+    toggleMemberExpanded(member) {
+      const index = this.expandedMembers.indexOf(member);
+      if (index > -1) {
+        this.expandedMembers.splice(index, 1);
+      } else {
+        this.expandedMembers.push(member);
       }
+    },
+
+    /**
+     * Set room join rule.
+     * @param joinRule One of "invite" or "public". Currently always disables guest access.
+     */
+    setRoomJoinRule(joinRule) {
+      const cli = this.$matrix.matrixClient;
+      if (!this.room || !cli) {
+        return;
+      }
+
+      if (joinRule == this.getRoomJoinRule()) {
+        return; // No change
+      }
+
+      this.updatingJoinRule = true;
+      var aliasPromise = Promise.resolve();
+      // if (!this.room.getCanonicalAlias()) {
+      //   const alias = "#" + this.room.roomId.substring(1);
+      //   aliasPromise = cli.createAlias(alias, this.room.roomId);
+      // }
+      aliasPromise
+        .then(() => {
+          cli.sendStateEvent(
+            this.room.roomId,
+            "m.room.join_rules",
+            { join_rule: joinRule },
+            ""
+          );
+        })
+        .then(() => {
+          cli.sendStateEvent(
+            this.room.roomId,
+            "m.room.guest_access",
+            { guest_access: "forbidden" },
+            ""
+          );
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(() => {
+          this.updatingJoinRule = false;
+        });
+    },
   },
 };
 </script>

@@ -294,7 +294,6 @@
     </v-container>
 
     <RoomInfoBottomSheet ref="roomInfoSheet" />
-
   </div>
 </template>
 
@@ -316,6 +315,7 @@ import RoomNameChanged from "./messages/RoomNameChanged.vue";
 import RoomTopicChanged from "./messages/RoomTopicChanged.vue";
 import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
 import RoomHistoryVisibility from "./messages/RoomHistoryVisibility.vue";
+import RoomJoinRules from "./messages/RoomJoinRules.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
@@ -373,10 +373,11 @@ export default {
     RoomTopicChanged,
     RoomAvatarChanged,
     RoomHistoryVisibility,
+    RoomJoinRules,
     DebugEvent,
     MessageOperations,
     VoiceRecorder,
-    RoomInfoBottomSheet
+    RoomInfoBottomSheet,
   },
 
   data() {
@@ -520,7 +521,7 @@ export default {
     },
     canRecordAudio() {
       return util.browserCanRecordAudio();
-    }
+    },
   },
 
   watch: {
@@ -762,6 +763,9 @@ export default {
 
         case "m.room.history_visibility":
           return RoomHistoryVisibility;
+
+        case "m.room.join_rules":
+          return RoomJoinRules;
       }
       return DebugEvent;
     },
