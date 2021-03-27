@@ -50,6 +50,14 @@ export default {
                     return user.user_id;
                 },
 
+                currentUserDisplayName() {
+                    if (this.ready) {
+                        const user = this.matrixClient.getUser(this.currentUserId) || {}
+                        return user.displayName;
+                    }
+                    return null;
+                },
+
                 currentRoomId() {
                     return this.$store.state.currentRoomId;
                 },
