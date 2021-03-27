@@ -113,7 +113,7 @@
             Your are logged in as <b>{{ displayName }}</b
             >.
           </div>
-          <v-btn block class="outlined-button" @click.stop="viewProfile"
+          <v-btn depressed block class="outlined-button" @click.stop="viewProfile"
             >View</v-btn
           >
         </div>
@@ -124,6 +124,7 @@
       <v-card-text>
         <v-btn
           color="red"
+          depressed
           block
           class="filled-button"
           @click.stop="showLeaveConfirmation = true"
@@ -170,8 +171,6 @@ export default {
       showLeaveConfirmation: false,
       expandedMembers: [],
       buildVersion: "",
-      roomJoinRule: null,
-      userCanChangeJoinRules: false,
       updatingJoinRule: false, // Flag if we are processing update curerntly
     };
   },
