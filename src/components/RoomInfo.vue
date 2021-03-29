@@ -306,22 +306,6 @@ export default {
       this.$navigation.push({ name: "Profile" }, 1);
     },
 
-    upgradeAccount() {
-      this.$matrix
-        .upgradeGuestAccount()
-        .then((user) => {
-          // Done, login with the "new" account to get a real token instead of our guest token.
-          this.user = user;
-          return this.$store.dispatch("auth/login", this.user);
-        })
-        .then(() => {
-          console.log("Upgrade done!");
-        })
-        .catch((err) => {
-          console.log("ERROR", err);
-        });
-    },
-
     copyRoomLink() {
       this.$copyText(this.roomLink).then(
         function (e) {

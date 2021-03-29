@@ -9,17 +9,17 @@
 <script>
 export default {
   name: "App",
-  methods: {
-    loggedIn() {
-      return this.$store.state.auth.status.loggedIn;
-    },
-    logOut() {
-      this.openDrawer = false;
-      this.$store.dispatch("auth/logout");
-      this.$nextTick(() => {
-        this.$navigation.push({path: "/login"}, -1);
-      })
-    },
+  mounted() {
+    if (this.currentUser) {
+      this.$matrix
+        .login(this.currentUser)
+        .then(() => {
+          console.log("Matrix client ready");
+        })
+        .catch((error) => {
+          console.log("Error creating client", error);
+        });
+    }
   },
   computed: {
     currentUser() {
@@ -35,32 +35,20 @@ export default {
       }
       if (this.$route.meta.includeRoom) {
         if (this.$matrix.currentRoom) {
-          title += " - " + (this.$matrix.currentRoom.summary.info.title || this.$matrix.currentRoom.roomId);
+          title +=
+            " - " +
+            (this.$matrix.currentRoom.summary.info.title ||
+              this.$matrix.currentRoom.roomId);
         } else if (this.$matrix.currentRoomId) {
-          title += " - " + (this.$matrix.currentRoomId);
+          title += " - " + this.$matrix.currentRoomId;
         }
       }
       return title;
-    }
+    },
   },
   watch: {
     title(title) {
       document.title = title;
-    },
-    currentUser: {
-      immediate: true,
-      handler(ignorednewVal, ignoredoldVal) {
-        if (this.currentUser) {
-          this.$matrix
-            .login(this.currentUser)
-            .then(() => {
-              console.log("Matrix client ready");
-            })
-            .catch((error) => {
-              console.log("Error creating client", error);
-            });
-        }
-      },
     },
   },
 };

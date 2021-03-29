@@ -1,7 +1,7 @@
 <template>
   <div>
     <RoomList />
-    <v-btn block class="outlined-button" @click.stop="logout">Logout</v-btn>
+    <v-btn block depressed class="outlined-button" @click.stop="logout">Logout</v-btn>
   </div>
 </template>
 
