@@ -31,7 +31,7 @@
             <div v-if="$matrix.currentUser.is_guest">
               This identity is temporary. Set a password to use it again.
             </div>
-            <v-btn block class="outlined-button" @click.stop="logout">Logout</v-btn>
+            <v-btn depressed block class="outlined-button" @click.stop="logout">Logout</v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -41,21 +41,24 @@
 
     <!-- edit password dialog -->
     <v-dialog v-model="showEditPasswordDialog" class="ma-0 pa-0" width="50%">
-      <v-card>
+      <v-card :disabled="settingPassword">
         <v-card-title>Change password</v-card-title>
         <v-card-text>
-          Not yet implemented.
-          <!-- <v-text-field v-model="password" /> -->
+          <v-text-field v-if="!$matrix.currentUser.is_guest" v-model="password" label="Old password" type="password" />
+          <v-text-field v-model="newPassword1" label="New password" type="password" />
+          <v-text-field v-model="newPassword2" label="Repeat new password" type="password" />
+          <div class="red--text" v-if="passwordErrorMessage">{{ passwordErrorMessage }}</div>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text @click="showEditPasswordDialog = false">Cancel</v-btn>
+          <v-btn text @click="closeEditPasswordDialog">Cancel</v-btn>
           <v-btn
+            :disabled="!passwordsMatch"
             color="primary"
             text
             @click="
-              showEditPasswordDialog = false;
+              setPassword($matrix.currentUser.is_guest ? $matrix.currentUser.password : password, newPassword1);
             "
             >Ok</v-btn
           >
@@ -97,6 +100,11 @@ export default {
       showEditPasswordDialog: false,
       showEditDisplaynameDialog: false,
       editValue: null,
+      password: null,
+      newPassword1: null,
+      newPassword2: null,
+      settingPassword: false,
+      passwordErrorMessage: null
     };
   },
 
@@ -127,6 +135,10 @@ export default {
         return null;
       }
       return (this.user.displayName || this.user.userId.substring(1)).substring(0, 1).toUpperCase();
+    },
+
+    passwordsMatch() {
+      return this.newPassword1 && this.newPassword2 && this.newPassword1 == this.newPassword2;
     }
   },
 
@@ -143,21 +155,29 @@ export default {
       this.$matrix.matrixClient.setDisplayName(name);
     },
 
-    upgradeAccount() {
-      this.$matrix
-        .upgradeGuestAccount()
-        .then(user => {
-          // Done, login with the "new" account to get a real token instead of our guest token.
-          this.user = user;
-          return this.$store.dispatch("auth/login", this.user);
-        })
-        .then(() => {
-          console.log("Upgrade done!");
-        })
-        .catch((err) => {
-          console.log("ERROR", err);
-        });
+    setPassword(oldPassword, newPassword) {
+      this.settingPassword = true;
+      this.passwordErrorMessage = null;
+      this.$matrix.setPassword(oldPassword, newPassword)
+      .then(success => {
+        console.log(success ? "Password changed" : "Failed to change password");
+        this.closeEditPasswordDialog();
+      })
+      .catch(error => {
+        this.passwordErrorMessage = error.message;
+      })
+      .finally(() => {
+        this.settingPassword = false;
+      });
     },
+
+    closeEditPasswordDialog() {
+      this.passwordErrorMessage = null;
+      this.password = null;
+      this.newPassword1 = null;
+      this.newPassword2 = null;
+      this.showEditPasswordDialog = false;
+    }
   },
 };
 </script>

@@ -608,7 +608,9 @@ $admin-fg: white;
 
     .action {
         padding: 4px 20px;
+        cursor: pointer;
         &::after {
+            /* divider */
             content: ' ';
             display: block;
             margin: 10px 0px;

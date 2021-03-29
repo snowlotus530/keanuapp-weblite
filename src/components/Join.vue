@@ -283,7 +283,10 @@ export default {
      * a random account.
      */
     getLoginPromise() {
-        return this.$store.dispatch("auth/login", this.currentUser || this.guestUser);
+      if (this.$matrix.ready) {
+        return Promise.resolve(this.$matrix.currentUser);
+      }
+      return this.$store.dispatch("auth/login", this.currentUser || this.guestUser);
     },
 
     getRoomInfo() {
@@ -326,7 +329,7 @@ export default {
     },
 
     handleLogin() {
-      this.$navigation.push({ name: "Login" }, 1);
+      this.$navigation.push({path: "/login"}, 1);
     },
 
     handleOpenApp() {

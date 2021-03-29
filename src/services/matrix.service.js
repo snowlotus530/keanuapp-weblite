@@ -77,7 +77,10 @@ export default {
                     const tempMatrixClient = sdk.createClient(User.homeServerUrl(user.home_server));
                     var promiseLogin;
 
-                    if (user.is_guest && !user.access_token) {
+                    if (user.access_token) {
+                        // Logged in on "real" account
+                        promiseLogin = Promise.resolve(user);
+                    } else if (user.is_guest && !user.user_id) {
                         // Generate random username and password. We don't user REAL matrix
                         // guest accounts because 1. They are not allowed to post media, 2. They
                         // can not use avatars and 3. They can not seamlessly be upgraded to real accounts.
@@ -96,9 +99,6 @@ export default {
                                 localStorage.setItem('user', JSON.stringify(response));
                                 return response;
                             })
-                    } else if (!user.is_guest && user.access_token) {
-                        // Logged in on "real" account
-                        promiseLogin = Promise.resolve(user);
                     } else {
                         var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password" };
                         if (user.device_id) {
@@ -153,29 +153,6 @@ export default {
 
                     localStorage.removeItem('user');
                     this.$store.commit("setCurrentRoomId", null);
-                },
-
-                /**
-                 * Upgrade a guest account into a "normal" account. For now, use random user and pass...
-                 */
-                upgradeGuestAccount() {
-                    if (!this.matrixClient || !this.currentUser || !this.currentUser.is_guest) {
-                        return Promise.reject("Invalid params");
-                    }
-                    const randomPassword = util.randomPass();
-                    const self = this;
-                    return this.matrixClient.register(this.matrixClient.getUserIdLocalpart(), randomPassword, null, {
-                        type: "m.login.dummy",
-                    }, undefined, this.currentUser.access_token)
-                        .then((response) => {
-                            console.log("Response", response);
-                            response.is_guest = false;
-                            response.password = randomPassword;
-                            self.currentUser = response;
-                            localStorage.setItem('user', JSON.stringify(response)); // Update local storage as well.
-                            self.logout();
-                            return self.currentUser;
-                        });
                 },
 
                 initClient() {
@@ -322,15 +299,23 @@ export default {
                         this.matrixClient = null;
                         this.matrixClientReady = false;
                     }
-                    this.$store.commit("setCurrentRoomId", null);
 
+                    // For "real" accounts we totally wipe the user object, but for "guest"
+                    // accounts (i.e. created from random data and with password never changed)
+                    // we need to hang on to the generated password and use that to login to a new
+                    // session, so only wipe the token in s that case.
                     // Clear the access token
                     var user = JSON.parse(localStorage.getItem('user'));
-                    if (user) {
+                    if (user.is_guest) {
                         delete user.access_token;
+                        localStorage.setItem('user', JSON.stringify(user));
+                        // Login again
+                        this.login(user);
+                    } else {
+                        localStorage.removeItem('user');
+                        this.$store.commit("setCurrentRoomId", null);
+                        this.$navigation.push({path: "/login"}, -1);
                     }
-                    localStorage.setItem('user', JSON.stringify(user));
-                    this.$navigation.push({ name: "Login" }, -1);
                 },
 
                 reloadRooms() {
@@ -396,6 +381,34 @@ export default {
                     if (this.matrixClient) {
                         this.matrixClient.off(event, handler);
                     }
+                },
+
+                setPassword(oldPassword, newPassword) {
+                    if (this.matrixClient && this.currentUser) {
+                        const authDict = {
+                            type: 'm.login.password',
+                            identifier: {
+                                type: 'm.id.user',
+                                user: this.currentUser.user_id,
+                            },
+                            // TODO: Remove `user` once servers support proper UIA
+                            // See https://github.com/matrix-org/synapse/issues/5665
+                            user: this.currentUser.user_id,
+                            password: oldPassword,
+                        };
+                        const self = this;
+                        return this.matrixClient.setPassword(authDict, newPassword)
+                        .then(() => {
+                            // Forget password and remove the 'is_guest' flag, we are now a "real" user!
+                            self.currentUser.password = undefined;
+                            self.currentUser.is_guest = false;
+                            localStorage.setItem('user', JSON.stringify(self.currentUser));
+                        })
+                        .then(() => {
+                            return true;
+                        })
+                    }
+                    return Promise.resolve(false);
                 },
 
                 uploadFile(file, opts) {
