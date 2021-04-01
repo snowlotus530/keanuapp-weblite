@@ -53,7 +53,7 @@ export default {
                 currentUserDisplayName() {
                     if (this.ready) {
                         const user = this.matrixClient.getUser(this.currentUserId) || {}
-                        return user.displayName;
+                        return this.userDisplayName || user.displayName;
                     }
                     return null;
                 },

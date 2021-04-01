@@ -144,7 +144,7 @@ export default {
       if (!this.$matrix.currentUser) {
         return null;
       }
-      return (this.$matrix.userDisplayName || this.$matrix.currentUserId.substring(1)).substring(0, 1).toUpperCase();
+      return (this.$matrix.currentUserDisplayName || this.$matrix.currentUserId.substring(1)).substring(0, 1).toUpperCase();
     }
   },
   methods: {
