@@ -48,7 +48,7 @@ const routes = [
     name: 'CreateRoom',
     component: CreateRoom,
     meta: {
-      title: 'Create'
+      title: 'Create room'
     }
   },
   {
@@ -62,6 +62,14 @@ const routes = [
     name: 'Join',
     component: Join
   },
+  {
+    path: '/invite',
+    name: 'Invite',
+    component: () => import('../components/Invite.vue'),
+    meta: {
+      title: 'Add Friends'
+    }
+  }
 ]
 
 const router = new VueRouter({

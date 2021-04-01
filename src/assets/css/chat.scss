@@ -435,12 +435,17 @@ $admin-fg: white;
     }
 }
 
-.room-name {
+.room-name, .room-name-inline {
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
     font-size: 18 * $chat-text-size;
     text-transform: uppercase;
     color: black;
+    text-align: center;
+}
+
+.room-name-inline {
+    text-align: start;
 }
 
 
@@ -523,19 +528,6 @@ $admin-fg: white;
         font-size: 16 * $chat-text-size !important;
     }
 
-    .room-name {
-        text-align: center;
-        margin-top: 15px;
-    }
-    .back {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        margin: 10px 0px;
-        font-weight: bold;
-        font-size: 12 * $chat-text-size;
-    }
-
     .qr {
         width: 120px;
         height: 120px;
@@ -568,6 +560,24 @@ $admin-fg: white;
     }
 }
 
+.header-button-left {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin: 10px 0px;
+    font-weight: bold;
+    font-size: 12 * $chat-text-size;
+}
+
+.header-button-right {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin: 10px 0px;
+    font-weight: bold;
+    font-size: 12 * $chat-text-size;
+}
+
 .profile {
     background-color: white;
     height: 100%;
@@ -575,19 +585,6 @@ $admin-fg: white;
         background-color: transparent;
         border: none;
     }
-    .room-name {
-        text-align: center;
-        margin-top: 15px;
-    }
-    .back {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        margin: 10px 0px;
-        font-weight: bold;
-        font-size: 12 * $chat-text-size;
-    }
-
     .v-card {
         background-color: white;
         border-radius: 20px;
@@ -713,4 +710,44 @@ $admin-fg: white;
             font-size: 70 * $chat-text-size !important;
         }
     }
+}
+
+.create-room {
+    .v-avatar {
+        border: 1px solid #808080 !important;
+    }
+
+    .section {
+        background-color: white;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid #808080 !important;
+        position: relative;
+    }
+
+    .link-copied {
+        position: absolute;
+        bottom: 10px;
+        left: 20%;
+        right: 20%;
+        background-color: #888888;
+        height: 50px;
+        border-radius: 25px;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+        padding-top: 10px;
+    }
+}
+
+.room-link .v-input__slot::before {
+    /* Remove text underline */
+    border-style: none !important;
+}
+    
+.created-room-welcome-header {
+    background-color: #e0e0e0;
+    border-radius: 25px;
+    margin: 20px;
+    padding: 20px;
 }
