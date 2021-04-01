@@ -198,7 +198,7 @@ export default {
     },
 
     userDisplayName() {
-      return this.$matrix.userDisplayName;
+      return this.$matrix.currentUserDisplayName;
     },
 
     userAvatar() {
@@ -218,7 +218,7 @@ export default {
       if (!this.currentUser || !this.currentUser.userId) {
         return null;
       }
-      return (this.userDisplayName || this.currentUser.userId.substring(1))
+      return (this.currentUserDisplayName || this.currentUser.userId.substring(1))
         .substring(0, 1)
         .toUpperCase();
     },
