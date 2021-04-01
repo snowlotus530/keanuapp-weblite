@@ -5,7 +5,7 @@
         <div class="room-name">My Profile</div>
             <v-btn
               text
-              class="back"
+              class="header-button-right"
               v-show="$navigation && $navigation.canPop()"
               @click.stop="$navigation.pop"
             >

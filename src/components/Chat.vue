@@ -32,6 +32,8 @@
         @notify="handleChatContainerResize"
       />
 
+      <CreatedRoomWelcomeHeader v-if="showCreatedRoomWelcomeHeader" v-on:close="closeCreateRoomWelcomeHeader" />
+
       <div
         v-for="(event, index) in events"
         :key="event.getId()"
@@ -322,6 +324,7 @@ import MessageOperations from "./messages/MessageOperations.vue";
 import ChatHeader from "./ChatHeader";
 import VoiceRecorder from "./VoiceRecorder";
 import RoomInfoBottomSheet from "./RoomInfoBottomSheet";
+import CreatedRoomWelcomeHeader from "./CreatedRoomWelcomeHeader";
 
 const READ_RECEIPT_TIMEOUT = 5000; /* How long a message must have been visible before the read marker is updated */
 
@@ -378,6 +381,7 @@ export default {
     MessageOperations,
     VoiceRecorder,
     RoomInfoBottomSheet,
+    CreatedRoomWelcomeHeader
   },
 
   data() {
@@ -424,6 +428,9 @@ export default {
 
       /** Last event we sent a Read Receipt/Read Marker for */
       lastRR: null,
+
+      /** If we just created this room, show a small welcome header with info */
+      showCreatedRoomWelcomeHeader: false
     };
   },
 
@@ -573,6 +580,17 @@ export default {
 
   methods: {
     onRoomJoined(initialEventId) {
+
+      // Was this room just created (by you)? Show a small info header in
+      // that case!
+      const createEvent = this.room.currentState.getStateEvents("m.room.create","");
+      if (createEvent) {
+        const creatorId = createEvent.getContent().creator;
+        if (creatorId == this.$matrix.currentUserId && createEvent.getLocalAge() < (2000 * 60000) /* 2 minutes */) {
+          this.showCreatedRoomWelcomeHeader = true;
+        }
+      }
+
       // Listen to events
       this.$matrix.on("Room.timeline", this.onEvent);
       this.$matrix.on("RoomMember.typing", this.onUserTyping);
@@ -621,8 +639,10 @@ export default {
             })
             .finally(() => {
               self.initialLoadDone = true;
-              if (initialEventId) {
+              if (initialEventId && !this.showCreatedRoomWelcomeHeader) {
                 self.scrollToEvent(initialEventId);
+              } else if (this.showCreatedRoomWelcomeHeader) {
+                self.onScroll();
               }
               self.restartRRTimer();
             });
@@ -1229,6 +1249,16 @@ export default {
       this.sendAttachment(text);
       this.showRecorder = false;
     },
+
+    closeCreateRoomWelcomeHeader() {
+      this.showCreatedRoomWelcomeHeader = false;
+      this.$nextTick(() => {
+        // We change the layout when removing the welcome header, so call
+        // onScroll here to handle updates (e.g. remove the "scroll to last" if we now
+        // can see all messages).
+        this.onScroll();
+      });
+    }
   },
 };
 </script>

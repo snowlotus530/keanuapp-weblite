@@ -5,7 +5,7 @@
         <div class="room-name">Info</div>
         <v-btn
           text
-          class="back"
+          class="header-button-left"
           v-show="$navigation && $navigation.canPop()"
           @click.stop="$navigation.pop"
         >
@@ -214,15 +214,6 @@ export default {
         return member.user ? member.user.displayName : member.name;
       }
       return "";
-    },
-
-    publicRoomLink() {
-      if (this.room && this.roomJoinRule == "public") {
-        return this.$router.getRoomLink(
-          this.room.getCanonicalAlias() || this.room.roomId
-        );
-      }
-      return null;
     },
 
     joinedMembers() {

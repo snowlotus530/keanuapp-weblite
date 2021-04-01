@@ -39,6 +39,15 @@ export default {
       }
       return "";
     },
+
+    publicRoomLink() {
+      if (this.room && this.roomJoinRule == "public") {
+        return this.$router.getRoomLink(
+          this.room.getCanonicalAlias() || this.room.roomId
+        );
+      }
+      return null;
+    },
   },
   watch: {
     room: {

@@ -12,7 +12,7 @@
       </v-col>
 
       <v-col class="ma-0 pa-0 flex-shrink-1 flex-nowrap" style="overflow:hidden;cursor:pointer" @click.stop="onHeaderClicked">
-        <div class="d-flex flex-nowrap room-name">{{ room.summary.info.title }} <!--<v-icon>expand_more</v-icon>--></div>
+        <div class="d-flex flex-nowrap room-name-inline">{{ room.summary.info.title }} <!--<v-icon>expand_more</v-icon>--></div>
         <div class="num-members">{{ memberCount }}{{ memberCount > 1 ? " members" : " member" }}</div>
       </v-col>
       <v-col cols="auto" class="text-end ma-0 pa-0">
