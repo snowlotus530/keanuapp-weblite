@@ -6,11 +6,11 @@
         <h2 class="dialog-title">
           Goodbye, {{ $matrix.currentUserDisplayName }}.
         </h2>
-        <div v-if="$matrix.currentUser.is_guest" class="dialog-text">
+        <div v-if="$matrix.currentUser.is_guest && onlyJoinedToThisRoom" class="dialog-text">
           If you want to join this group again, you can join under a new identity. To keep {{ $matrix.currentUserDisplayName }}, <a @click.prevent="viewProfile">create an account</a>.
         </div>
         <div v-else class="dialog-text">
-          Since this group is public, you can join again later.
+          You can always join this room again if you know the link.
         </div>
       </template>
       <template v-else>
@@ -80,6 +80,16 @@ export default {
         this.$emit("close");
       }
     },
+  },
+
+  computed: {
+    onlyJoinedToThisRoom() {
+      const joinedRooms = this.$matrix.joinedRooms;
+      if (joinedRooms && joinedRooms.length == 1 && joinedRooms[0].roomId == this.room.roomId) {
+        return true;
+      }
+      return false;
+    }
   },
 
   methods: {

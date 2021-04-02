@@ -61,6 +61,12 @@ export default {
                 currentRoomId() {
                     return this.$store.state.currentRoomId;
                 },
+
+                joinedRooms() {
+                    return this.rooms.filter(room => {
+                        return room._selfMembership === 'join'
+                    });
+                },
             },
 
             watch: {
@@ -367,7 +373,7 @@ export default {
                     var ids = {};
                     const ret = [];
                     for (const room of this.rooms) {
-                        if (room._selfMembership == 'join') { // && this.getRoomJoinRule(room) == 'invite') {
+                        if (room._selfMembership == 'join' && this.getRoomJoinRule(room) == 'invite') {
                             for (const member of room.getJoinedMembers()) {
                                 if (member.userId != this.currentUserId && !ids[member.userId]) {
                                     ids[member.userId] = member;

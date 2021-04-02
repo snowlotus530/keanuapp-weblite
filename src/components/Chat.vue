@@ -586,7 +586,7 @@ export default {
       const createEvent = this.room.currentState.getStateEvents("m.room.create","");
       if (createEvent) {
         const creatorId = createEvent.getContent().creator;
-        if (creatorId == this.$matrix.currentUserId && createEvent.getLocalAge() < (2000 * 60000) /* 2 minutes */) {
+        if (creatorId == this.$matrix.currentUserId && createEvent.getLocalAge() < (5 * 60000) /* 5 minutes */) {
           this.showCreatedRoomWelcomeHeader = true;
         }
       }
