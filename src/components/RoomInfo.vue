@@ -26,7 +26,14 @@
         <div class="h1">{{ roomName }}</div>
         <div class="h3">{{ roomTopic }}</div>
         <div class="small">Created by {{ creator }}</div>
-        <canvas class="qr" id="room-qr"></canvas>
+        <v-expand-transition>
+        <canvas
+          v-if="publicRoomLink"
+          ref="roomQr"
+          class="qr"
+          id="room-qr"
+        ></canvas>
+        </v-expand-transition>
       </div>
     </v-card>
 
@@ -113,7 +120,11 @@
             Your are logged in as <b>{{ displayName }}</b
             >.
           </div>
-          <v-btn depressed block class="outlined-button" @click.stop="viewProfile"
+          <v-btn
+            depressed
+            block
+            class="outlined-button"
+            @click.stop="viewProfile"
             >View</v-btn
           >
         </div>
@@ -263,21 +274,23 @@ export default {
     },
 
     updateQRCode() {
-      var fullUrl = this.roomLink;
-      var canvas = document.getElementById("room-qr");
-      QRCode.toCanvas(
-        canvas,
-        fullUrl,
-        {
-          type: "image/png",
-          margin: 1,
-          width: canvas.clientWidth,
-        },
-        function (error) {
-          if (error) console.error(error);
-          else console.log("success!");
-        }
-      );
+      var fullUrl = this.publicRoomLink;
+      var canvas = this.$refs.roomQr;
+      if (fullUrl && canvas) {
+        QRCode.toCanvas(
+          canvas,
+          fullUrl,
+          {
+            type: "image/png",
+            margin: 1,
+            width: canvas.clientWidth,
+          },
+          function (error) {
+            if (error) console.error(error);
+            else console.log("success!");
+          }
+        );
+      }
     },
 
     memberAvatar(member) {
@@ -298,7 +311,7 @@ export default {
     },
 
     copyRoomLink() {
-      this.$copyText(this.roomLink).then(
+      this.$copyText(this.publicRoomLink).then(
         function (e) {
           console.log(e);
         },
@@ -359,6 +372,7 @@ export default {
         })
         .finally(() => {
           this.updatingJoinRule = false;
+          this.updateQRCode();
         });
     },
   },
