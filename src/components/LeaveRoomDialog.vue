@@ -6,8 +6,13 @@
         <h2 class="dialog-title">
           Goodbye, {{ $matrix.currentUserDisplayName }}.
         </h2>
-        <div v-if="$matrix.currentUser.is_guest && onlyJoinedToThisRoom" class="dialog-text">
-          If you want to join this group again, you can join under a new identity. To keep {{ $matrix.currentUserDisplayName }}, <a @click.prevent="viewProfile">create an account</a>.
+        <div
+          v-if="$matrix.currentUser.is_guest && lastRoom"
+          class="dialog-text"
+        >
+          If you want to join this group again, you can join under a new
+          identity. To keep {{ $matrix.currentUserDisplayName }},
+          <a @click.prevent="viewProfile">create an account</a>.
         </div>
         <div v-else class="dialog-text">
           You can always join this room again if you know the link.
@@ -38,10 +43,7 @@
               depressed
               block
               class="filled-button"
-              @click.stop="
-                onLeaveRoom();
-                showDialog = false;
-              "
+              @click.stop="onLeaveRoom()"
               >Leave</v-btn
             >
           </v-col>
@@ -67,6 +69,7 @@ export default {
   data() {
     return {
       showDialog: false,
+      lastRoom: false,
     };
   },
   watch: {
@@ -78,29 +81,42 @@ export default {
     showDialog() {
       if (!this.showDialog) {
         this.$emit("close");
+      } else {
+        this.lastRoom = this.onlyJoinedToThisRoom();
       }
     },
   },
 
-  computed: {
+  methods: {
     onlyJoinedToThisRoom() {
       const joinedRooms = this.$matrix.joinedRooms;
-      if (joinedRooms && joinedRooms.length == 1 && joinedRooms[0].roomId == this.room.roomId) {
+      if (
+        joinedRooms &&
+        joinedRooms.length == 1 &&
+        joinedRooms[0].roomId == this.room.roomId
+      ) {
         return true;
       }
       return false;
-    }
-  },
+    },
 
-  methods: {
     onLeaveRoom() {
+      const lastRoom = this.onlyJoinedToThisRoom();
       //this.$matrix.matrixClient.forget(this.room.roomId, true, undefined)
       const roomId = this.room.roomId;
       this.$matrix
         .leaveRoom(roomId)
         .then(() => {
+          this.showDialog = false;
           console.log("Left room");
-          this.$navigation.push({ name: "Home", params: { roomId: null } }, -1);
+          if (lastRoom) {
+            this.$navigation.push({ name: "Goodbye" }, -1);
+          } else {
+            this.$navigation.push(
+              { name: "Home", params: { roomId: null } },
+              -1
+            );
+          }
         })
         .catch((err) => {
           console.log("Error leaving", err);
