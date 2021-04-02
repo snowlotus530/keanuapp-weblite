@@ -314,7 +314,7 @@ export default {
                     } else {
                         localStorage.removeItem('user');
                         this.$store.commit("setCurrentRoomId", null);
-                        this.$navigation.push({path: "/login"}, -1);
+                        this.$navigation.push({ path: "/login" }, -1);
                     }
                 },
 
@@ -360,6 +360,41 @@ export default {
                     return room || null;
                 },
 
+                /**
+                 * Return all users we are in a "invite" only room with!
+                 */
+                getAllFriends() {
+                    var ids = {};
+                    const ret = [];
+                    for (const room of this.rooms) {
+                        if (room._selfMembership == 'join') { // && this.getRoomJoinRule(room) == 'invite') {
+                            for (const member of room.getJoinedMembers()) {
+                                if (member.userId != this.currentUserId && !ids[member.userId]) {
+                                    ids[member.userId] = member;
+                                    ret.push(member);
+                                }
+                            }
+                        }
+                    }
+                    ret.sort((a, b) => {
+                        const aName = a.user ? a.user.displayName : a.name;
+                        const bName = b.user ? b.user.displayName : b.name;
+                        return aName.localeCompare(bName);
+                    });
+                    return ret;
+                },
+
+                getRoomJoinRule(room) {
+                    if (room) {
+                        const joinRules = room.currentState.getStateEvents(
+                            "m.room.join_rules",
+                            ""
+                        );
+                        return joinRules && joinRules.getContent().join_rule;
+                    }
+                    return null;
+                },
+
                 leaveRoom(roomId) {
                     return this.matrixClient.leave(roomId, undefined)
                         .then(() => {
@@ -398,15 +433,15 @@ export default {
                         };
                         const self = this;
                         return this.matrixClient.setPassword(authDict, newPassword)
-                        .then(() => {
-                            // Forget password and remove the 'is_guest' flag, we are now a "real" user!
-                            self.currentUser.password = undefined;
-                            self.currentUser.is_guest = false;
-                            localStorage.setItem('user', JSON.stringify(self.currentUser));
-                        })
-                        .then(() => {
-                            return true;
-                        })
+                            .then(() => {
+                                // Forget password and remove the 'is_guest' flag, we are now a "real" user!
+                                self.currentUser.password = undefined;
+                                self.currentUser.is_guest = false;
+                                localStorage.setItem('user', JSON.stringify(self.currentUser));
+                            })
+                            .then(() => {
+                                return true;
+                            })
                     }
                     return Promise.resolve(false);
                 },
