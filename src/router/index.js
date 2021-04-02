@@ -69,6 +69,11 @@ const routes = [
     meta: {
       title: 'Add Friends'
     }
+  },
+  {
+    path: '/goodbye',
+    name: 'Goodbye',
+    component: () => import('../components/QuoteView.vue'),
   }
 ]
 
