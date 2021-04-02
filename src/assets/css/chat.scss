@@ -724,20 +724,6 @@ $admin-fg: white;
         border: 1px solid #808080 !important;
         position: relative;
     }
-
-    .link-copied {
-        position: absolute;
-        bottom: 10px;
-        left: 20%;
-        right: 20%;
-        background-color: #888888;
-        height: 50px;
-        border-radius: 25px;
-        color: white;
-        text-align: center;
-        vertical-align: middle;
-        padding-top: 10px;
-    }
 }
 
 .room-link .v-input__slot::before {
@@ -750,4 +736,18 @@ $admin-fg: white;
     border-radius: 25px;
     margin: 20px;
     padding: 20px;
+}
+
+.link-copied {
+    position: absolute;
+    bottom: 10px;
+    left: 20%;
+    right: 20%;
+    background-color: #888888;
+    height: 50px;
+    border-radius: 25px;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 10px;
 }

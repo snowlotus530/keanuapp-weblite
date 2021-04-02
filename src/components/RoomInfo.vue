@@ -60,6 +60,7 @@
             type="text"
             @click:append="copyRoomLink"
           ></v-text-field>
+          <div v-if="publicRoomLinkCopied" class="link-copied">Link copied!</div>
         </v-radio-group>
 
         <!-- <div v-if="anyoneCanJoin">
@@ -183,6 +184,7 @@ export default {
       expandedMembers: [],
       buildVersion: "",
       updatingJoinRule: false, // Flag if we are processing update curerntly
+      publicRoomLinkCopied: false,
     };
   },
   mounted() {
@@ -311,10 +313,15 @@ export default {
     },
 
     copyRoomLink() {
+      const self = this;
       this.$copyText(this.publicRoomLink).then(
-        function (e) {
-          console.log(e);
-        },
+        function (ignored) {
+          // Success!
+          self.publicRoomLinkCopied = true;
+          setInterval(() => {
+            // Hide again
+            self.publicRoomLinkCopied = false;
+          }, 3000);        },
         function (e) {
           console.log(e);
         }
