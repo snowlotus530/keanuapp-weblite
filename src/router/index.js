@@ -63,7 +63,7 @@ const routes = [
     component: Join
   },
   {
-    path: '/invite',
+    path: '/invite/:roomId?',
     name: 'Invite',
     component: () => import('../components/Invite.vue'),
     meta: {
@@ -91,6 +91,11 @@ router.beforeEach((to, from, next) => {
     if (roomId && roomId.startsWith('#')) {
       //Invite to public room
       authRequired = false;
+    }
+  } else if (to.name == 'Invite') {
+    if (to.params.roomId) {
+      const roomId = util.sanitizeRoomId(to.params.roomId);
+      router.app.$matrix.setCurrentRoomId(roomId);
     }
   }
 

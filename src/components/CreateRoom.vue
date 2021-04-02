@@ -121,6 +121,14 @@
         <div v-if="status">{{ status }}</div>
       </div>
     </v-fade-transition>
+    <input
+      ref="avatar"
+      type="file"
+      name="avatar"
+      @change="handlePickedAvatar($event)"
+      accept="image/*"
+      style="display: none"
+    />
   </div>
 </template>
 
@@ -239,7 +247,7 @@ export default {
         this.$matrix.setCurrentRoomId(roomId);
         this.$navigation.push(
           {
-            name: "Invite"
+            name: "Invite",
           },
           1
         );

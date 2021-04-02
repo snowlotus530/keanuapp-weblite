@@ -65,14 +65,7 @@ export default {
   },
   methods: {
     getRoomJoinRule() {
-      if (this.room) {
-        const joinRules = this.room.currentState.getStateEvents(
-          "m.room.join_rules",
-          ""
-        );
-        return joinRules && joinRules.getContent().join_rule;
-      }
-      return null;
+      return this.$matrix.getRoomJoinRule(this.room);
     },
 
     updatePermissions() {
