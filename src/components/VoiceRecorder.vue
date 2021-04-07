@@ -147,7 +147,7 @@ import util from "../plugins/utils";
 import VoiceRecorderLock from "./VoiceRecorderLock";
 require("md-gum-polyfill");
 import RecordRTC from "recordrtc";
-import {Decoder, tools, Reader} from 'ts-ebml';
+import {Decoder, tools, Reader} from 'ebml';
 
 export default {
   name: "VoiceRecorder",
