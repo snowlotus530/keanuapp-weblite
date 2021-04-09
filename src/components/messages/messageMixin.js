@@ -62,6 +62,10 @@ export default {
     }
   },
   computed: {
+    incoming() {
+      return this.event && this.event.getSender() != this.$matrix.currentUserId;
+    },
+
     /**
      * Don't show sender and time if the next event is within 2 minutes and also from us (= back to back messages)
      */

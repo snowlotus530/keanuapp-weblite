@@ -13,16 +13,19 @@
     >
       <div ref="messageOperationsStrut" class="message-operations-strut">
         <message-operations
+          ref="messageOperations"
           :style="opStyle"
+          :emojis="recentEmojis"
           v-on:close="showContextMenu = false"
           v-if="selectedEvent && showContextMenu"
           v-on:addreaction="addReaction"
+          v-on:addquickreaction="addQuickReaction"
           v-on:addreply="addReply(selectedEvent)"
           v-on:edit="edit(selectedEvent)"
           v-on:redact="redact(selectedEvent)"
           v-on:download="download(selectedEvent)"
+          v-on:more="showMoreMessageOperations"
           :event="selectedEvent"
-          :incoming="selectedEvent.getSender() != $matrix.currentUserId"
         />
       </div>
 
@@ -255,11 +258,22 @@
       </v-dialog>
     </div>
 
-    <div v-if="showEmojiPicker">
-      <v-dialog v-model="showEmojiPicker" class="ma-0 pa-0">
-        <VEmojiPicker style="width: 100%" @select="emojiSelected" />
-      </v-dialog>
-    </div>
+    <v-dialog v-model="showEmojiPicker" class="ma-0 pa-0" eager>
+      <div>
+      <MessageOperationsPicker
+          v-on:close="showEmojiPicker = false"
+          v-if="selectedEvent"
+          v-on:addreaction="addReaction"
+          v-on:addquickreaction="addQuickReaction"
+          v-on:addreply="addReply(selectedEvent)"
+          v-on:edit="edit(selectedEvent)"
+          v-on:redact="redact(selectedEvent)"
+          v-on:download="download(selectedEvent)"
+          :event="selectedEvent"
+          />
+      <VEmojiPicker ref="emojiPicker" style="width: 100%" @select="emojiSelected" />
+      </div>
+    </v-dialog>
 
     <!-- "NOT ALLOWED FOR GUEST ACCOUNTS" dialog -->
     <v-dialog v-model="showNotAllowedForGuests" class="ma-0 pa-0" width="50%">
@@ -321,6 +335,7 @@ import RoomJoinRules from "./messages/RoomJoinRules.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
+import MessageOperationsPicker from "./messages/MessageOperationsPicker.vue";
 import ChatHeader from "./ChatHeader";
 import VoiceRecorder from "./VoiceRecorder";
 import RoomInfoBottomSheet from "./RoomInfoBottomSheet";
@@ -379,6 +394,7 @@ export default {
     RoomJoinRules,
     DebugEvent,
     MessageOperations,
+    MessageOperationsPicker,
     VoiceRecorder,
     RoomInfoBottomSheet,
     CreatedRoomWelcomeHeader
@@ -430,7 +446,10 @@ export default {
       lastRR: null,
 
       /** If we just created this room, show a small welcome header with info */
-      showCreatedRoomWelcomeHeader: false
+      showCreatedRoomWelcomeHeader: false,
+
+      /** An array of recent emojis. Used in the "message operations" popup. */
+      recentEmojis: []
     };
   },
 
@@ -522,6 +541,9 @@ export default {
           var rectChat = this.$refs.messageOperationsStrut.getBoundingClientRect();
           top = rectAnchor.top - rectChat.top;
           left = rectAnchor.left - rectChat.left;
+          if (left + 250 > rectChat.right) {
+            left = rectChat.right - 250; // Pretty ugly, but we want to make sure it does not escape the screen, and we don't have the exakt width of it (yet)!
+          }
         }
       }
       return "top:" + top + "px;left:" + left + "px";
@@ -713,6 +735,7 @@ export default {
      * Triggered when our "long tap" timer hits.
      */
     touchTimerElapsed() {
+      this.updateRecentEmojis();
       this.showContextMenu = true;
     },
 
@@ -1040,12 +1063,20 @@ export default {
       });
     },
 
+    showMoreMessageOperations(e) {
+      this.addReaction(e);
+    },
+    
     addReaction(e) {
       const event = e.event;
       // Store the event we are reacting to, so that we know where to
       // send when the picker closes.
       this.selectedEvent = event;
       this.showEmojiPicker = true;
+    },
+
+    addQuickReaction(e) {
+      this.sendQuickReaction({ reaction: e.emoji, event: e.event });
     },
 
     addReply(event) {
@@ -1124,6 +1155,7 @@ export default {
         console.log("Got the ref", ref);
       }
       this.selectedEvent = event;
+      this.updateRecentEmojis();
       this.showContextMenu = true;
       this.showContextMenuAnchor = e.anchor;
     },
@@ -1258,7 +1290,16 @@ export default {
         // can see all messages).
         this.onScroll();
       });
+    },
+
+    updateRecentEmojis() {
+      if (this.$refs.emojiPicker) {
+        this.recentEmojis = this.$refs.emojiPicker.mapEmojis["Frequently"];
+        return;
+      }
+      this.recentEmojis = [];
     }
+
   },
 };
 </script>
