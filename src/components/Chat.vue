@@ -83,7 +83,7 @@
               v-on:context-menu="showContextMenuForEvent($event)"
               v-on:own-avatar-clicked="viewProfile"
             />
-            <!-- <div>EventID: {{ event.getId() }}</div> -->
+            <!-- <div style="user-select:text">EventID: {{ event.getId() }}</div> -->
             <div
               v-if="event.getId() == readMarker && index < events.length - 1"
               class="read-marker"
@@ -104,7 +104,7 @@
         small
         elevation="0"
         color="black"
-        @click.stop="smoothScrollToEnd"
+        @click.stop="scrollToEndOfTimeline"
       >
         <v-icon color="white">arrow_downward</v-icon>
       </v-btn>
@@ -294,8 +294,8 @@
     <v-container
       fluid
       fill-height
-      style="position: absolute"
-      v-if="!initialLoadDone"
+      style="position: absolute;background-color:rgba(0,0,0,0.2)"
+      v-if="!initialLoadDone || loading"
     >
       <v-row align="center" justify="center">
         <v-col class="text-center">
@@ -420,6 +420,7 @@ export default {
       showContextMenu: false,
       showContextMenuAnchor: null,
       initialLoadDone: false,
+      loading: false, // Set this to true during long operations to show a "spinner" overlay
       showRecorder: false,
       showRecorderPTT: false, // True to open the voice recorder in push-to-talk mode.
 
@@ -619,7 +620,7 @@ export default {
 
       console.log("Read up to " + initialEventId);
 
-      //initialEventId = null;
+      initialEventId = "$rkyknHVJfTmbICP-lw3MyQ9Kw-cpMOGnh09l_tHg4ss";
 
       this.timelineWindow = new TimelineWindow(
         this.$matrix.matrixClient,
@@ -690,6 +691,27 @@ export default {
         },
         0
       );
+    },
+
+    scrollToEndOfTimeline() {
+      if (this.timelineWindow && this.timelineWindow.canPaginate(EventTimeline.FORWARDS)) {
+        this.loading = true;
+          // Instead of paging though ALL history, just reload a timeline at the live marker...
+          var timelineWindow = new TimelineWindow(this.$matrix.matrixClient, this.room.getUnfilteredTimelineSet(), {});
+          const self = this;
+          timelineWindow
+            .load(null, 20)
+            .then(() => {
+              self.timelineWindow = timelineWindow;
+              self.events = self.timelineWindow.getEvents();
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+      } else {
+        // Can't paginate, just scroll to bottom of window!
+        this.smoothScrollToEnd();
+      }
     },
 
     touchX(event) {
