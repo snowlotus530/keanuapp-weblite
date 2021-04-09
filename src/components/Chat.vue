@@ -258,7 +258,7 @@
       </v-dialog>
     </div>
 
-    <v-dialog v-model="showEmojiPicker" class="ma-0 pa-0" eager>
+    <MessageOperationsBottomSheet ref="messageOperationsSheet" xv-show="showEmojiPicker">
       <div>
       <MessageOperationsPicker
           v-on:close="showEmojiPicker = false"
@@ -273,7 +273,7 @@
           />
       <VEmojiPicker ref="emojiPicker" style="width: 100%" @select="emojiSelected" />
       </div>
-    </v-dialog>
+    </MessageOperationsBottomSheet>
 
     <!-- "NOT ALLOWED FOR GUEST ACCOUNTS" dialog -->
     <v-dialog v-model="showNotAllowedForGuests" class="ma-0 pa-0" width="50%">
@@ -340,6 +340,7 @@ import ChatHeader from "./ChatHeader";
 import VoiceRecorder from "./VoiceRecorder";
 import RoomInfoBottomSheet from "./RoomInfoBottomSheet";
 import CreatedRoomWelcomeHeader from "./CreatedRoomWelcomeHeader";
+import MessageOperationsBottomSheet from './MessageOperationsBottomSheet';
 
 const READ_RECEIPT_TIMEOUT = 5000; /* How long a message must have been visible before the read marker is updated */
 
@@ -397,7 +398,8 @@ export default {
     MessageOperationsPicker,
     VoiceRecorder,
     RoomInfoBottomSheet,
-    CreatedRoomWelcomeHeader
+    CreatedRoomWelcomeHeader,
+    MessageOperationsBottomSheet
   },
 
   data() {
@@ -1072,6 +1074,7 @@ export default {
       // Store the event we are reacting to, so that we know where to
       // send when the picker closes.
       this.selectedEvent = event;
+      this.$refs.messageOperationsSheet.open();
       this.showEmojiPicker = true;
     },
 
