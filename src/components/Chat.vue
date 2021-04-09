@@ -864,7 +864,8 @@ export default {
       }
       this.showScrollToEnd =
         container.scrollHeight - container.scrollTop.toFixed(0) >
-        container.clientHeight;
+        container.clientHeight || (this.timelineWindow &&
+        this.timelineWindow.canPaginate(EventTimeline.FORWARDS));
 
       this.restartRRTimer();
     },
