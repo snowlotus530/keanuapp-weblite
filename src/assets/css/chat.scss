@@ -377,13 +377,22 @@ $admin-fg: white;
 .message-operations {
     position: absolute;
     width: fit-content;
-    background-color: #e2e2e2;
+    background-color: white;
+    height: 40px;
+    border-radius: 20px;
+    box-shadow: 4px 4px 8px #888888;
     // &.incoming {
     //     right: 30%;
     // }
     // &.outgoing {
-    //     left: 30%;
+    //     left: unset !important;
+    //     right: 10px !important;
     // }
+}
+
+.message-operations-picker {
+    background-color: white;
+    text-align: center;
 }
 
 .quick-reaction-container {
