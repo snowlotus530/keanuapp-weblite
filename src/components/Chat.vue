@@ -341,6 +341,7 @@ import CreatedRoomWelcomeHeader from "./CreatedRoomWelcomeHeader";
 import MessageOperationsBottomSheet from './MessageOperationsBottomSheet';
 
 const READ_RECEIPT_TIMEOUT = 5000; /* How long a message must have been visible before the read marker is updated */
+const WINDOW_BUFFER_SIZE = 0.3 /** Relative window height of when we start paginating. Always keep this much loaded before and after our scroll position!  */
 
 // from https://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
 function ScrollPosition(node) {
@@ -406,6 +407,10 @@ export default {
       currentInput: "",
       typingMembers: [],
       timelineWindow: null,
+      
+      /** true if we are currently paginating */ 
+      timelineWindowPaginating: false,
+
       scrollPosition: null,
       currentImageInput: null,
       currentImageInputPath: null,
@@ -620,7 +625,7 @@ export default {
 
       console.log("Read up to " + initialEventId);
 
-      initialEventId = "$rkyknHVJfTmbICP-lw3MyQ9Kw-cpMOGnh09l_tHg4ss";
+      //initialEventId = null;
 
       this.timelineWindow = new TimelineWindow(
         this.$matrix.matrixClient,
@@ -637,7 +642,7 @@ export default {
           const getMoreIfNeeded = function _getMoreIfNeeded() {
             const container = self.$refs.chatContainer;
             if (
-              container.scrollHeight <= container.clientHeight &&
+              container.scrollHeight <= (1 + 2 * WINDOW_BUFFER_SIZE) * container.clientHeight &&
               self.timelineWindow &&
               self.timelineWindow.canPaginate(EventTimeline.BACKWARDS)
             ) {
@@ -848,12 +853,12 @@ export default {
       if (!container) {
         return;
       }
-      if (container.scrollTop == 0) {
+      const bufferHeight = container.clientHeight * WINDOW_BUFFER_SIZE;
+      if (container.scrollTop <= bufferHeight) {
         // Scrolled to top
         this.handleScrolledToTop();
       } else if (
-        container.scrollHeight - container.scrollTop.toFixed(0) ==
-        container.clientHeight
+        container.scrollHeight - container.scrollTop.toFixed(0) - container.clientHeight <= bufferHeight
       ) {
         this.handleScrolledToBottom(false);
       }
@@ -1012,8 +1017,10 @@ export default {
       console.log("@top");
       if (
         this.timelineWindow &&
-        this.timelineWindow.canPaginate(EventTimeline.BACKWARDS)
+        this.timelineWindow.canPaginate(EventTimeline.BACKWARDS) &&
+        !this.timelineWindowPaginating
       ) {
+        this.timelineWindowPaginating = true;
         this.timelineWindow
           .paginate(EventTimeline.BACKWARDS, 10, true)
           .then((success) => {
@@ -1026,6 +1033,9 @@ export default {
                 this.scrollPosition.restore();
               });
             }
+          })
+          .finally(() => {
+            this.timelineWindowPaginating = false;
           });
       }
     },
@@ -1034,8 +1044,10 @@ export default {
       console.log("@bottom");
       if (
         this.timelineWindow &&
-        this.timelineWindow.canPaginate(EventTimeline.FORWARDS)
+        this.timelineWindow.canPaginate(EventTimeline.FORWARDS) &&
+        !this.timelineWindowPaginating
       ) {
+        this.timelineWindowPaginating = true;
         this.timelineWindow
           .paginate(EventTimeline.FORWARDS, 10, true)
           .then((success) => {
@@ -1051,6 +1063,9 @@ export default {
                 }
               });
             }
+          })
+          .finally(() => {
+            this.timelineWindowPaginating = false;
           });
       }
     },
