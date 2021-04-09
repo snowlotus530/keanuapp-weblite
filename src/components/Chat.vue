@@ -259,7 +259,6 @@
     </div>
 
     <MessageOperationsBottomSheet ref="messageOperationsSheet" xv-show="showEmojiPicker">
-      <div>
       <MessageOperationsPicker
           v-on:close="showEmojiPicker = false"
           v-if="selectedEvent"
@@ -272,7 +271,6 @@
           :event="selectedEvent"
           />
       <VEmojiPicker ref="emojiPicker" style="width: 100%" @select="emojiSelected" />
-      </div>
     </MessageOperationsBottomSheet>
 
     <!-- "NOT ALLOWED FOR GUEST ACCOUNTS" dialog -->
