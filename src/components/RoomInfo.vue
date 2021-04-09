@@ -28,7 +28,7 @@
         <div class="small">Created by {{ creator }}</div>
         <v-expand-transition>
         <canvas
-          v-if="publicRoomLink"
+          v-show="publicRoomLink"
           ref="roomQr"
           class="qr"
           id="room-qr"
