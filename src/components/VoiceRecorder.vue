@@ -147,7 +147,7 @@ import util from "../plugins/utils";
 import VoiceRecorderLock from "./VoiceRecorderLock";
 require("md-gum-polyfill");
 import RecordRTC from "recordrtc";
-import {Decoder, tools, Reader} from 'ebml';
+import ysFixWebmDuration from "fix-webm-duration";
 
 export default {
   name: "VoiceRecorder",
@@ -385,26 +385,25 @@ export default {
       this.$emit("file", { file: this.recordedFile });
     },
     getFile(send) {
-      this.recorder.stopRecording(
-        function () {
-          this.correctMetadata(this.recorder.getBlob()).then((blob) => {
-            this.recordedFile = new File(
-              [blob],
-              util.formatRecordStartTime(this.recordStartedAt) + ".webm",
-              {
-                type: blob.type,
-                lastModified: Date.now(),
-              }
-            );
-            //const player = new Audio(URL.createObjectURL(this.recordedFile));
-            //player.play();
-            if (send) {
-              //console.log("send");
-              this.send();
+      const duration = Date.now() - this.recordStartedAt;
+      this.recorder.stopRecording(() => {
+        this.correctMetadata(this.recorder.getBlob(), duration).then((blob) => {
+          this.recordedFile = new File(
+            [blob],
+            util.formatRecordStartTime(this.recordStartedAt) + ".webm",
+            {
+              type: blob.type,
+              lastModified: Date.now(),
             }
-          });
-        }.bind(this)
-      );
+          );
+          //const player = new Audio(URL.createObjectURL(this.recordedFile));
+          //player.play();
+          if (send) {
+            //console.log("send");
+            this.send();
+          }
+        });
+      });
     },
     startRecordTimer() {
       this.stopRecordTimer();
@@ -426,32 +425,20 @@ export default {
     /*
      * There is an issue with browsers not setting correct metadata in the generated webm file.
      * See here: https://bugs.chromium.org/p/chromium/issues/detail?id=642012
-     * Use es-embl to try to update the cues section.
+     * Use fix-webm-duration package to try to update the cues section.
      */
-    async correctMetadata(blob) {
-      try {
-        const decoder = new Decoder();
-        const reader = new Reader();
-        reader.logging = true;
-        reader.logGroup = "Raw WebM file";
-        reader.drop_default_duration = false;
-        const webMBuf = await blob.arrayBuffer();
-        const elms = decoder.decode(webMBuf);
-        elms.forEach((elm) => {
-          reader.read(elm);
-        });
-        reader.stop();
-        const refinedMetadataBuf = tools.makeMetadataSeekable(
-          reader.metadatas,
-          reader.duration,
-          reader.cues
-        );
-        const body = webMBuf.slice(reader.metadataSize);
-        return new Blob([refinedMetadataBuf, body], { type: blob.type });
-      } catch (err) {
-        console.err(err);
-        return blob;
-      }
+    async correctMetadata(blob, duration) {
+      return new Promise((resolve, reject) => {
+        try {
+          ysFixWebmDuration(blob, duration, function (fixedBlob) {
+            const b = new Blob([fixedBlob], { type: blob.type });
+            resolve(b);
+          });
+        } catch (err) {
+          console.error(err);
+          reject(err);
+        }
+      });
     },
   },
 };
