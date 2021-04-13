@@ -159,6 +159,11 @@ export default {
 
                     localStorage.removeItem('user');
                     this.$store.commit("setCurrentRoomId", null);
+                    this.rooms = [];
+                    this.userDisplayName = null;
+                    this.userAvatar = null;
+                    this.currentRoom = null;
+                    this.notificationCount = 0;
                 },
 
                 initClient() {
