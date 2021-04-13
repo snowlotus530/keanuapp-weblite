@@ -25,7 +25,7 @@
         <v-row v-if="canEditProfile">
           <v-col class="flex-grow-0 flex-shrink-0">
             <v-avatar @click="showAvatarPickerList">
-              <v-img v-if="profile" :src="profile.image" />
+              <v-img v-if="selectedProfile" :src="selectedProfile.image" />
             </v-avatar>
           </v-col>
           <v-col class="flex-shrink-1 flex-grow-1">
@@ -50,7 +50,7 @@
                     {
                     }
                   "
-                  v-model="profile.name"
+                  v-model="selectedProfile.name"
                 ></v-text-field>
               </template>
               <template v-slot:item="data">
@@ -134,16 +134,15 @@ export default {
       waitingForInfo: true,
       waitingForMembership: false,
       availableAvatars: [],
-      randomProfile: null,
       selectedProfile: null,
     };
   },
   mounted() {
     this.$matrix.on("Room.myMembership", this.onMyMembership);
     this.availableAvatars = util.getDefaultAvatars();
-    this.randomProfile = this.availableAvatars[
+    this.selectAvatar(this.availableAvatars[
       Math.floor(Math.random() * this.availableAvatars.length)
-    ];
+    ]);
   },
   destroyed() {
     this.$matrix.off("Room.myMembership", this.onMyMembership);
@@ -168,33 +167,12 @@ export default {
       return this.$matrix.currentRoomId;
     },
 
-    profile() {
-      return {
-        image:
-          (this.selectedProfile ? this.selectedProfile.image : null) ||
-          this.userAvatar ||
-          this.randomProfile.image,
-        name:
-          (this.selectedProfile ? this.selectedProfile.name : null) ||
-          this.userDisplayName ||
-          this.randomProfile.name,
-      };
-    },
-
     canEditProfile() {
       // If we have an account already, we can't edit profile here (need to go into profile view)
       if (this.currentUser) {
         return false;
       }
       return true;
-    },
-
-    hasChangedAvatar() {
-      return this.userAvatar != this.profile.image;
-    },
-
-    hasChangedDisplayName() {
-      return this.userDisplayName != this.profile.name;
     },
 
     userDisplayName() {
@@ -339,16 +317,24 @@ export default {
     handleJoin() {
       this.loading = true;
       this.loadingMessage = "Logging in...";
+      const hasUser = this.currentUser ? true : false;
+      var setProfileData = false;
       return this.getLoginPromise()
         .then(
           function (user) {
-            if (!this.hasChangedDisplayName) {
-              console.log("Join: No display name change");
+            if (user.is_guest && !hasUser) {
+              // Newly created account, joining first room.
+              // Set avatar and display name to either the randomly chosen ones, or the
+              // ones the users has changed to.
+              setProfileData = true;
+            }
+
+            if (!setProfileData || !this.selectedProfile.name) {
               return Promise.resolve(user);
             } else {
-              console.log("Join: Set display name to: " + this.profile.name);
+              console.log("Join: Set display name to: " + this.selectedProfile.name);
               return this.$matrix.matrixClient.setDisplayName(
-                this.profile.name,
+                this.selectedProfile.name,
                 undefined
               );
             }
@@ -356,14 +342,14 @@ export default {
         )
         .then(
           function () {
-            if (!this.hasChangedAvatar) {
+            if (!setProfileData || !this.selectedProfile.image) {
               console.log("Join: No avatar change");
               return Promise.resolve("no avatar");
             } else {
               console.log("Join: Updating avatar");
               return util.setAvatar(
                 this.$matrix.matrixClient,
-                this.profile.image,
+                this.selectedProfile.image,
                 function (progress) {
                   console.log("Progress: " + JSON.stringify(progress));
                 }
