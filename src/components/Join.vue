@@ -108,9 +108,9 @@
         >Join room</v-btn
       >
 
-      <div class="join-privacy">
+      <!-- <div class="join-privacy">
         Enhance your physical privacy. <a href="#">Learn how</a>
-      </div>
+      </div> -->
 
       <div v-if="loadingMessage">{{ loadingMessage }}</div>
     </div>
