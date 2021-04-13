@@ -327,9 +327,14 @@ export default {
               // Set avatar and display name to either the randomly chosen ones, or the
               // ones the users has changed to.
               setProfileData = true;
+
+              // Set display name and avatar directly on the matrix object.
+              if (this.selectedProfile.name && this.selectedProfile.name.length > 0) {
+                this.$matrix.userDisplayName = this.selectedProfile.name;
+              }
             }
 
-            if (!setProfileData || !this.selectedProfile.name) {
+            if (!setProfileData || !this.selectedProfile.name || this.selectedProfile.name.length == 0) {
               return Promise.resolve(user);
             } else {
               console.log("Join: Set display name to: " + this.selectedProfile.name);
@@ -348,7 +353,7 @@ export default {
             } else {
               console.log("Join: Updating avatar");
               return util.setAvatar(
-                this.$matrix.matrixClient,
+                this.$matrix,
                 this.selectedProfile.image,
                 function (progress) {
                   console.log("Progress: " + JSON.stringify(progress));

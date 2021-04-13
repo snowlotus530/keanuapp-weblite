@@ -461,7 +461,7 @@ class Util {
         return this._importAll(require.context('../assets/avatars/', true, /\.(jpeg|jpg|png)$/));
     }
 
-    setAvatar(matrixClient, file, onUploadProgress) {
+    setAvatar(matrix, file, onUploadProgress) {
         return new Promise((resolve, reject) => {
             axios.get(file, { responseType: 'arraybuffer' })
                 .then(response => {
@@ -471,12 +471,14 @@ class Util {
                         progressHandler: onUploadProgress,
                         onlyContentUri: false
                     };
-                    matrixClient.uploadContent(response.data, opts)
+                    var avatarUri;
+                    matrix.matrixClient.uploadContent(response.data, opts)
                         .then((response) => {
-                            const uri = response.content_uri;
-                            return matrixClient.setAvatarUrl(uri);
+                            avatarUri = response.content_uri;
+                            return matrix.matrixClient.setAvatarUrl(avatarUri);
                         })
                         .then(result => {
+                            matrix.userAvatar = avatarUri;
                             resolve(result);
                         })
                         .catch(err => {
