@@ -82,8 +82,10 @@
               v-on:send-quick-reaction="sendQuickReaction"
               v-on:context-menu="showContextMenuForEvent($event)"
               v-on:own-avatar-clicked="viewProfile"
+              v-on:download="download(event)"
             />
             <!-- <div v-if="debugging" style="user-select:text">EventID: {{ event.getId() }}</div> -->
+            <!-- <div v-if="debugging" style="user-select:text">Event: {{ JSON.stringify(event) }}</div> -->
             <div
               v-if="event.getId() == readMarker && index < events.length - 1"
               class="read-marker"
@@ -314,10 +316,12 @@
 <script>
 import { TimelineWindow, EventTimeline } from "matrix-js-sdk";
 import MessageIncomingText from "./messages/MessageIncomingText";
+import MessageIncomingFile from "./messages/MessageIncomingFile";
 import MessageIncomingImage from "./messages/MessageIncomingImage.vue";
 import MessageIncomingAudio from "./messages/MessageIncomingAudio.vue";
 import MessageIncomingVideo from "./messages/MessageIncomingVideo.vue";
 import MessageOutgoingText from "./messages/MessageOutgoingText";
+import MessageOutgoingFile from "./messages/MessageOutgoingFile";
 import MessageOutgoingImage from "./messages/MessageOutgoingImage.vue";
 import MessageOutgoingAudio from "./messages/MessageOutgoingAudio.vue";
 import MessageOutgoingVideo from "./messages/MessageOutgoingVideo.vue";
@@ -376,10 +380,12 @@ export default {
   components: {
     ChatHeader,
     MessageIncomingText,
+    MessageIncomingFile,
     MessageIncomingImage,
     MessageIncomingAudio,
     MessageIncomingVideo,
     MessageOutgoingText,
+    MessageOutgoingFile,
     MessageOutgoingImage,
     MessageOutgoingAudio,
     MessageOutgoingVideo,
@@ -812,6 +818,8 @@ export default {
               return MessageIncomingAudio;
             } else if (event.getContent().msgtype == "m.video") {
               return MessageIncomingVideo;
+            } else if (event.getContent().msgtype == "m.file") {
+              return MessageIncomingFile;
             }
             return MessageIncomingText;
           } else {
@@ -821,6 +829,8 @@ export default {
               return MessageOutgoingAudio;
             } else if (event.getContent().msgtype == "m.video") {
               return MessageOutgoingVideo;
+            } else if (event.getContent().msgtype == "m.file") {
+              return MessageOutgoingFile;
             }
             return MessageOutgoingText;
           }
