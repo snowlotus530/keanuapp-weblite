@@ -83,7 +83,7 @@
               v-on:context-menu="showContextMenuForEvent($event)"
               v-on:own-avatar-clicked="viewProfile"
             />
-            <!-- <div style="user-select:text">EventID: {{ event.getId() }}</div> -->
+            <!-- <div v-if="debugging" style="user-select:text">EventID: {{ event.getId() }}</div> -->
             <div
               v-if="event.getId() == readMarker && index < events.length - 1"
               class="read-marker"
@@ -557,6 +557,9 @@ export default {
     canRecordAudio() {
       return util.browserCanRecordAudio();
     },
+    debugging() {
+      return (window.location.host || "").startsWith("localhost");
+    }
   },
 
   watch: {
@@ -837,7 +840,7 @@ export default {
         case "m.room.join_rules":
           return RoomJoinRules;
       }
-      return DebugEvent;
+      return this.debugging ? DebugEvent : null;
     },
 
     paginateBackIfNeeded() {
