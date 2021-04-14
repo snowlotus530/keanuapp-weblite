@@ -1,8 +1,26 @@
 <template>
   <v-list dense class="room-list">
+    <div v-if="showInvites" class="h4">{{invitesTitle}}</div>
+    <v-list-item-group v-if="showInvites" v-model="currentRoomId" color="primary">
+      <v-slide-y-transition group>
+      <v-list-item :disabled="roomsProcessing[room.roomId]" v-for="room in $matrix.invites" :key="room.roomId" :value="room.roomId">
+        <v-list-item-avatar size="40" color="#e0e0e0">
+          <v-img :src="room.avatar" />
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title>{{ room.name || room.summary.info.title }}</v-list-item-title>
+          <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
+        </v-list-item-content>
+        <v-list-item-action>
+          <v-btn @click.stop="acceptInvitation(room)" icon><v-icon>check_circle</v-icon></v-btn>
+          <v-btn @click.stop="rejectInvitation(room)" icon><v-icon>cancel</v-icon></v-btn>
+        </v-list-item-action>
+      </v-list-item>
+      </v-slide-y-transition>
+    </v-list-item-group>
     <div class="h4">{{title}}</div>
     <v-list-item-group v-model="currentRoomId" color="primary">
-      <v-list-item v-for="room in $matrix.rooms" :key="room.roomId" :value="room.roomId">
+      <v-list-item v-for="room in $matrix.joinedRooms" :key="room.roomId" :value="room.roomId">
         <v-list-item-avatar size="40" color="#e0e0e0">
           <v-img :src="room.avatar" />
         </v-list-item-avatar>
@@ -18,6 +36,7 @@
 
 <script>
 import util from "../plugins/utils";
+import Vue from 'vue';
 
 export default {
   name: "RoomList",
@@ -26,17 +45,60 @@ export default {
     title: {
       type: String,
       default: "Rooms"
+    },
+    invitesTitle: {
+      type: String,
+      default: "Invites"
+    },
+    showInvites: {
+      type: Boolean,
+      default: false
     }
   },
 
   data: () => ({
     currentRoomId: null,
+    /** A list of rooms currently processing some operation, like "join" or "reject" */
+    roomsProcessing: {},
   }),
 
   methods: {
     notificationCount(room) {
       return room.getUnreadNotificationCount('total') || 0;
-    }
+    },
+
+    acceptInvitation(room) {
+      Vue.set(this.roomsProcessing, room.roomId, true);
+      this.$matrix.matrixClient.joinRoom(room.roomId)
+        .then((ignoredRoom) => {
+          this.$nextTick(() => {
+            this.$navigation.push(
+              {
+                name: "Chat",
+                params: { roomId: util.sanitizeRoomId(room.getCanonicalAlias() || room.roomId) },
+              },
+              -1
+            );
+          });
+        })
+        .catch((err) => {
+          console.error("Failed to accept invite: ", err);
+        })
+        .finally(() => {
+          Vue.delete(this.roomsProcessing, room.roomId);
+        });
+    },
+
+    rejectInvitation(room) {
+      Vue.set(this.roomsProcessing, room.roomId, true);
+      this.$matrix.leaveRoom(room.roomId)
+        .catch((err) => {
+          console.error("Failed to reject invite: ", err);
+        })
+        .finally(() => {
+          Vue.delete(this.roomsProcessing, room.roomId);
+        });
+    },
   },
 
   watch: {
@@ -50,4 +112,11 @@ export default {
 
 <style lang="scss">
 @import "@/assets/css/chat.scss";
+</style>
+
+<style lang="scss" scoped>
+/** Align action buttons side to side */
+.v-list-item__action--stack {
+  flex-direction: row !important;
+}
 </style>
