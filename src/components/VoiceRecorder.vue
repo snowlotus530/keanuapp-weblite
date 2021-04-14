@@ -339,6 +339,9 @@ export default {
           this.recorder = RecordRTC(stream, {
             type: "audio",
             mimeType: "audio/webm",
+            sampleRate: 16000,
+            desiredSampRate: 16000,
+            numberOfAudioChannels: 1
           });
           this.recorder.startRecording();
           this.state = State.RECORDING;
