@@ -10,6 +10,11 @@
 export default {
   name: "App",
   mounted() {
+    if (window.location.protocol == "http") {
+      // Redirect to HTTPS
+      window.location.href = window.location.href.replace("http:", "https:");
+      return;
+    }
     if (this.currentUser) {
       this.$matrix
         .login(this.currentUser)
