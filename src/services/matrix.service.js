@@ -67,6 +67,12 @@ export default {
                         return room._selfMembership === 'join'
                     });
                 },
+
+                invites() {
+                    return this.rooms.filter(room => {
+                        return room._selfMembership === 'invite'
+                    });
+                }
             },
 
             watch: {
@@ -264,6 +270,7 @@ export default {
                         client.on("event", this.onEvent);
                         client.on("Room", this.onRoom);
                         client.on("Session.logged_out", this.onSessionLoggedOut);
+                        client.on("Room.myMembership", this.onRoomMyMembership);
                     }
                 },
 
@@ -272,6 +279,7 @@ export default {
                         client.off("event", this.onEvent);
                         client.off("Room", this.onRoom);
                         client.off("Session.logged_out", this.onSessionLoggedOut);
+                        client.off("Room.myMembership", this.onRoomMyMembership);
                     }
                 },
 
@@ -300,6 +308,15 @@ export default {
                     console.log("Got room: " + ignoredroom);
                     this.reloadRooms();
                     this.updateNotificationCount();
+                },
+
+                onRoomMyMembership(room) {
+                    if (room._selfMembership === "invite") {
+                        // Invitation. Need to call "recalculate" to pick
+                        // up room name, not sure why exactly.
+                        room.recalculate();
+                        this.reloadRooms();
+                    }
                 },
 
                 onSessionLoggedOut() {

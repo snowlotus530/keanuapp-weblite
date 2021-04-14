@@ -28,6 +28,7 @@
           </v-col>
           <v-col class="flex-shrink-1 flex-grow-1">
             <div class="h1">{{ displayName }}</div>
+            <div class="text-center">{{ $matrix.currentUser.user_id }}</div>
             <div v-if="$matrix.currentUser.is_guest">
               This identity is temporary. Set a password to use it again.
             </div>
