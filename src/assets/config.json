@@ -1,3 +1,4 @@
 {
-    "defaultServer": "https://neo.keanu.im"
+    "defaultServer": "https://neo.keanu.im",
+    "useShortCodeStickers": false
 }

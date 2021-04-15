@@ -197,6 +197,15 @@ $admin-fg: white;
         width: 70%;
         max-width: 70%;
     }
+    .bubble.sticker-bubble {
+        padding: 0px;
+        overflow: hidden;
+        display: inline-block;
+        width: 30%;
+        max-width: 30%;
+        background-color: transparent;
+        border: 0px solid transparent !important;
+    }
     .avatar {
         display: inline-block;
         vertical-align: top !important;
@@ -260,6 +269,13 @@ $admin-fg: white;
         .v-image, video {
             border-radius: 10px 10px 0 10px;
         }
+    }
+    .bubble.sticker-bubble {
+        padding: 0px;
+        display: inline-block;
+        width: 30%;
+        max-width: 30%;
+        background-color: transparent;
     }
     .avatar {
         display: inline-block;
