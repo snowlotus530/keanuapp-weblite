@@ -7,7 +7,7 @@ try {
     const packInfo = stickerPackInfo.split("\n");
     for (let i = 0; i < packInfo.length; i++) {
         const pack = packInfo[i];
-        if (pack && pack.length > 0) {
+        if (pack && pack.length > 0 && !pack.startsWith('#')) {
             stickerPacks[pack] = [];
             stickerPacks.ordering.push(pack);
         }
