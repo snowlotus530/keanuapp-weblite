@@ -5,6 +5,7 @@ import router from './router'
 import store from './store'
 import matrix from './services/matrix.service'
 import navigation from './services/navigation.service'
+import cleaninsights from './services/cleaninsights.service'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import VEmojiPicker from 'v-emoji-picker';
@@ -23,6 +24,7 @@ Vue.config.productionTip = false
 Vue.use(VueResize);
 Vue.use(VEmojiPicker);
 Vue.use(matrix, { store: store });
+Vue.use(cleaninsights);
 Vue.use(VueClipboard);
 
 // Add bubble functionality to custom events.
@@ -152,5 +154,6 @@ new Vue({
   router,
   store,
   matrix,
+  cleaninsights,
   render: h => h(App)
 }).$mount('#app');
