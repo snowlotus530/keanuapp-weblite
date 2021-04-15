@@ -1,4 +1,24 @@
 {
     "defaultServer": "https://neo.keanu.im",
-    "useShortCodeStickers": false
+    "useShortCodeStickers": false,
+    "analytics": {
+        "enabled": true,
+        "config": {
+            "server": "https://metrics.cleaninsight.org",
+            "siteid": 14,
+            "timeout": 5,
+            "persistEveryNTimes": 1,
+            "debug": true,
+            "campaigns": {
+                "beta": {
+                    "start": "2021-01-01T00:00:00-00:00",
+                    "end": "2021-12-31T23:59:59-00:00",
+                    "aggregationPeriodLength": 1,
+                    "numberOfPeriods": 90,
+                    "onlyRecordOnce": false,
+                    "eventAggregationRule": "avg"
+                }
+            }
+        }
+    }
 }

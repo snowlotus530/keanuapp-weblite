@@ -1370,6 +1370,9 @@ export default {
       }
       this.sendAttachment(text);
       this.showRecorder = false;
+
+      // Log event to Clean Insights
+      this.$ci.event("Audio", "Voice message sent");
     },
 
     closeCreateRoomWelcomeHeader() {
