@@ -18,7 +18,7 @@
       :style="{ top: `${isMove ? y : calcY()}px` }"
     >
       <div class="bottom-sheet-handle"><div class="bottom-sheet-handle-decoration" /></div>
-      <div style="position:absolute;top:20px;left:0;right:0;bottom:0;overflow-y:auto">
+      <div style="position:absolute;top:20px;left:0;right:0;bottom:0;overflow-y:auto;padding:20px">
         <slot></slot>
       </div>
     </div>
@@ -140,6 +140,7 @@ export default {
   bottom: 0;
   overflow-x: hidden;
   overflow-y: hidden;
+  z-index: 10;
 }
 
 .bottom-sheet-bg {
