@@ -195,6 +195,19 @@
           </v-btn>
         </v-col>
 
+        <v-col v-if="config.useShortCodeStickers" class="input-area-button text-center flex-grow-0 flex-shrink-1">
+            <v-btn
+              v-if="!showRecorder"
+              icon
+              large
+              color="black"
+              @click="showStickerPicker"
+              :disabled="attachButtonDisabled"
+            >
+              <v-icon large>face</v-icon>
+            </v-btn>
+        </v-col>
+
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
           <label icon flat ref="attachmentLabel">
             <v-btn
@@ -275,6 +288,8 @@
       <VEmojiPicker ref="emojiPicker" style="width: 100%" @select="emojiSelected" />
     </MessageOperationsBottomSheet>
 
+    <StickerPickerBottomSheet ref="stickerPickerSheet" style="z-index:10" v-on:selectSticker="sendSticker" />
+
     <!-- "NOT ALLOWED FOR GUEST ACCOUNTS" dialog -->
     <v-dialog v-model="showNotAllowedForGuests" class="ma-0 pa-0" width="50%">
       <v-card>
@@ -320,11 +335,13 @@ import MessageIncomingFile from "./messages/MessageIncomingFile";
 import MessageIncomingImage from "./messages/MessageIncomingImage.vue";
 import MessageIncomingAudio from "./messages/MessageIncomingAudio.vue";
 import MessageIncomingVideo from "./messages/MessageIncomingVideo.vue";
+import MessageIncomingSticker from "./messages/MessageIncomingSticker.vue";
 import MessageOutgoingText from "./messages/MessageOutgoingText";
 import MessageOutgoingFile from "./messages/MessageOutgoingFile";
 import MessageOutgoingImage from "./messages/MessageOutgoingImage.vue";
 import MessageOutgoingAudio from "./messages/MessageOutgoingAudio.vue";
 import MessageOutgoingVideo from "./messages/MessageOutgoingVideo.vue";
+import MessageOutgoingSticker from "./messages/MessageOutgoingSticker.vue";
 import ContactJoin from "./messages/ContactJoin.vue";
 import ContactLeave from "./messages/ContactLeave.vue";
 import ContactInvited from "./messages/ContactInvited.vue";
@@ -343,6 +360,10 @@ import VoiceRecorder from "./VoiceRecorder";
 import RoomInfoBottomSheet from "./RoomInfoBottomSheet";
 import CreatedRoomWelcomeHeader from "./CreatedRoomWelcomeHeader";
 import MessageOperationsBottomSheet from './MessageOperationsBottomSheet';
+import stickers from '../plugins/stickers';
+import StickerPickerBottomSheet from './StickerPickerBottomSheet';
+import BottomSheet from './BottomSheet.vue';
+import config from "../assets/config";
 
 const READ_RECEIPT_TIMEOUT = 5000; /* How long a message must have been visible before the read marker is updated */
 const WINDOW_BUFFER_SIZE = 0.3 /** Relative window height of when we start paginating. Always keep this much loaded before and after our scroll position!  */
@@ -384,11 +405,13 @@ export default {
     MessageIncomingImage,
     MessageIncomingAudio,
     MessageIncomingVideo,
+    MessageIncomingSticker,
     MessageOutgoingText,
     MessageOutgoingFile,
     MessageOutgoingImage,
     MessageOutgoingAudio,
     MessageOutgoingVideo,
+    MessageOutgoingSticker,
     ContactJoin,
     ContactLeave,
     ContactInvited,
@@ -404,11 +427,14 @@ export default {
     VoiceRecorder,
     RoomInfoBottomSheet,
     CreatedRoomWelcomeHeader,
-    MessageOperationsBottomSheet
+    MessageOperationsBottomSheet,
+    StickerPickerBottomSheet,
+    BottomSheet,
   },
 
   data() {
-    return {
+      return {
+      config: config,
       events: [],
       currentInput: "",
       typingMembers: [],
@@ -820,6 +846,8 @@ export default {
               return MessageIncomingVideo;
             } else if (event.getContent().msgtype == "m.file") {
               return MessageIncomingFile;
+            } else if (stickers.isStickerShortcode(event.getContent().body)) {
+              return MessageIncomingSticker;
             }
             return MessageIncomingText;
           } else {
@@ -831,6 +859,8 @@ export default {
               return MessageOutgoingVideo;
             } else if (event.getContent().msgtype == "m.file") {
               return MessageOutgoingFile;
+            } else if (stickers.isStickerShortcode(event.getContent().body)) {
+              return MessageOutgoingSticker;
             }
             return MessageOutgoingText;
           }
@@ -978,6 +1008,10 @@ export default {
         };
         reader.readAsDataURL(event.target.files[0]);
       }
+    },
+
+    showStickerPicker() {
+       this.$refs.stickerPickerSheet.open();
     },
 
     onUploadProgress(p) {
@@ -1198,6 +1232,10 @@ export default {
         .catch((err) => {
           console.log("Failed to send quick reaction:", err);
         });
+    },
+
+    sendSticker(stickerShortCode) {
+      this.sendMessage(stickerShortCode);
     },
 
     showContextMenuForEvent(e) {

@@ -39,3 +39,12 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+```
+
+## Theming
+
+# Sticker short codes - To enable sticker short codes, follow there steps:
+* set "useShortCodeStickers" to true in config.json.
+* Add your sticker pack folders (containing stickers) to /src/assets/stickers/
+* Create file /src/assets/stickers/order.txt that lists the folders names in order, one folder name per line.
