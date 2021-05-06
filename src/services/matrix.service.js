@@ -1,5 +1,6 @@
 global.Olm = require("olm");
 import sdk from "matrix-js-sdk";
+import { TimelineWindow, EventTimeline } from "matrix-js-sdk";
 import util from "../plugins/utils";
 import User from "../models/user";
 import config from "../assets/config";
@@ -432,6 +433,107 @@ export default {
                             this.matrixClient.store.removeRoom(roomId);
                             //this.matrixClient.forget(roomId, true, undefined);
                         })
+                },
+
+                /**
+                 * Purge the room with the given id! This means:
+                 * - Make room invite only
+                 * - Disallow guest access
+                 * - Set history visibility to 'joined'
+                 * - Redact all events
+                 * - Kick all members
+                 * @param roomId 
+                 */
+                purgeRoom(roomId) {
+                    return new Promise((resolve, reject) => {
+                        const room = this.getRoom(roomId);
+                        if (!room) {
+                            reject("Room not found!");
+                            return;
+                        }
+
+                        const timelineWindow = new TimelineWindow(
+                            this.matrixClient,
+                            room.getUnfilteredTimelineSet(),
+                            {}
+                        );
+                        const self = this;
+
+                        console.log("Purge: set invite only");
+                        this.matrixClient.sendStateEvent(
+                            roomId,
+                            "m.room.join_rules",
+                            { join_rule: "invite" },
+                            ""
+                        )
+                            .then(() => {
+                                console.log("Purge: forbid guest access");
+                                return this.matrixClient.sendStateEvent(
+                                    roomId,
+                                    "m.room.guest_access",
+                                    { guest_access: "forbidden" },
+                                    ""
+                                );
+                            })
+                            .then(() => {
+                                console.log("Purge: set history visibility to 'joined'");
+                                return this.matrixClient.sendStateEvent(roomId, "m.room.history_visibility", {
+                                    history_visibility: "joined",
+                                });
+                            })
+                            .then(() => {
+                                console.log("Purge: create timeline");
+                                return timelineWindow.load(null, 100)
+                            })
+                            .then(() => {
+                                const getMoreIfAvailable = function _getMoreIfAvailable() {
+                                    if (timelineWindow.canPaginate(EventTimeline.BACKWARDS)
+                                    ) {
+                                        console.log("Purge: page back");
+                                        return timelineWindow
+                                            .paginate(EventTimeline.BACKWARDS, 100, true, 5)
+                                            .then((ignoredsuccess) => {
+                                                return _getMoreIfAvailable.call(self);
+                                            });
+                                    } else {
+                                        return Promise.resolve("Done");
+                                    }
+                                }.bind(self);
+                                return getMoreIfAvailable();
+                            })
+                            .then(() => {
+                                console.log("Purge: redact events");
+                                var redactionPromises = [];
+                                timelineWindow.getEvents().forEach(event => {
+                                    if (!event.isRedacted() && !event.isRedaction() && !event.isState()) {
+                                        // Redact!
+                                        redactionPromises.push(this.matrixClient.redactEvent(event.getRoomId(), event.getId()));
+                                    }
+                                });
+                                return Promise.all(redactionPromises);
+                            })
+                            .then(() => {
+                                console.log("Purge: kick members");
+                                var joined = room.getMembersWithMembership("join");
+                                var invited = room.getMembersWithMembership("invite");
+                                var members = joined.concat(invited);
+                                
+                                var kickPromises = [];
+                                members.forEach(member => {
+                                    if (member.userId != self.currentUserId) {
+                                        kickPromises.push(this.matrixClient.kick(roomId, member.userId));
+                                    }
+                                });
+                                return Promise.all(kickPromises);
+                            })
+                            .then(() => {
+                                resolve(true); // Done!
+                            })
+                            .catch((err) => {
+                                console.error("Error purging room", err);
+                                reject(err);
+                            });
+                    })
                 },
 
                 on(event, handler) {

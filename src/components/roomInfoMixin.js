@@ -2,7 +2,8 @@ export default {
   data() {
     return {
       roomJoinRule: null,
-      userCanChangeJoinRule: false
+      userCanChangeJoinRule: false,
+      userCanPurgeRoom: false
     }
   },
   mounted() {
@@ -81,9 +82,11 @@ export default {
             this.$matrix.matrixClient
           );
         this.userCanChangeJoinRule = canChangeAccess;
+        this.userCanPurgeRoom = canChangeAccess; //TODO - need different permissions here?
       } else {
         this.roomJoinRule = null;
         this.userCanChangeJoinRule = false;
+        this.userCanPurgeRoom = false;
       }
     },
 
