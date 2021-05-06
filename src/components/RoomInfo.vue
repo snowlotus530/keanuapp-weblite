@@ -63,6 +63,15 @@
           <div v-if="publicRoomLinkCopied" class="link-copied">Link copied!</div>
         </v-radio-group>
 
+        <v-btn
+          v-if="userCanPurgeRoom"
+          color="red"
+          depressed
+          block
+          class="filled-button"
+          @click.stop="showPurgeConfirmation = true"
+          >Purge room</v-btn
+        >
         <!-- <div v-if="anyoneCanJoin">
           <div>Anyone with a link can join.</div>
           <v-text-field
@@ -158,11 +167,19 @@
       :room="room"
       @close="showLeaveConfirmation = false"
     />
+
+    <PurgeRoomDialog
+      :show="showPurgeConfirmation"
+      :room="room"
+      @close="showPurgeConfirmation = false"
+    />
+
   </div>
 </template>
 
 <script>
 import LeaveRoomDialog from "../components/LeaveRoomDialog";
+import PurgeRoomDialog from "../components/PurgeRoomDialog";
 import DeviceList from "../components/DeviceList";
 import QRCode from "qrcode";
 import roomInfoMixin from "./roomInfoMixin";
@@ -172,6 +189,7 @@ export default {
   mixins: [roomInfoMixin],
   components: {
     LeaveRoomDialog,
+    PurgeRoomDialog,
     DeviceList,
   },
   data() {
@@ -181,6 +199,7 @@ export default {
       displayName: "",
       showAllMembers: false,
       showLeaveConfirmation: false,
+      showPurgeConfirmation: false,
       expandedMembers: [],
       buildVersion: "",
       updatingJoinRule: false, // Flag if we are processing update curerntly
