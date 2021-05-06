@@ -839,6 +839,10 @@ export default {
         case "m.room.message":
           if (event.getSender() != this.$matrix.currentUserId) {
             if (event.getContent().msgtype == "m.image") {
+              // For SVG, make downloadable
+              if (event.getContent().info && event.getContent().info.mimetype && event.getContent().info.mimetype.startsWith("image/svg")) {
+                return MessageIncomingFile;
+              }
               return MessageIncomingImage;
             } else if (event.getContent().msgtype == "m.audio") {
               return MessageIncomingAudio;
@@ -852,6 +856,10 @@ export default {
             return MessageIncomingText;
           } else {
             if (event.getContent().msgtype == "m.image") {
+              // For SVG, make downloadable
+              if (event.getContent().info && event.getContent().info.mimetype && event.getContent().info.mimetype.startsWith("image/svg")) {
+                return MessageOutgoingImage;
+              }
               return MessageOutgoingImage;
             } else if (event.getContent().msgtype == "m.audio") {
               return MessageOutgoingAudio;
