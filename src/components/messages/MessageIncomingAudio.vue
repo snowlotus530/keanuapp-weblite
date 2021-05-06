@@ -6,9 +6,9 @@
         messageEventDisplayName(event).substring(0, 1).toUpperCase()
       }}</span>
     </v-avatar>
+    <QuickReactions :event="event" :reactions="reactions" />
     <div class="audio-bubble">
       <audio controls :src="src">Audio file</audio>
-      <QuickReactions :event="event" :reactions="reactions" />
     </div>
     <div class="op-button" ref="opbutton">
       <v-btn icon @click.stop="showContextMenu($refs.opbutton)"

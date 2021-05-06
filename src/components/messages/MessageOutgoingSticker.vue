@@ -5,11 +5,22 @@
         ><v-icon>more_vert</v-icon></v-btn
       >
     </div>
+    <QuickReactions :event="event" :reactions="reactions" />
     <div class="bubble sticker-bubble">
-      <v-img :aspect-ratio="16 / 9" ref="image" :src="src" :cover="cover" :contain="contain" />
-      <QuickReactions :event="event" :reactions="reactions" />
+      <v-img
+        :aspect-ratio="16 / 9"
+        ref="image"
+        :src="src"
+        :cover="cover"
+        :contain="contain"
+      />
     </div>
-    <v-avatar class="avatar" size="32" color="#ededed" @click.stop="ownAvatarClicked">
+    <v-avatar
+      class="avatar"
+      size="32"
+      color="#ededed"
+      @click.stop="ownAvatarClicked"
+    >
       <img v-if="userAvatar" :src="userAvatar" />
       <span v-else class="white--text headline">{{ userAvatarLetter }}</span>
     </v-avatar>
@@ -37,7 +48,7 @@ export default {
     };
   },
   mounted() {
-    this.src = stickers.getStickerImage(this.event.getContent().body)
+    this.src = stickers.getStickerImage(this.event.getContent().body);
   },
 };
 </script>
