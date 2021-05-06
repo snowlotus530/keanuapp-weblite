@@ -5,13 +5,16 @@
         ><v-icon>more_vert</v-icon></v-btn
       >
     </div>
+    <QuickReactions :event="event" :reactions="reactions" />
     <div class="bubble">
-      <QuickReactions :event="event" :reactions="reactions" />
       <div class="original-message" v-if="inReplyToText">
         <div class="original-message-sender">
           {{ inReplyToSender || "Someone" }} said:
         </div>
-        <div class="original-message-text" v-html="linkify($sanitize(inReplyToText))" />
+        <div
+          class="original-message-text"
+          v-html="linkify($sanitize(inReplyToText))"
+        />
       </div>
 
       <div class="message">
@@ -21,7 +24,12 @@
         >
       </div>
     </div>
-    <v-avatar class="avatar" size="32" color="#ededed" @click.stop="ownAvatarClicked">
+    <v-avatar
+      class="avatar"
+      size="32"
+      color="#ededed"
+      @click.stop="ownAvatarClicked"
+    >
       <img v-if="userAvatar" :src="userAvatar" />
       <span v-else class="white--text headline">{{ userAvatarLetter }}</span>
     </v-avatar>

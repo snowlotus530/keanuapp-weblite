@@ -5,11 +5,16 @@
         ><v-icon>more_vert</v-icon></v-btn
       >
     </div>
+    <QuickReactions :event="event" :reactions="reactions" />
     <div class="audio-bubble">
       <audio controls :src="src">Audio file</audio>
-      <QuickReactions :event="event" :reactions="reactions" />
     </div>
-    <v-avatar class="avatar" size="32" color="#ededed" @click.stop="ownAvatarClicked">
+    <v-avatar
+      class="avatar"
+      size="32"
+      color="#ededed"
+      @click.stop="ownAvatarClicked"
+    >
       <img v-if="userAvatar" :src="userAvatar" />
       <span v-else class="white--text headline">{{ userAvatarLetter }}</span>
     </v-avatar>

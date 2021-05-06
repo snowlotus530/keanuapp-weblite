@@ -412,16 +412,20 @@ $admin-fg: white;
 }
 
 .quick-reaction-container {
+    display: inline-block;
     position: absolute;
+    top: -12px;
+    left: 50px;
+    z-index: 2;
     background-color: #000000;
     border: 2px solid white;
     border-radius: 13px;
     height: 26px;
     width: max-content;
-    top: -15px;
     padding: 0px 6px;
     .messageOut & {
-        right: 10px;
+        left: unset;
+        right: 50px;
     }
     .quick-reaction {
         position: relative;

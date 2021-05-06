@@ -6,9 +6,15 @@
         messageEventDisplayName(event).substring(0, 1).toUpperCase()
       }}</span>
     </v-avatar>
+    <QuickReactions :event="event" :reactions="reactions" />
     <div class="bubble sticker-bubble">
-      <v-img :aspect-ratio="16 / 9" ref="image" :src="src" :cover="cover" :contain="contain" />
-      <QuickReactions :event="event" :reactions="reactions" />
+      <v-img
+        :aspect-ratio="16 / 9"
+        ref="image"
+        :src="src"
+        :cover="cover"
+        :contain="contain"
+      />
     </div>
     <div class="op-button" ref="opbutton">
       <v-btn icon @click.stop="showContextMenu($refs.opbutton)"
@@ -39,7 +45,7 @@ export default {
   },
   mounted() {
     //console.log("Mounted with event:", JSON.stringify(this.event.getContent()));
-    this.src = stickers.getStickerImage(this.event.getContent().body)
+    this.src = stickers.getStickerImage(this.event.getContent().body);
   },
 };
 </script>

@@ -6,18 +6,24 @@
         messageEventDisplayName(event).substring(0, 1).toUpperCase()
       }}</span>
     </v-avatar>
-
+    <QuickReactions :event="event" :reactions="reactions" />
     <div class="bubble">
-      <QuickReactions :event="event" :reactions="reactions" />
       <div class="original-message" v-if="inReplyToText">
         <div class="original-message-sender">
           {{ inReplyToSender || "Someone" }} said:
         </div>
-        <div class="original-message-text" v-html="linkify($sanitize(inReplyToText))" />
+        <div
+          class="original-message-text"
+          v-html="linkify($sanitize(inReplyToText))"
+        />
       </div>
       <div class="message">
         <span>File: </span>
-        <span style="cursor:pointer" @click.stop="$emit('download')" v-html="linkify($sanitize(messageText))" />
+        <span
+          style="cursor: pointer"
+          @click.stop="$emit('download')"
+          v-html="linkify($sanitize(messageText))"
+        />
         <span class="edit-marker" v-if="event.replacingEventId()"
           >(edited)</span
         >

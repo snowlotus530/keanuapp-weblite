@@ -6,14 +6,18 @@
         messageEventDisplayName(event).substring(0, 1).toUpperCase()
       }}</span>
     </v-avatar>
+    <QuickReactions :event="event" :reactions="reactions" />
     <div class="bubble image-bubble">
       <v-responsive :aspect-ratio="16 / 9" :src="src">
-        <video :src="src" controls style="width:100%;height:100%">Video file</video>
+        <video :src="src" controls style="width: 100%; height: 100%">
+          Video file
+        </video>
         <div v-if="downloadProgress" class="download-overlay">
-          <div class="text-center download-text">{{ downloadProgress }}% downloaded</div>
+          <div class="text-center download-text">
+            {{ downloadProgress }}% downloaded
+          </div>
         </div>
       </v-responsive>
-      <QuickReactions :event="event" :reactions="reactions" />
     </div>
     <div class="op-button" ref="opbutton">
       <v-btn icon @click.stop="showContextMenu($refs.opbutton)"
