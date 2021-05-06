@@ -4,7 +4,7 @@
     "analytics": {
         "enabled": true,
         "config": {
-            "server": "https://metrics.cleaninsight.org",
+            "server": "https://metrics.cleaninsights.org/cleaninsights.php",
             "siteid": 14,
             "timeout": 5,
             "persistEveryNTimes": 1,
