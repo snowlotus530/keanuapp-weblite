@@ -1,11 +1,5 @@
 <template>
-  <div class="messageOut">
-    <div class="op-button" ref="opbutton">
-      <v-btn icon @click.stop="showContextMenu($refs.opbutton)"
-        ><v-icon>more_vert</v-icon></v-btn
-      >
-    </div>
-    <QuickReactions :event="event" :reactions="reactions" />
+  <message-outgoing v-bind="{ ...$props, ...$attrs }">
     <div class="bubble image-bubble">
       <v-img
         :aspect-ratio="16 / 9"
@@ -15,31 +9,16 @@
         :contain="contain"
       />
     </div>
-    <v-avatar
-      class="avatar"
-      size="32"
-      color="#ededed"
-      @click.stop="ownAvatarClicked"
-    >
-      <img v-if="userAvatar" :src="userAvatar" />
-      <span v-else class="white--text headline">{{ userAvatarLetter }}</span>
-    </v-avatar>
-    <div class="senderAndTime">
-      <!-- <div class="sender">{{ "You" }}</div> -->
-      <div class="time">
-        {{ formatTime(event.event.origin_server_ts) }}
-        <div class="status">{{ event.status }}</div>
-      </div>
-    </div>
-  </div>
+  </message-outgoing>
 </template>
 
 <script>
-import messageMixin from "./messageMixin";
 import util from "../../plugins/utils";
+import MessageOutgoing from "./MessageOutgoing.vue";
 
 export default {
-  mixins: [messageMixin],
+  extends: MessageOutgoing,
+  components: { MessageOutgoing },
   data() {
     return {
       src: null,

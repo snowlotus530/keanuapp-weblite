@@ -1,12 +1,5 @@
 <template>
-  <div :class="messageClasses">
-    <v-avatar class="avatar" size="32" color="#ededed">
-      <img v-if="messageEventAvatar(event)" :src="messageEventAvatar(event)" />
-      <span v-else class="white--text headline">{{
-        messageEventDisplayName(event).substring(0, 1).toUpperCase()
-      }}</span>
-    </v-avatar>
-    <QuickReactions :event="event" :reactions="reactions" />
+  <message-incoming v-bind="{ ...$props, ...$attrs }">
     <div class="bubble image-bubble">
       <v-responsive :aspect-ratio="16 / 9" :src="src">
         <video :src="src" controls style="width: 100%; height: 100%">
@@ -19,26 +12,17 @@
         </div>
       </v-responsive>
     </div>
-    <div class="op-button" ref="opbutton">
-      <v-btn icon @click.stop="showContextMenu($refs.opbutton)"
-        ><v-icon>more_vert</v-icon></v-btn
-      >
-    </div>
-    <div v-if="showSenderAndTime" class="senderAndTime">
-      <div class="sender">{{ messageEventDisplayName(event) }}</div>
-      <div class="time">
-        {{ formatTime(event.event.origin_server_ts) }}
-      </div>
-    </div>
-  </div>
+  </message-incoming>
 </template>
 
 <script>
-import messageMixin from "./messageMixin";
 import attachmentMixin from "./attachmentMixin";
+import MessageIncoming from "./MessageIncoming.vue";
 
 export default {
-  mixins: [messageMixin, attachmentMixin],
+  extends: MessageIncoming,
+  components: { MessageIncoming },
+  mixins: [attachmentMixin],
 };
 </script>
 
