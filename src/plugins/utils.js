@@ -565,6 +565,13 @@ class Util {
         return dayjs.duration(ms).format("HH:mm:ss");
     }
 
+    formatDuration(ms) {
+        if (ms >= (60 * 60000)) {
+            return dayjs.duration(ms).format("H:mm:ss");
+        }
+        return dayjs.duration(ms).format("m:ss");
+    }
+
     formatRecordStartTime(timestamp) {
         var then = dayjs(timestamp);
         return then.format('lll');

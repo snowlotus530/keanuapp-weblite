@@ -1,18 +1,19 @@
 <template>
   <message-outgoing v-bind="{ ...$props, ...$attrs }">
     <div class="audio-bubble">
-      <audio controls :src="src">Audio file</audio>
+      <audio-player :src="src">Audio file</audio-player>
     </div>
   </message-outgoing>
 </template>
 
 <script>
 import attachmentMixin from "./attachmentMixin";
+import AudioPlayer from './AudioPlayer.vue';
 import MessageOutgoing from "./MessageOutgoing.vue";
 
 export default {
   extends: MessageOutgoing,
-  components: { MessageOutgoing },
+  components: { MessageOutgoing, AudioPlayer },
   mixins: [attachmentMixin],
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
   <message-incoming v-bind="{...$props, ...$attrs}">
-    <div class="audio-bubble">
-      <audio controls :src="src">Audio file</audio>
+    <div class="bubble audio-bubble">
+      <audio-player :src="src">Audio file</audio-player>
     </div>
   </message-incoming>
 </template>
@@ -9,11 +9,12 @@
 <script>
 import attachmentMixin from "./attachmentMixin";
 import MessageIncoming from './MessageIncoming.vue';
+import AudioPlayer from './AudioPlayer.vue';
 
 export default {
   extends: MessageIncoming,
   mixins: [attachmentMixin],
-  components: { MessageIncoming }
+  components: { MessageIncoming, AudioPlayer }
 };
 </script>
 
