@@ -9,7 +9,7 @@
     <v-btn v-else @click.stop="play" icon
       ><v-icon size="20">play_arrow</v-icon></v-btn
     >
-    <div class="play-time" style="flex: 1 1 80px">
+    <div class="play-time" style="flex: 1 0 80px">
       {{ currentTime }} / {{ totalTime }}
     </div>
     <v-slider 
