@@ -80,7 +80,7 @@ export default new Vuex.Store({
             state.currentRoomId = roomId;
         },
         setUser(state, user) {
-            state.auth.user = JSON.stringify(user);
+            state.auth.user = user; // Don't stringify, our persistUserPlugin handles that!
         },
         setTempUser(state, user) {
             state.tempuser = JSON.stringify(user);
