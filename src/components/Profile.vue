@@ -146,7 +146,7 @@ export default {
   methods: {
     logout() {
       //TODO - For guest accounts, show warning about not being able to rejoin.
-      this.$store.dispatch("auth/logout");
+      this.$store.dispatch("logout");
       this.$nextTick(() => {
         this.$navigation.push({path: "/login"}, -1);
       })

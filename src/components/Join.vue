@@ -60,6 +60,7 @@
                 <div class="ml-2">{{ data.item.name }}</div>
               </template>
             </v-select>
+            <v-switch v-model="sharedComputer" label="Using a shared computer" />
           </v-col>
         </v-row>
         <v-row v-else>
@@ -200,6 +201,14 @@ export default {
         .substring(0, 1)
         .toUpperCase();
     },
+    sharedComputer: {
+      get: function () {
+        return !this.$store.state.useLocalStorage;
+      },
+      set: function (sharedComputer) {
+        this.$store.commit('setUseLocalStorage', !sharedComputer);
+      },
+    }
   },
   watch: {
     roomId: {
@@ -264,7 +273,7 @@ export default {
       if (this.$matrix.ready) {
         return Promise.resolve(this.$matrix.currentUser);
       }
-      return this.$store.dispatch("auth/login", this.currentUser || this.guestUser);
+      return this.$store.dispatch("login", this.currentUser || this.guestUser);
     },
 
     getRoomInfo() {

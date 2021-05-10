@@ -7,9 +7,6 @@ import config from "../assets/config";
 
 const LocalStorageCryptoStore = require("matrix-js-sdk/lib/crypto/store/localStorage-crypto-store")
     .LocalStorageCryptoStore;
-sdk.setCryptoStoreFactory(
-    () => new LocalStorageCryptoStore(window.localStorage)
-);
 
 export default {
     install(Vue, options) {
@@ -86,10 +83,15 @@ export default {
             },
 
             methods: {
+                createCryptoStore() {
+                    console.log("create crypto store");
+                    return new LocalStorageCryptoStore(this.$store.getters.storage);
+                },
                 login(user) {
                     const tempMatrixClient = sdk.createClient(User.homeServerUrl(user.home_server));
                     var promiseLogin;
-
+                    
+                    const self = this;
                     if (user.access_token) {
                         // Logged in on "real" account
                         promiseLogin = Promise.resolve(user);
@@ -109,7 +111,7 @@ export default {
                                 console.log("Response", response);
                                 response.password = pass;
                                 response.is_guest = true;
-                                localStorage.setItem('user', JSON.stringify(response));
+                                this.$store.commit("setUser", response);
                                 return response;
                             })
                     } else {
@@ -125,15 +127,15 @@ export default {
                                     // Copy over needed properties
                                     u = Object.assign(user, response);
                                 }
-                                localStorage.setItem('user', JSON.stringify(u));
+                                this.$store.commit("setUser", u);
                                 return response;
                             })
                     }
 
                     return promiseLogin
-                        .then(user => {
-                            return this.getMatrixClient(user);
-                        })
+                        .then((user) => {
+                            return self.getMatrixClient(user);
+                        });
                 },
 
                 clearCryptoStore() {
@@ -141,12 +143,13 @@ export default {
                     // TODO - for some reason "clearStores" called in "logout" only clears the "account" crypto
                     // data item, not all sessions etc. Why? We need to do that manually here!
                     const toRemove = [];
-                    for (let i = 0; i < localStorage.length; ++i) {
-                        const key = localStorage.key(i);
+                    const storage = this.$store.getters.storage;
+                    for (let i = 0; i < storage.length; ++i) {
+                        const key = storage.key(i);
                         if (key.startsWith("crypto.")) toRemove.push(key);
                     }
                     for (const key of toRemove) {
-                        localStorage.removeItem(key);
+                        storage.removeItem(key);
                     }
                 },
 
@@ -164,7 +167,7 @@ export default {
                     }
 
 
-                    localStorage.removeItem('user');
+                    this.$store.commit("setUser", null);
                     this.$store.commit("setCurrentRoomId", null);
                     this.rooms = [];
                     this.userDisplayName = null;
@@ -188,7 +191,7 @@ export default {
                         })
                 },
 
-                async getMatrixClient(user) {
+                getMatrixClient(user) {
                     if (user === undefined) {
                         user = this.$store.state.auth.user;
                     }
@@ -204,9 +207,9 @@ export default {
                         })
                     }
 
-                    const matrixStore = new sdk.MemoryStore(window.localStorage);
+                    const matrixStore = new sdk.MemoryStore(this.$store.getters.storage);
                     const webStorageSessionStore = new sdk.WebStorageSessionStore(
-                        window.localStorage
+                        this.$store.getters.storage
                     );
 
                     var homeServer = user.home_server;
@@ -334,14 +337,14 @@ export default {
                     // we need to hang on to the generated password and use that to login to a new
                     // session, so only wipe the token in s that case.
                     // Clear the access token
-                    var user = JSON.parse(localStorage.getItem('user'));
+                    var user = JSON.parse(this.$store.state.auth.user);
                     if (user.is_guest) {
                         delete user.access_token;
-                        localStorage.setItem('user', JSON.stringify(user));
+                        this.$store.commit("setUser", user);
                         // Login again
                         this.login(user);
                     } else {
-                        localStorage.removeItem('user');
+                        this.$store.commit("setUser", null);
                         this.$store.commit("setCurrentRoomId", null);
                         this.$navigation.push({ path: "/login" }, -1);
                     }
@@ -567,7 +570,7 @@ export default {
                                 // Forget password and remove the 'is_guest' flag, we are now a "real" user!
                                 self.currentUser.password = undefined;
                                 self.currentUser.is_guest = false;
-                                localStorage.setItem('user', JSON.stringify(self.currentUser));
+                                self.$store.commit("setUser", self.currentUser);
                             })
                             .then(() => {
                                 return true;
@@ -598,7 +601,7 @@ export default {
                         })
                     } else {
                         const tempMatrixClient = sdk.createClient(config.defaultServer);
-                        var tempUserString = localStorage.getItem('tempuser');
+                        var tempUserString = this.$store.state.tempuser;
                         var tempUser = null;
                         if (tempUserString) {
                             tempUser = JSON.parse(tempUserString);
@@ -619,7 +622,7 @@ export default {
                                     console.log("Response", response);
                                     response.password = pass;
                                     response.is_guest = true;
-                                    localStorage.setItem('tempuser', JSON.stringify(response));
+                                    this.$store.commit("setTempUser", response);
                                     return response;
                                 });
                         }
@@ -696,6 +699,8 @@ export default {
 
             }
         })
+
+        sdk.setCryptoStoreFactory(matrixService.createCryptoStore.bind(matrixService));
 
         Vue.prototype.$matrix = matrixService;
     }
