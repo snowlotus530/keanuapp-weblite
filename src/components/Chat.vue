@@ -9,14 +9,14 @@
       ref="chatContainer"
       style="overflow-x: hidden; overflow-y: auto"
       v-on:scroll="onScroll"
-      @click="closeContextMenuIfOpen"
+      @click="closeContextMenusIfOpen"
     >
       <div ref="messageOperationsStrut" class="message-operations-strut">
         <message-operations
           ref="messageOperations"
           :style="opStyle"
           :emojis="recentEmojis"
-          v-on:close="showContextMenu = false"
+          v-on:close="showContextMenu = false;showContextMenuAnchor = null;"
           v-if="selectedEvent && showContextMenu"
           v-on:addreaction="addReaction"
           v-on:addquickreaction="addQuickReaction"
@@ -25,6 +25,18 @@
           v-on:redact="redact(selectedEvent)"
           v-on:download="download(selectedEvent)"
           v-on:more="showMoreMessageOperations"
+          :event="selectedEvent"
+        />
+      </div>
+
+      <div ref="avatarOperationsStrut" class="avatar-operations-strut">
+        <avatar-operations
+          ref="avatarOperations"
+          :style="avatarOpStyle"
+          v-on:close="showAvatarMenu = false;showAvatarMenuAnchor = null;"
+          v-on:start-private-chat="startPrivateChat($event)"
+          v-if="selectedEvent && showAvatarMenu"
+          :room="room"
           :event="selectedEvent"
         />
       </div>
@@ -82,6 +94,7 @@
               v-on:send-quick-reaction="sendQuickReaction"
               v-on:context-menu="showContextMenuForEvent($event)"
               v-on:own-avatar-clicked="viewProfile"
+              v-on:other-avatar-clicked="showAvatarMenuForEvent($event)"
               v-on:download="download(event)"
             />
             <!-- <div v-if="debugging" style="user-select:text">EventID: {{ event.getId() }}</div> -->
@@ -355,6 +368,7 @@ import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
 import MessageOperationsPicker from "./messages/MessageOperationsPicker.vue";
+import AvatarOperations from "./messages/AvatarOperations.vue";
 import ChatHeader from "./ChatHeader";
 import VoiceRecorder from "./VoiceRecorder";
 import RoomInfoBottomSheet from "./RoomInfoBottomSheet";
@@ -430,6 +444,7 @@ export default {
     MessageOperationsBottomSheet,
     StickerPickerBottomSheet,
     BottomSheet,
+    AvatarOperations,
   },
 
   data() {
@@ -456,6 +471,8 @@ export default {
       replyToEvent: null,
       showContextMenu: false,
       showContextMenuAnchor: null,
+      showAvatarMenu: false,
+      showAvatarMenuAnchor: null,
       initialLoadDone: false,
       loading: false, // Set this to true during long operations to show a "spinner" overlay
       showRecorder: false,
@@ -582,6 +599,25 @@ export default {
           if (left + 250 > rectChat.right) {
             left = rectChat.right - 250; // Pretty ugly, but we want to make sure it does not escape the screen, and we don't have the exakt width of it (yet)!
           }
+        }
+      }
+      return "top:" + top + "px;left:" + left + "px";
+    },
+    avatarOpStyle() {
+      // Calculate where to show the context menu.
+      //
+      const ref = this.selectedEvent && this.$refs[this.selectedEvent.getId()];
+      var top = 0;
+      var left = 0;
+      if (ref && ref[0]) {
+        if (this.showAvatarMenuAnchor) {
+          var rectAnchor = this.showAvatarMenuAnchor.getBoundingClientRect();
+          var rectChat = this.$refs.avatarOperationsStrut.getBoundingClientRect();
+          top = rectAnchor.top - rectChat.top;
+          left = rectAnchor.left - rectChat.left;
+          // if (left + 250 > rectChat.right) {
+          //   left = rectChat.right - 250; // Pretty ugly, but we want to make sure it does not escape the screen, and we don't have the exakt width of it (yet)!
+          // }
         }
       }
       return "top:" + top + "px;left:" + left + "px";
@@ -1258,13 +1294,44 @@ export default {
       this.showContextMenuAnchor = e.anchor;
     },
 
+    showAvatarMenuForEvent(e) {
+      const event = e.event;
+      this.selectedEvent = event;
+      this.showAvatarMenu = true;
+      this.showAvatarMenuAnchor = e.anchor;
+    },
+
     viewProfile() {
       this.$navigation.push({ name: "Profile" }, 1);
     },
 
-    closeContextMenuIfOpen(e) {
+    startPrivateChat(e) {
+      this.$matrix.getOrCreatePrivateChat(e.event.getSender())
+        .then(room => {
+          this.$nextTick(() => {
+            this.$navigation.push(
+              {
+                name: "Chat",
+                params: { roomId: util.sanitizeRoomId(room.getCanonicalAlias() || room.roomId) },
+              },
+              -1
+            );
+          });
+        })
+        .catch(err => {
+          console.error(err);
+        })
+    },
+
+    closeContextMenusIfOpen(e) {
       if (this.showContextMenu) {
         this.showContextMenu = false;
+        this.showContextMenuAnchor = null;
+        e.preventDefault();
+      }
+      if (this.showAvatarMenu) {
+        this.showAvatarMenu = false;
+        this.showAvatarMenuAnchor = null;
         e.preventDefault();
       }
     },

@@ -90,7 +90,7 @@ export default {
                 login(user) {
                     const tempMatrixClient = sdk.createClient(User.homeServerUrl(user.home_server));
                     var promiseLogin;
-                    
+
                     const self = this;
                     if (user.access_token) {
                         // Logged in on "real" account
@@ -520,7 +520,7 @@ export default {
                                 var joined = room.getMembersWithMembership("join");
                                 var invited = room.getMembersWithMembership("invite");
                                 var members = joined.concat(invited);
-                                
+
                                 var kickPromises = [];
                                 members.forEach(member => {
                                     if (member.userId != self.currentUserId) {
@@ -537,6 +537,77 @@ export default {
                                 reject(err);
                             });
                     })
+                },
+
+                /**
+                 * Get a private chat room with the given user. Searches through our rooms to see
+                 * if a suitable room already exists. If not, one is created.
+                 * @param {*} userId The user to chat with.
+                 */
+                getOrCreatePrivateChat(userId) {
+                    return new Promise((resolve, reject) => {
+                        for (const room of this.rooms) {
+                            // Is the other member the one we are looking for?
+                            if (this.isDirectRoomWith(room, userId)) {
+                                var member = room.getMember(userId);
+                                if (member && member.membership == "invite") {
+                                    // TODO Resend invite
+                                }
+                                resolve(room);
+                                return;
+                            }
+                        }
+
+                        // No room found, create one
+                        //
+                        const createRoomOptions = {
+                            visibility: "private", // Not listed!
+                            //name: this.roomName,
+                            preset: "private_chat",
+                            initial_state: [
+                                {
+                                    type: "m.room.encryption",
+                                    state_key: "",
+                                    content: {
+                                        algorithm: "m.megolm.v1.aes-sha2",
+                                    },
+                                },
+                                {
+                                    type: "m.room.guest_access",
+                                    state_key: "",
+                                    content: {
+                                        guest_access: "forbidden",
+                                    },
+                                },
+                            ],
+                            invite: [userId]
+                        };
+                        return this.matrixClient
+                            .createRoom(createRoomOptions)
+                            .then(({ room_id, room_alias }) => {
+                                resolve(this.getRoom(room_alias || room_id));
+                            })
+                            .catch((error) => {
+                                reject(error);
+                            });
+                    })
+                },
+
+                /**
+                 * Return true if this room is a direct room with the given user.
+                 * @param { } room 
+                 * @param {*} userId 
+                 */
+                isDirectRoomWith(room, userId) {
+                    if (room._selfMembership == "join" && room.getInvitedAndJoinedMemberCount() == 2) {
+                        // Is the other member the one we are looking for?
+                        if (room.getMembersWithMembership("join").some(item => item.userId == userId)) {
+                            return true;
+                        } else if (room.getMembersWithMembership("invite").some(item => item.userId == userId)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 },
 
                 on(event, handler) {

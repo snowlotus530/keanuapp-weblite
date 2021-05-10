@@ -420,7 +420,7 @@ $admin-fg: white;
     }
 }
 
-.message-operations-strut {
+.message-operations-strut, .avatar-operations-strut {
     position: relative;
     height: 0px;
     z-index: 1;
@@ -440,6 +440,16 @@ $admin-fg: white;
     //     left: unset !important;
     //     right: 10px !important;
     // }
+}
+
+.avatar-operations {
+    position: absolute;
+    width: fit-content;
+    background-color: white;
+    height: 40px;
+    border-radius: 20px;
+    padding: 0px 20px;
+    box-shadow: 4px 4px 8px #888888;
 }
 
 .message-operations-picker {
