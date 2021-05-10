@@ -1,5 +1,5 @@
 <template>
-  <message-incoming v-bind="{...$props, ...$attrs}">
+  <message-incoming v-bind="{...$props, ...$attrs}" v-on="$listeners">
     <div class="bubble">
       <div class="original-message" v-if="inReplyToText">
         <div class="original-message-sender">
