@@ -1,5 +1,5 @@
 <template>
-  <message-outgoing v-bind="{ ...$props, ...$attrs }">
+  <message-outgoing v-bind="{ ...$props, ...$attrs }" v-on="$listeners">
     <div class="bubble image-bubble">
       <v-img
         :aspect-ratio="16 / 9"

@@ -1,5 +1,5 @@
 <template>
-  <message-incoming v-bind="{...$props, ...$attrs}">
+  <message-incoming v-bind="{...$props, ...$attrs}" v-on="$listeners">
     <div class="bubble audio-bubble">
       <audio-player :src="src">Audio file</audio-player>
     </div>
