@@ -10,7 +10,7 @@
 export default {
   name: "App",
   mounted() {
-    if (window.location.protocol == "http") {
+    if (window.location.protocol == "http" && !window.location.hostname.endsWith('.onion')) {
       // Redirect to HTTPS
       window.location.href = window.location.href.replace("http:", "https:");
       return;
