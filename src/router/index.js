@@ -84,7 +84,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const publicPages = ['/login'];
   var authRequired = !publicPages.includes(to.path);
-  const loggedIn = localStorage.getItem('user');
+  const loggedIn = router.app.$store.state.auth.user;
 
   if (to.name == 'Chat' || to.name == 'Join') {
     if (!to.params.roomId && to.hash) {

@@ -120,7 +120,7 @@ export default {
         user.normalize();
 
         this.loading = true;
-        this.$store.dispatch("auth/login", user).then(
+        this.$store.dispatch("login", user).then(
           () => {
             if (this.$matrix.currentRoomId) {
               this.$navigation.push({name: "Chat", params: { roomId: util.sanitizeRoomId(this.$matrix.currentRoomId) }}, -1);

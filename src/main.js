@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify';
-import router from './router'
 import store from './store'
+import router from './router'
 import matrix from './services/matrix.service'
 import navigation from './services/navigation.service'
 import cleaninsights from './services/cleaninsights.service'
@@ -151,8 +151,8 @@ Vue.use(navigation, router);
 
 new Vue({
   vuetify,
-  router,
   store,
+  router,
   matrix,
   cleaninsights,
   render: h => h(App)
