@@ -1,7 +1,7 @@
 <template>
   <!-- BASE CLASS FOR INCOMING MESSAGE -->
   <div :class="messageClasses">
-    <v-avatar class="avatar" size="32" color="#ededed">
+    <v-avatar class="avatar" ref="avatar" size="32" color="#ededed" @click.stop="otherAvatarClicked($refs.avatar.$el)">
       <img v-if="messageEventAvatar(event)" :src="messageEventAvatar(event)" />
       <span v-else class="white--text headline">{{
         messageEventDisplayName(event).substring(0, 1).toUpperCase()

@@ -156,6 +156,10 @@ export default {
       this.$emit("own-avatar-clicked", {event: this.event});
     },
 
+    otherAvatarClicked(avatarRef) {
+      this.$emit("other-avatar-clicked", {event: this.event, anchor: avatarRef});
+    },
+
     showContextMenu(buttonRef) {
       this.$emit("context-menu", {event: this.event,anchor: buttonRef});
     },
