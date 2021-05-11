@@ -562,7 +562,6 @@ export default {
                         //
                         const createRoomOptions = {
                             visibility: "private", // Not listed!
-                            //name: this.roomName,
                             preset: "private_chat",
                             initial_state: [
                                 {
