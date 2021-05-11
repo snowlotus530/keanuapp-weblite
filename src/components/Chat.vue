@@ -16,7 +16,10 @@
           ref="messageOperations"
           :style="opStyle"
           :emojis="recentEmojis"
-          v-on:close="showContextMenu = false;showContextMenuAnchor = null;"
+          v-on:close="
+            showContextMenu = false;
+            showContextMenuAnchor = null;
+          "
           v-if="selectedEvent && showContextMenu"
           v-on:addreaction="addReaction"
           v-on:addquickreaction="addQuickReaction"
@@ -33,7 +36,10 @@
         <avatar-operations
           ref="avatarOperations"
           :style="avatarOpStyle"
-          v-on:close="showAvatarMenu = false;showAvatarMenuAnchor = null;"
+          v-on:close="
+            showAvatarMenu = false;
+            showAvatarMenuAnchor = null;
+          "
           v-on:start-private-chat="startPrivateChat($event)"
           v-if="selectedEvent && showAvatarMenu"
           :room="room"
@@ -47,7 +53,10 @@
         @notify="handleChatContainerResize"
       />
 
-      <CreatedRoomWelcomeHeader v-if="showCreatedRoomWelcomeHeader" v-on:close="closeCreateRoomWelcomeHeader" />
+      <CreatedRoomWelcomeHeader
+        v-if="showCreatedRoomWelcomeHeader"
+        v-on:close="closeCreateRoomWelcomeHeader"
+      />
 
       <div
         v-for="(event, index) in events"
@@ -208,17 +217,20 @@
           </v-btn>
         </v-col>
 
-        <v-col v-if="config.useShortCodeStickers" class="input-area-button text-center flex-grow-0 flex-shrink-1">
-            <v-btn
-              v-if="!showRecorder"
-              icon
-              large
-              color="black"
-              @click="showStickerPicker"
-              :disabled="attachButtonDisabled"
-            >
-              <v-icon large>face</v-icon>
-            </v-btn>
+        <v-col
+          v-if="config.useShortCodeStickers"
+          class="input-area-button text-center flex-grow-0 flex-shrink-1"
+        >
+          <v-btn
+            v-if="!showRecorder"
+            icon
+            large
+            color="black"
+            @click="showStickerPicker"
+            :disabled="attachButtonDisabled"
+          >
+            <v-icon large>face</v-icon>
+          </v-btn>
         </v-col>
 
         <v-col class="input-area-button text-center flex-grow-0 flex-shrink-1">
@@ -254,16 +266,52 @@
     </v-container>
 
     <div v-if="currentImageInputPath">
-      <v-dialog v-model="currentImageInputPath" class="ma-0 pa-0" width="50%">
+      <v-dialog v-model="currentImageInputPath" class="ma-0 pa-0" :width="$vuetify.breakpoint.smAndUp ? '50%' : '85%'">
         <v-card class="ma-0 pa-0">
-          <v-card-text class="ma-0 pa-0">
+          <v-card-text class="ma-0 pa-2">
             <v-img
-              v-if="currentImageInput"
+              v-if="currentImageInput && currentImageInput.image"
               :aspect-ratio="1"
-              :src="currentImageInput"
+              :src="currentImageInput.image"
               contain
-              style="max-height: 50vh"
+              style="max-height: 50vh; background-color: #e2e2e2"
             />
+            <div>
+              file: {{ currentImageInputPath.name }}
+              <span
+                v-if="
+                  currentImageInput &&
+                  currentImageInput.scaled &&
+                  currentImageInput.useScaled
+                "
+              >
+                {{ currentImageInput.scaledDimensions.width }} x
+                {{ currentImageInput.scaledDimensions.height }}</span
+              >
+              <span
+                v-else-if="currentImageInput && currentImageInput.dimensions"
+              >
+                {{ currentImageInput.dimensions.width }} x
+                {{ currentImageInput.dimensions.height }}</span
+              >
+              <span
+                v-if="
+                  currentImageInput &&
+                  currentImageInput.scaled &&
+                  currentImageInput.useScaled
+                "
+              >
+                ({{ formatBytes(currentImageInput.scaledSize) }})</span
+              >
+              <span v-else>
+                ({{ formatBytes(currentImageInputPath.size) }})</span
+              >
+              <v-switch
+                v-if="currentImageInput && currentImageInput.scaled"
+                label="Scale image"
+                v-model="currentImageInput.useScaled"
+              />
+            </div>
             <div v-if="currentSendError">{{ currentSendError }}</div>
             <div v-else>{{ currentSendProgress }}</div>
           </v-card-text>
@@ -286,22 +334,33 @@
       </v-dialog>
     </div>
 
-    <MessageOperationsBottomSheet ref="messageOperationsSheet" xv-show="showEmojiPicker">
+    <MessageOperationsBottomSheet
+      ref="messageOperationsSheet"
+      xv-show="showEmojiPicker"
+    >
       <MessageOperationsPicker
-          v-on:close="showEmojiPicker = false"
-          v-if="selectedEvent"
-          v-on:addreaction="addReaction"
-          v-on:addquickreaction="addQuickReaction"
-          v-on:addreply="addReply(selectedEvent)"
-          v-on:edit="edit(selectedEvent)"
-          v-on:redact="redact(selectedEvent)"
-          v-on:download="download(selectedEvent)"
-          :event="selectedEvent"
-          />
-      <VEmojiPicker ref="emojiPicker" style="width: 100%" @select="emojiSelected" />
+        v-on:close="showEmojiPicker = false"
+        v-if="selectedEvent"
+        v-on:addreaction="addReaction"
+        v-on:addquickreaction="addQuickReaction"
+        v-on:addreply="addReply(selectedEvent)"
+        v-on:edit="edit(selectedEvent)"
+        v-on:redact="redact(selectedEvent)"
+        v-on:download="download(selectedEvent)"
+        :event="selectedEvent"
+      />
+      <VEmojiPicker
+        ref="emojiPicker"
+        style="width: 100%"
+        @select="emojiSelected"
+      />
     </MessageOperationsBottomSheet>
 
-    <StickerPickerBottomSheet ref="stickerPickerSheet" style="z-index:10" v-on:selectSticker="sendSticker" />
+    <StickerPickerBottomSheet
+      ref="stickerPickerSheet"
+      style="z-index: 10"
+      v-on:selectSticker="sendSticker"
+    />
 
     <!-- "NOT ALLOWED FOR GUEST ACCOUNTS" dialog -->
     <v-dialog v-model="showNotAllowedForGuests" class="ma-0 pa-0" width="50%">
@@ -324,7 +383,7 @@
     <v-container
       fluid
       fill-height
-      style="position: absolute;background-color:rgba(0,0,0,0.2)"
+      style="position: absolute; background-color: rgba(0, 0, 0, 0.2)"
       v-if="!initialLoadDone || loading"
     >
       <v-row align="center" justify="center">
@@ -342,6 +401,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import { TimelineWindow, EventTimeline } from "matrix-js-sdk";
 import MessageIncomingText from "./messages/MessageIncomingText";
 import MessageIncomingFile from "./messages/MessageIncomingFile";
@@ -373,14 +433,18 @@ import ChatHeader from "./ChatHeader";
 import VoiceRecorder from "./VoiceRecorder";
 import RoomInfoBottomSheet from "./RoomInfoBottomSheet";
 import CreatedRoomWelcomeHeader from "./CreatedRoomWelcomeHeader";
-import MessageOperationsBottomSheet from './MessageOperationsBottomSheet';
-import stickers from '../plugins/stickers';
-import StickerPickerBottomSheet from './StickerPickerBottomSheet';
-import BottomSheet from './BottomSheet.vue';
+import MessageOperationsBottomSheet from "./MessageOperationsBottomSheet";
+import stickers from "../plugins/stickers";
+import StickerPickerBottomSheet from "./StickerPickerBottomSheet";
+import BottomSheet from "./BottomSheet.vue";
 import config from "../assets/config";
+import ImageResize from "image-resize";
+const sizeOf = require("image-size");
+const dataUriToBuffer = require("data-uri-to-buffer");
+const prettyBytes = require("pretty-bytes");
 
 const READ_RECEIPT_TIMEOUT = 5000; /* How long a message must have been visible before the read marker is updated */
-const WINDOW_BUFFER_SIZE = 0.3 /** Relative window height of when we start paginating. Always keep this much loaded before and after our scroll position!  */
+const WINDOW_BUFFER_SIZE = 0.3; /** Relative window height of when we start paginating. Always keep this much loaded before and after our scroll position!  */
 
 // from https://kirbysayshi.com/2013/08/19/maintaining-scroll-position-knockoutjs-list.html
 function ScrollPosition(node) {
@@ -448,14 +512,14 @@ export default {
   },
 
   data() {
-      return {
+    return {
       config: config,
       events: [],
       currentInput: "",
       typingMembers: [],
       timelineWindow: null,
-      
-      /** true if we are currently paginating */ 
+
+      /** true if we are currently paginating */
       timelineWindowPaginating: false,
 
       scrollPosition: null,
@@ -504,7 +568,7 @@ export default {
       showCreatedRoomWelcomeHeader: false,
 
       /** An array of recent emojis. Used in the "message operations" popup. */
-      recentEmojis: []
+      recentEmojis: [],
     };
   },
 
@@ -627,7 +691,7 @@ export default {
     },
     debugging() {
       return (window.location.host || "").startsWith("localhost");
-    }
+    },
   },
 
   watch: {
@@ -679,13 +743,18 @@ export default {
 
   methods: {
     onRoomJoined(initialEventId) {
-
       // Was this room just created (by you)? Show a small info header in
       // that case!
-      const createEvent = this.room.currentState.getStateEvents("m.room.create","");
+      const createEvent = this.room.currentState.getStateEvents(
+        "m.room.create",
+        ""
+      );
       if (createEvent) {
         const creatorId = createEvent.getContent().creator;
-        if (creatorId == this.$matrix.currentUserId && createEvent.getLocalAge() < (5 * 60000) /* 5 minutes */) {
+        if (
+          creatorId == this.$matrix.currentUserId &&
+          createEvent.getLocalAge() < 5 * 60000 /* 5 minutes */
+        ) {
           this.showCreatedRoomWelcomeHeader = true;
         }
       }
@@ -713,7 +782,8 @@ export default {
           const getMoreIfNeeded = function _getMoreIfNeeded() {
             const container = self.$refs.chatContainer;
             if (
-              container.scrollHeight <= (1 + 2 * WINDOW_BUFFER_SIZE) * container.clientHeight &&
+              container.scrollHeight <=
+                (1 + 2 * WINDOW_BUFFER_SIZE) * container.clientHeight &&
               self.timelineWindow &&
               self.timelineWindow.canPaginate(EventTimeline.BACKWARDS)
             ) {
@@ -770,20 +840,27 @@ export default {
     },
 
     scrollToEndOfTimeline() {
-      if (this.timelineWindow && this.timelineWindow.canPaginate(EventTimeline.FORWARDS)) {
+      if (
+        this.timelineWindow &&
+        this.timelineWindow.canPaginate(EventTimeline.FORWARDS)
+      ) {
         this.loading = true;
-          // Instead of paging though ALL history, just reload a timeline at the live marker...
-          var timelineWindow = new TimelineWindow(this.$matrix.matrixClient, this.room.getUnfilteredTimelineSet(), {});
-          const self = this;
-          timelineWindow
-            .load(null, 20)
-            .then(() => {
-              self.timelineWindow = timelineWindow;
-              self.events = self.timelineWindow.getEvents();
-            })
-            .finally(() => {
-              this.loading = false;
-            });
+        // Instead of paging though ALL history, just reload a timeline at the live marker...
+        var timelineWindow = new TimelineWindow(
+          this.$matrix.matrixClient,
+          this.room.getUnfilteredTimelineSet(),
+          {}
+        );
+        const self = this;
+        timelineWindow
+          .load(null, 20)
+          .then(() => {
+            self.timelineWindow = timelineWindow;
+            self.events = self.timelineWindow.getEvents();
+          })
+          .finally(() => {
+            this.loading = false;
+          });
       } else {
         // Can't paginate, just scroll to bottom of window!
         this.smoothScrollToEnd();
@@ -876,7 +953,11 @@ export default {
           if (event.getSender() != this.$matrix.currentUserId) {
             if (event.getContent().msgtype == "m.image") {
               // For SVG, make downloadable
-              if (event.getContent().info && event.getContent().info.mimetype && event.getContent().info.mimetype.startsWith("image/svg")) {
+              if (
+                event.getContent().info &&
+                event.getContent().info.mimetype &&
+                event.getContent().info.mimetype.startsWith("image/svg")
+              ) {
                 return MessageIncomingFile;
               }
               return MessageIncomingImage;
@@ -893,7 +974,11 @@ export default {
           } else {
             if (event.getContent().msgtype == "m.image") {
               // For SVG, make downloadable
-              if (event.getContent().info && event.getContent().info.mimetype && event.getContent().info.mimetype.startsWith("image/svg")) {
+              if (
+                event.getContent().info &&
+                event.getContent().info.mimetype &&
+                event.getContent().info.mimetype.startsWith("image/svg")
+              ) {
                 return MessageOutgoingImage;
               }
               return MessageOutgoingImage;
@@ -945,14 +1030,18 @@ export default {
         // Scrolled to top
         this.handleScrolledToTop();
       } else if (
-        container.scrollHeight - container.scrollTop.toFixed(0) - container.clientHeight <= bufferHeight
+        container.scrollHeight -
+          container.scrollTop.toFixed(0) -
+          container.clientHeight <=
+        bufferHeight
       ) {
         this.handleScrolledToBottom(false);
       }
       this.showScrollToEnd =
         container.scrollHeight - container.scrollTop.toFixed(0) >
-        container.clientHeight || (this.timelineWindow &&
-        this.timelineWindow.canPaginate(EventTimeline.FORWARDS));
+          container.clientHeight ||
+        (this.timelineWindow &&
+          this.timelineWindow.canPaginate(EventTimeline.FORWARDS));
 
       this.restartRRTimer();
     },
@@ -1046,16 +1135,68 @@ export default {
       if (event.target.files && event.target.files[0]) {
         var reader = new FileReader();
         reader.onload = (e) => {
+          const file = event.target.files[0];
           this.currentSendShowSendButton = true;
-          this.currentImageInput = e.target.result;
-          this.currentImageInputPath = event.target.files[0];
+          if (file.type.startsWith("image/")) {
+            this.currentImageInput = {
+              image: e.target.result,
+              dimensions: null,
+            };
+            try {
+              this.currentImageInput.dimensions = sizeOf(
+                dataUriToBuffer(e.target.result)
+              );
+
+              // Need to resize?
+              const w = this.currentImageInput.dimensions.width;
+              const h = this.currentImageInput.dimensions.height;
+              if (w > 640 || h > 640) {
+                var aspect = w / h;
+                var newWidth = parseInt((w > h ? 640 : 640 * aspect).toFixed());
+                var newHeight = parseInt(
+                  (w > h ? 640 / aspect : 640).toFixed()
+                );
+                var imageResize = new ImageResize({
+                  format: "png",
+                  width: newWidth,
+                  height: newHeight,
+                  outputType: "blob",
+                });
+                imageResize
+                  .play(event.target)
+                  .then((img) => {
+                    Vue.set(
+                      this.currentImageInput,
+                      "scaled",
+                      new File([img], file.name, {
+                        type: img.type,
+                        lastModified: Date.now(),
+                      })
+                    );
+                    Vue.set(this.currentImageInput, "useScaled", true);
+                    Vue.set(this.currentImageInput, "scaledSize", img.size);
+                    Vue.set(this.currentImageInput, "scaledDimensions", {
+                      width: newWidth,
+                      height: newHeight,
+                    });
+                  })
+                  .catch((err) => {
+                    console.error("Resize failed:", err);
+                  });
+              }
+            } catch (error) {
+              console.error("Failed to get image dimensions: " + error);
+            }
+          }
+          console.log(this.currentImageInput);
+          this.currentImageInputPath = file;
         };
         reader.readAsDataURL(event.target.files[0]);
       }
     },
 
     showStickerPicker() {
-       this.$refs.stickerPickerSheet.open();
+      this.$refs.stickerPickerSheet.open();
     },
 
     onUploadProgress(p) {
@@ -1068,12 +1209,22 @@ export default {
     },
 
     sendAttachment(withText) {
+      this.$refs.attachment.value = null;
       if (this.currentImageInputPath) {
+        var inputFile = this.currentImageInputPath;
+        if (
+          this.currentImageInput &&
+          this.currentImageInput.scaled &&
+          this.currentImageInput.useScaled
+        ) {
+          // Send scaled version of image instead!
+          inputFile = this.currentImageInput.scaled;
+        }
         this.currentSendProgress = null;
         this.currentSendOperation = util.sendImage(
           this.$matrix.matrixClient,
           this.roomId,
-          this.currentImageInputPath,
+          inputFile,
           this.onUploadProgress
         );
         this.currentSendOperation
@@ -1095,6 +1246,7 @@ export default {
     },
 
     cancelSendAttachment() {
+      this.$refs.attachment.value = null;
       if (this.currentSendOperation) {
         this.currentSendOperation.reject("Canceled");
       }
@@ -1195,7 +1347,7 @@ export default {
     showMoreMessageOperations(e) {
       this.addReaction(e);
     },
-    
+
     addReaction(e) {
       const event = e.event;
       // Store the event we are reacting to, so that we know where to
@@ -1306,21 +1458,26 @@ export default {
     },
 
     startPrivateChat(e) {
-      this.$matrix.getOrCreatePrivateChat(e.event.getSender())
-        .then(room => {
+      this.$matrix
+        .getOrCreatePrivateChat(e.event.getSender())
+        .then((room) => {
           this.$nextTick(() => {
             this.$navigation.push(
               {
                 name: "Chat",
-                params: { roomId: util.sanitizeRoomId(room.getCanonicalAlias() || room.roomId) },
+                params: {
+                  roomId: util.sanitizeRoomId(
+                    room.getCanonicalAlias() || room.roomId
+                  ),
+                },
               },
               -1
             );
           });
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
-        })
+        });
     },
 
     closeContextMenusIfOpen(e) {
@@ -1466,8 +1623,11 @@ export default {
         return;
       }
       this.recentEmojis = [];
-    }
+    },
 
+    formatBytes(bytes) {
+      return prettyBytes(bytes);
+    },
   },
 };
 </script>
