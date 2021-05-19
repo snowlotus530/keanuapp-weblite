@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import config from "./assets/config";
+
 export default {
   name: "App",
   mounted() {
@@ -31,7 +33,7 @@ export default {
       return this.$store.state.auth.user;
     },
     title() {
-      var title = "Keanu Weblite";
+      var title = config.appName;
       if (this.$matrix.notificationCount > 0) {
         title += " [" + this.$matrix.notificationCount + "]";
       }
