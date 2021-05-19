@@ -1,4 +1,5 @@
 {
+    "appName": "Keanu Weblite",
     "defaultServer": "https://neo.keanu.im",
     "useShortCodeStickers": false,
     "analytics": {
