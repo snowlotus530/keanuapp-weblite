@@ -111,7 +111,7 @@
             <div
               v-if="event.getId() == readMarker && index < events.length - 1"
               class="read-marker"
-              title="Unread messages"
+              :title="$t('message.unread_messages')"
             />
           </div>
         </div>
@@ -135,7 +135,7 @@
 
       <v-row class="ma-0 pa-0">
         <div v-if="replyToEvent">
-          REPLYING TO EVENT: {{ replyToEvent.getContent().body }}
+          {{$t('message.replying_to_event',{message: replyToEvent.getContent().body}) }}
         </div>
 
         <!-- CONTACT IS TYPING -->
@@ -154,7 +154,7 @@
             v-model="currentInput"
             no-resize
             class="input-area-text"
-            placeholder="Your message..."
+            :placeholder="$t('message.your_message')"
             hide-details
             background-color="white"
             v-on:keydown.enter.prevent="
@@ -308,7 +308,7 @@
               >
               <v-switch
                 v-if="currentImageInput && currentImageInput.scaled"
-                label="Scale image"
+                :label="$('message.scale_image')"
                 v-model="currentImageInput.useScaled"
               />
             </div>
@@ -319,7 +319,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="primary" text @click="cancelSendAttachment"
-              >Cancel</v-btn
+              >{{$t('menu.cancel')}}</v-btn
             >
             <v-btn
               color="primary"
@@ -327,7 +327,7 @@
               @click="sendAttachment"
               v-if="currentSendShowSendButton"
               :disabled="currentSendOperation != null"
-              >Send</v-btn
+              >{{$t('menu.send')}}</v-btn
             >
           </v-card-actions>
         </v-card>
@@ -336,7 +336,6 @@
 
     <MessageOperationsBottomSheet
       ref="messageOperationsSheet"
-      xv-show="showEmojiPicker"
     >
       <MessageOperationsPicker
         v-on:close="showEmojiPicker = false"
@@ -361,23 +360,6 @@
       style="z-index: 10"
       v-on:selectSticker="sendSticker"
     />
-
-    <!-- "NOT ALLOWED FOR GUEST ACCOUNTS" dialog -->
-    <v-dialog v-model="showNotAllowedForGuests" class="ma-0 pa-0" width="50%">
-      <v-card>
-        <v-card-title>You are logged in as a guest</v-card-title>
-        <v-card-text>
-          <div>Unfortunately guests are not allowed to upload files.</div>
-        </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="showNotAllowedForGuests = false"
-            >Ok</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
 
     <!-- Loading indicator -->
     <v-container
@@ -555,9 +537,6 @@ export default {
        */
       showScrollToEnd: false,
 
-      /** Shows a dialog with info about an operation being disallowed for guests */
-      showNotAllowedForGuests: false,
-
       /** A timer for read receipts. */
       rrTimer: null,
 
@@ -641,9 +620,9 @@ export default {
     typingMembersString() {
       const count = this.typingMembers.length;
       if (count > 1) {
-        return "" + count + " members are typing";
+        return this.$t('message.users_are_typing',{count: count});
       } else if (count > 0) {
-        return this.typingMembers[0].name + " is typing";
+        return this.$t('message.user_is_typing',{user: this.typingMembers[0].name});
       } else {
         return "";
       }
@@ -776,7 +755,6 @@ export default {
       this.timelineWindow
         .load(initialEventId, 20)
         .then(() => {
-          console.log("This is", self);
           self.events = self.timelineWindow.getEvents();
 
           const getMoreIfNeeded = function _getMoreIfNeeded() {
@@ -1046,7 +1024,7 @@ export default {
       this.restartRRTimer();
     },
     onEvent(event) {
-      console.log("OnEvent", JSON.stringify(event));
+      //console.log("OnEvent", JSON.stringify(event));
       if (event.getRoomId() !== this.roomId) {
         return; // Not for this room
       }
@@ -1083,7 +1061,7 @@ export default {
           this.typingMembers.splice(index, 1);
         }
       }
-      console.log("Typing: ", this.typingMembers);
+      //console.log("Typing: ", this.typingMembers);
     },
 
     sendCurrentTextMessage() {
@@ -1119,12 +1097,6 @@ export default {
      * Show attachment picker to select file
      */
     showAttachmentPicker() {
-      // Guests not currently allowed to send attachments (=actually upload them)
-      // See https://matrix.org/docs/spec/client_server/r0.2.0#guest-access
-      // if (this.$matrix.currentUser && this.$matrix.currentUser.is_guest) {
-      //   this.showNotAllowedForGuests = true;
-      //   return;
-      // }
       this.$refs.attachment.click();
     },
 
@@ -1202,9 +1174,9 @@ export default {
     onUploadProgress(p) {
       if (p.total) {
         this.currentSendProgress =
-          "Uploaded " + (p.loaded || 0) + " of " + p.total;
+          this.$t('message.upload_progress_with_total',{count: (p.loaded || 0), total: p.total});
       } else {
-        this.currentSendProgress = "Uploaded " + (p.loaded || 0);
+        this.currentSendProgress = this.$t('message.upload_progress',{count: (p.loaded || 0)});
       }
     },
 
@@ -1390,7 +1362,7 @@ export default {
           const link = document.createElement("a");
           link.href = url;
           link.target = "_blank";
-          link.download = event.getContent().body || "Download";
+          link.download = event.getContent().body || this.$t('fallbacks.download_name');
           link.click();
           URL.revokeObjectURL(url);
         })
@@ -1436,10 +1408,6 @@ export default {
 
     showContextMenuForEvent(e) {
       const event = e.event;
-      const ref = this.$refs[event.getId()];
-      if (ref) {
-        console.log("Got the ref", ref);
-      }
       this.selectedEvent = event;
       this.updateRecentEmojis();
       this.showContextMenu = true;

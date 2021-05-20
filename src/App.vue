@@ -33,7 +33,7 @@ export default {
       return this.$store.state.auth.user;
     },
     title() {
-      var title = config.appName;
+      var title = this.$t(config.appName);
       if (this.$matrix.notificationCount > 0) {
         title += " [" + this.$matrix.notificationCount + "]";
       }

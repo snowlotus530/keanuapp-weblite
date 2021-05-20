@@ -1,7 +1,7 @@
 <template>
   <!-- ROOM JOIN RULES CHANGED -->
   <div class="statusEvent">
-    {{ stateEventDisplayName(event) }} made the room {{ joinRule(event) }}
+    {{ $t('message.user_changed_join_rules', { user: stateEventDisplayName(event), type: joinRule(event)}) }}
   </div>
 </template>
 
@@ -15,9 +15,9 @@ export default {
       const joinRule = event.getContent().join_rule;
       switch (joinRule) {
         case "invite":
-          return "invite only";
+          return this.$t('message.room_joinrule_invite');
         case "public":
-          return "public";
+          return this.$t('message.room_joinrule_public');
       }
       return joinRule;
     }

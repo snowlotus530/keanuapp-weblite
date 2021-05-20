@@ -1,14 +1,14 @@
 <template>
   <div class="d-flex flex-column pa-4" style="overflow: hidden">
     <div class="flex-grow-0 flex-shrink-0">
-      <div class="room-name">Add Friends</div>
+      <div class="room-name">{{$t('invite.title')}}</div>
       <v-btn
         :loading="loading"
         text
         class="header-button-right"
         @click.stop="done"
       >
-        <span>Done</span>
+        <span>{{$t('invite.done')}}</span>
       </v-btn>
     </div>
 
@@ -16,7 +16,7 @@
       class="flex-grow-0 flex-shrink-0"
       style="min-height: 100px; max-height: 30vh"
     >
-      <div class="h4">Send invites to</div>
+      <div class="h4">{{$t('invite.send_invites_to')}}</div>
       <div>{{ status }}</div>
       <v-chip-group active-class="primary--text" column>
         <v-chip
@@ -102,14 +102,14 @@ export default {
         this.loading = false;
         if (this.selectedMembers.length > 0) {
           // Error.
-          this.status = "Failed to invite one or or more friends!";
+          this.status = this.$t('invite.status_error');
         } else {
           this.status = "";
           this.close();
         }
         return;
       }
-      this.status = `Inviting friend ${index + 1} of ${memberArray.length}`;
+      this.status = this.$t('invite.status_error', {index: index + 1, count: memberArray.length});
       const member = memberArray[index];
 
       // Is this userId already a member of this room? In that case don't send an invite.

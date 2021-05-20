@@ -8,7 +8,7 @@
         @click.stop="handleLogin"
         :loading="loading"
         v-if="!currentUser"
-        >Login</v-btn
+        >{{$t('menu.login')}}</v-btn
       >
 
       <v-avatar class="join-avatar">
@@ -17,7 +17,7 @@
           roomName.substring(0, 1).toUpperCase()
         }}</span>
       </v-avatar>
-      <div class="join-title">Welcome to {{ roomName }}</div>
+      <div class="join-title">{{$t('join.title', {roomName: roomName})}}</div>
       <div class="join-message">
         <!-- Join the group chat in a web browser or with the Keanu app. -->
       </div>
@@ -33,7 +33,7 @@
               ref="avatar"
               :items="availableAvatars"
               cache-items
-              label="User name"
+              :label="$t('join.user_name_label')"
               outlined
               dense
               @change="selectAvatar"
@@ -60,12 +60,12 @@
                 <div class="ml-2">{{ data.item.name }}</div>
               </template>
             </v-select>
-            <v-switch v-model="sharedComputer" label="Using a shared computer" />
+            <v-switch v-model="sharedComputer" :label="$t('join.shared_computer')" />
           </v-col>
         </v-row>
         <v-row v-else>
           <v-col>
-            You are joining as:
+            {{$t('join.joining_as')}}
             <div style="display: inline-block">
               <v-avatar color="#e0e0e0" style="">
                 <v-img v-if="userAvatar" :src="userAvatar" />
@@ -97,7 +97,7 @@
         @click.stop="handleJoin"
         :loading="loading"
         v-if="!currentUser"
-        >Join as guest</v-btn
+        >{{$t('join.join_guest')}}</v-btn
       >
       <v-btn
         class="btn-dark"
@@ -106,7 +106,7 @@
         @click.stop="handleJoin"
         :loading="loading"
         v-else
-        >Join room</v-btn
+        >{{$t('join.join')}}</v-btn
       >
 
       <!-- <div class="join-privacy">
@@ -325,7 +325,7 @@ export default {
 
     handleJoin() {
       this.loading = true;
-      this.loadingMessage = "Logging in...";
+      this.loadingMessage = this.$t('join.status_logging_in');
       const hasUser = this.currentUser ? true : false;
       var setProfileData = false;
       return this.getLoginPromise()
@@ -374,7 +374,7 @@ export default {
         .then(
           function (ignoreduser) {
             console.log("Join: joining room");
-            this.loadingMessage = "Joining room...";
+            this.loadingMessage = this.$t('join.status_joining');
             return this.$matrix.matrixClient.joinRoom(this.roomId);
           }.bind(this)
         )

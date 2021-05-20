@@ -3,7 +3,7 @@
     <div class="bubble">
       <div class="original-message" v-if="inReplyToText">
         <div class="original-message-sender">
-          {{ inReplyToSender || "Someone" }} said:
+          {{ $t('message.user_said', {user: inReplyToSender || "Someone"}) }}
         </div>
         <div
           class="original-message-text"
@@ -13,7 +13,7 @@
       <div class="message">
         <span v-html="linkify($sanitize(messageText))" />
         <span class="edit-marker" v-if="event.replacingEventId()"
-          >(edited)</span
+          >{{ $t('edited') }}</span
         >
       </div>
       <!-- <div>{{ JSON.stringify(event) }}</div> -->

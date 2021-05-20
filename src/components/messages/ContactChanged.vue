@@ -2,10 +2,10 @@
   <!-- Contact joined the chat -->
   <div class="messageJoin">
     <div v-if="displayNameChange">
-    {{ changer }} changed display name to {{ event.getContent().displayname }}
+      {{ $t('message.user_changed_display_name', { user: changer, displayName: event.getContent().displayname})}}
     </div>
     <div v-if="avatarChange">
-    {{ changer }} changed the avatar
+      {{ $t('message.user_changed_avatar', { user: changer})}}
     </div>
   </div>
 </template>
@@ -28,7 +28,7 @@ export default {
     },
     changer() {
       if (this.event.getSender() == this.$matrix.currentUserId) {
-        return "You";
+        return this.$t("message.you");
       }
       if (this.displayNameChange) {
         return this.event.getPrevContent().displayname;

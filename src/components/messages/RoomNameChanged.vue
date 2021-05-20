@@ -1,8 +1,7 @@
 <template>
   <!-- ROOM NAME CHANGED -->
   <div class="statusEvent">
-    {{ stateEventDisplayName(event) }} changed room name to
-    {{ event.getContent().name }}
+    {{ $t('message.user_changed_room_name', {user: stateEventDisplayName(event), name: event.getContent().name}) }}
   </div>
 </template>
 

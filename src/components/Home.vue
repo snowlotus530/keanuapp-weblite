@@ -1,7 +1,7 @@
 <template>
   <div class="pa-4">
     <RoomList showInvites />
-    <v-btn block depressed class="outlined-button" @click.stop="logout">Logout</v-btn>
+    <v-btn block depressed class="outlined-button" @click.stop="logout">{{$t('menu.logout')}}</v-btn>
 
     <!-- Loading indicator -->
     <v-container

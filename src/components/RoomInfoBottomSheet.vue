@@ -11,14 +11,14 @@
             roomName.substring(0, 1).toUpperCase()
           }}</span>
         </v-avatar>
-        <div class="h4">This group</div>
+        <div class="h4">{{$t('room_info_sheet.this_room')}}</div>
         <div class="h2">{{ roomName }}</div>
         <v-btn
           height="20px"
           color="black"
           class="filled-button"
           @click.stop="showDetails"
-          >View details</v-btn
+          >{{$t('room_info_sheet.view_details')}}</v-btn
         >
       </div>
       <room-list :title="'Other groups'" v-on:close="close" />
@@ -27,7 +27,7 @@
           color="black"
           class="outlined-button"
           @click.stop="createRoom"
-          >Create group</v-btn
+          >{{$t('room_info_sheet.create_room')}}</v-btn
         >
     </div>
   </BottomSheet>
