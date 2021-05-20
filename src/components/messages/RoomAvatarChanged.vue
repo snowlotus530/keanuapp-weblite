@@ -1,7 +1,7 @@
 <template>
   <!-- ROOM AVATAR CHANGED -->
   <div class="statusEvent">
-    {{ stateEventDisplayName(event) }} changed the room avatar
+    {{ $t('message.user_changed_room_avatar',{user: stateEventDisplayName(event)}) }}
   </div>
 </template>
 

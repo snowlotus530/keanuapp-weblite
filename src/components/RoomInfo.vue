@@ -2,7 +2,7 @@
   <div v-if="room" class="room-info">
     <div class="chat-header">
       <v-container fluid>
-        <div class="room-name">Info</div>
+        <div class="room-name">{{ $t("room_info.title") }}</div>
         <v-btn
           text
           class="header-button-left"
@@ -10,7 +10,7 @@
           @click.stop="$navigation.pop"
         >
           <v-icon>arrow_back</v-icon>
-          <span>BACK</span>
+          <span>{{ $t("menu.back") }}</span>
         </v-btn>
       </v-container>
     </div>
@@ -25,31 +25,30 @@
         </v-avatar>
         <div class="h1">{{ roomName }}</div>
         <div class="h3">{{ roomTopic }}</div>
-        <div class="small">Created by {{ creator }}</div>
+        <div class="small">
+          {{ $t("room_info.created_by", { user: creator }) }}
+        </div>
         <v-expand-transition>
-        <canvas
-          v-show="publicRoomLink"
-          ref="roomQr"
-          class="qr"
-          id="room-qr"
-        ></canvas>
+          <canvas
+            v-show="publicRoomLink"
+            ref="roomQr"
+            class="qr"
+            id="room-qr"
+          ></canvas>
         </v-expand-transition>
       </div>
     </v-card>
 
     <v-card class="account ma-3" flat>
-      <v-card-title class="h2">Permissions</v-card-title>
+      <v-card-title class="h2">{{ $t("room_info.permissions") }})</v-card-title>
       <v-card-text>
         <v-radio-group
           v-model="roomJoinRule"
           v-if="roomJoinRule"
           :disabled="!userCanChangeJoinRule || updatingJoinRule"
         >
-          <v-radio
-            label="Room can be joined by invitation only"
-            :value="'invite'"
-          />
-          <v-radio label="Anyone with the link can join" :value="'public'">
+          <v-radio :label="$t('room_info.join_invite')" :value="'invite'" />
+          <v-radio :label="$t('room_info.join_public')" :value="'public'">
           </v-radio>
           <v-text-field
             v-if="publicRoomLink"
@@ -60,7 +59,9 @@
             type="text"
             @click:append="copyRoomLink"
           ></v-text-field>
-          <div v-if="publicRoomLinkCopied" class="link-copied">Link copied!</div>
+          <div v-if="publicRoomLinkCopied" class="link-copied">
+            {{ $t("room_info.link_copied") }}
+          </div>
         </v-radio-group>
 
         <v-btn
@@ -70,7 +71,7 @@
           block
           class="filled-button"
           @click.stop="showPurgeConfirmation = true"
-          >Purge room</v-btn
+          >{{ $("room_info.purge") }}</v-btn
         >
         <!-- <div v-if="anyoneCanJoin">
           <div>Anyone with a link can join.</div>
@@ -88,7 +89,7 @@
 
     <v-card class="members ma-3" flat>
       <v-card-title class="h2"
-        >Members<v-spacer></v-spacer>
+        >{{ $t("room_info.members") }}<v-spacer></v-spacer>
         <div>{{ memberCount }}</div></v-card-title
       >
       <v-card-text>
@@ -105,37 +106,52 @@
               member.name.substring(0, 1).toUpperCase()
             }}</span>
           </v-avatar>
-          {{ member.user ? member.user.displayName : member.name
-          }}{{ member.userId == $matrix.currentUserId ? " (you)" : "" }}
+          {{
+            member.userId == $matrix.currentUserId
+              ? $t("room_info.user_you", {
+                  user: member.user ? member.user.displayName : member.name,
+                })
+              : $t("room_info.user", {
+                  user: member.user ? member.user.displayName : member.name,
+                })
+          }}
           <DeviceList
             v-if="expandedMembers.includes(member)"
             :member="member"
           />
         </div>
         <div class="show-all" @click="showAllMembers = !showAllMembers">
-          {{ showAllMembers ? "Hide" : "Show all" }}
+          {{
+            showAllMembers ? $t("room_info.hide_all") : $t("room_info.show_all")
+          }}
         </div>
       </v-card-text>
     </v-card>
 
     <v-card class="account ma-3" flat>
-      <v-card-title class="h2">My Profile</v-card-title>
+      <v-card-title class="h2">{{ $t("room_info.my_profile") }}</v-card-title>
       <v-card-text>
         <div>
           <div v-if="$matrix.currentUser.is_guest">
-            Your identity <b>{{ displayName }}</b> is temporary. You can change
-            your name or set a password to keep it.
+            <i18n path="room_info.identity_temporary" tag="span">
+              <template v-slot:displayName>
+                <b>{{ displayName }}</b>
+              </template>
+            </i18n>
           </div>
           <div v-else>
-            Your are logged in as <b>{{ displayName }}</b
-            >.
+            <i18n path="room_info.identity" tag="span">
+              <template v-slot:displayName>
+                <b>{{ displayName }}</b>
+              </template>
+            </i18n>
           </div>
           <v-btn
             depressed
             block
             class="outlined-button"
             @click.stop="viewProfile"
-            >View</v-btn
+            >{{$t('room_info.view_profile')}}</v-btn
           >
         </div>
       </v-card-text>
@@ -149,18 +165,13 @@
           block
           class="filled-button"
           @click.stop="showLeaveConfirmation = true"
-          >Leave group</v-btn
+          >{{$t('room_info.leave_room')}}</v-btn
         >
-        <div>
-          Note: This step cannot be undone. Make sure you want to logout and
-          delete the chat forever.
-        </div>
+        <div>{{$t('room_info.leave_room_info')}}</div>
       </v-card-text>
     </v-card>
 
-    <div class="build-version">
-      Powered by Guardian Project. Version: {{ buildVersion }}
-    </div>
+    <div class="build-version">{{$t('room_info.version_info',{version: buildVersion})}}</div>
 
     <LeaveRoomDialog
       :show="showLeaveConfirmation"
@@ -173,7 +184,6 @@
       :room="room"
       @close="showPurgeConfirmation = false"
     />
-
   </div>
 </template>
 
@@ -340,7 +350,8 @@ export default {
           setInterval(() => {
             // Hide again
             self.publicRoomLinkCopied = false;
-          }, 3000);        },
+          }, 3000);
+        },
         function (e) {
           console.log(e);
         }

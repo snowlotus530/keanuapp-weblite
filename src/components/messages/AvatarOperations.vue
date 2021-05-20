@@ -7,7 +7,7 @@
     }"
   >
     <v-btn v-if="incoming" text @click.stop="startPrivateChat" class="ma-0 pa-0"
-      >Private chat with this user</v-btn
+      >{{ $t("menu.start_private_chat") }}</v-btn
     >
   </div>
 </template>

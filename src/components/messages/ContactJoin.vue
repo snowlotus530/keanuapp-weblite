@@ -1,7 +1,7 @@
 <template>
   <!-- Contact joined the chat -->
   <div class="messageJoin">
-    {{ stateEventDisplayName(event) }} joined the chat
+    {{ $t('message.user_joined',{user: stateEventDisplayName(event)}) }}
   </div>
 </template>
 

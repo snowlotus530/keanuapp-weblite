@@ -5,15 +5,15 @@
     </v-btn>
 
     <div color="rgba(255,255,255,0.1)" class="text-center">
-      <div class="h2">Login</div>
+      <div class="h2">{{$t('login.title')}}</div>
       <v-form v-model="isValid">
         <v-text-field
           v-model="user.user_id"
-          label="Username"
+          :label="$t('login.username')"
           color="black"
           background-color="white"
           outlined
-          :rules="[(v) => !!v || 'Username is required']"
+          :rules="[(v) => !!v || $t('login.username_required')]"
           :error="userErrorMessage != null"
           :error-messages="userErrorMessage"
           required
@@ -22,12 +22,12 @@
         <v-text-field
           ref="password"
           v-model="user.password"
-          label="Password"
+          :label="$t('login.password')"
           color="black"
           background-color="white"
           outlined
           type="password"
-          :rules="[(v) => !!v || 'Password is required']"
+          :rules="[(v) => !!v || $t('login.password_required')]"
           :error="passErrorMessage != null"
           :error-messages="passErrorMessage"
           required
@@ -40,7 +40,7 @@
             block
             @click.stop="handleLogin"
             :loading="loading"
-            >Login</v-btn
+            >{{$t('login.login')}}</v-btn
           >
       </v-form>
     </div>
