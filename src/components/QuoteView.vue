@@ -25,8 +25,6 @@
   </transition>
 </template>
 <script>
-import quotes from "../assets/quotes";
-
 export default {
   name: "QuoteView",
   data() {
@@ -37,6 +35,16 @@ export default {
     }
   },
   mounted() {
+    var quotes;
+    try {
+      quotes = require('@/assets/quotes/' + this.$i18n.locale + '/quotes');
+    } catch (error) {      
+        console.error("No quotes for language");
+        quotes = undefined;
+    }
+    if (!quotes) {
+      quotes = require('@/assets/quotes/en/quotes'); // Default fallback
+    }
     const n = quotes.quotes.length;
     const quote = quotes.quotes[Math.floor(Math.random() * n)];
     this.quote = quote.quote;

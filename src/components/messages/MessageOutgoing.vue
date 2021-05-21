@@ -18,7 +18,7 @@
       <img v-if="userAvatar" :src="userAvatar" />
       <span v-else class="white--text headline">{{ userAvatarLetter }}</span>
     </v-avatar>
-    <!-- <div class="sender">{{ "You" }}</div> -->
+    <!-- <div class="sender">{{ $t('message.you') }}</div> -->
     <div class="senderAndTime">
       <div class="time">
         {{ formatTime(event.event.origin_server_ts) }}

@@ -2,7 +2,7 @@
   <div v-if="user" class="profile">
     <div class="chat-header">
       <v-container fluid>
-        <div class="room-name">My Profile</div>
+        <div class="room-name">{{$t('profile.title')}}</div>
             <v-btn
               text
               class="header-button-right"
@@ -29,31 +29,29 @@
           <v-col class="flex-shrink-1 flex-grow-1">
             <div class="h1">{{ displayName }}</div>
             <div class="text-center">{{ $matrix.currentUser.user_id }}</div>
-            <div v-if="$matrix.currentUser.is_guest">
-              This identity is temporary. Set a password to use it again.
-            </div>
-            <v-btn depressed block class="outlined-button" @click.stop="logout">Logout</v-btn>
+            <div v-if="$matrix.currentUser.is_guest">{{$t('profile.temporary_identity')}}</div>
+            <v-btn depressed block class="outlined-button" @click.stop="logout">{{$t('menu.logout')}}</v-btn>
           </v-col>
         </v-row>
       </v-container>
 
-    <div class="action" @click="showEditPasswordDialog = true"><v-icon>lock</v-icon><span>Set password</span></div>
-    <div class="action" @click="editValue = displayName;showEditDisplaynameDialog = true"><v-icon>edit</v-icon><span>Change name</span></div>
+    <div class="action" @click="showEditPasswordDialog = true"><v-icon>lock</v-icon><span>{{$t('profile.set_password')}}</span></div>
+    <div class="action" @click="editValue = displayName;showEditDisplaynameDialog = true"><v-icon>edit</v-icon><span>{{$t('profile.change_name')}}</span></div>
 
     <!-- edit password dialog -->
     <v-dialog v-model="showEditPasswordDialog" class="ma-0 pa-0" width="50%">
       <v-card :disabled="settingPassword">
-        <v-card-title>Change password</v-card-title>
+        <v-card-title>{{$t('profile.change_password')}}</v-card-title>
         <v-card-text>
-          <v-text-field v-if="!$matrix.currentUser.is_guest" v-model="password" label="Old password" type="password" />
-          <v-text-field v-model="newPassword1" label="New password" type="password" />
-          <v-text-field v-model="newPassword2" label="Repeat new password" type="password" />
+          <v-text-field v-if="!$matrix.currentUser.is_guest" v-model="password" :label="$t('profile.password_old')" type="password" />
+          <v-text-field v-model="newPassword1" :label="$t('profile.password_new')" type="password" />
+          <v-text-field v-model="newPassword2" :label="$t('profile.password_repeat')" type="password" />
           <div class="red--text" v-if="passwordErrorMessage">{{ passwordErrorMessage }}</div>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text @click="closeEditPasswordDialog">Cancel</v-btn>
+          <v-btn text @click="closeEditPasswordDialog">{{$t('menu.cancel')}}</v-btn>
           <v-btn
             :disabled="!passwordsMatch"
             color="primary"
@@ -61,7 +59,7 @@
             @click="
               setPassword($matrix.currentUser.is_guest ? $matrix.currentUser.password : password, newPassword1);
             "
-            >Ok</v-btn
+            >{{$t('menu.ok')}}</v-btn
           >
         </v-card-actions>
       </v-card>
@@ -70,14 +68,14 @@
     <!-- edit display name dialog -->
     <v-dialog v-model="showEditDisplaynameDialog" class="ma-0 pa-0" width="50%">
       <v-card>
-        <v-card-title>Display name</v-card-title>
+        <v-card-title>{{$t('profile.display_name')}}</v-card-title>
         <v-card-text>
           <v-text-field v-model="editValue" />
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text @click="showEditDisplaynameDialog = false">Cancel</v-btn>
+          <v-btn text @click="showEditDisplaynameDialog = false">{{$t('menu.cancel')}}</v-btn>
           <v-btn
             color="primary"
             text
@@ -85,7 +83,7 @@
               setDisplayName(editValue);
               showEditDisplaynameDialog = false;
             "
-            >Ok</v-btn
+            >{{$t('menu.ok')}}</v-btn
           >
         </v-card-actions>
       </v-card>

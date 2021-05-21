@@ -1,7 +1,7 @@
 <template>
   <message-outgoing v-bind="{ ...$props, ...$attrs }" v-on="$listeners">
     <div class="audio-bubble">
-      <audio-player :src="src">Audio file</audio-player>
+      <audio-player :src="src">{{ $t('fallbacks.audio_file')}}</audio-player>
     </div>
   </message-outgoing>
 </template>

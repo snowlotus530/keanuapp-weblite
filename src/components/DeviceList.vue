@@ -1,6 +1,6 @@
 <template>
   <v-list dense @click.native.stop="nullEvent">
-    <v-subheader>DEVICES</v-subheader>
+    <v-subheader>{{$t('device_list.title')}}</v-subheader>
     <v-list-item-group color="primary">
       <v-list-item
         v-for="device in devices"
@@ -84,11 +84,11 @@ export default {
 
     verificationStatus(device) {
       if (device.isBlocked()) {
-        return "Blocked";
+        return this.$t('device_list.blocked');
       } else if (device.isVerified()) {
-        return "Verified";
+        return this.$t('device_list.verified');
       } else {
-        return "Not verified";
+        return this.$t('device_list.not_verified');
       }
     },
 

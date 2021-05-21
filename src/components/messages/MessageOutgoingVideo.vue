@@ -3,7 +3,7 @@
     <div class="bubble image-bubble">
       <v-responsive :aspect-ratio="16 / 9" class="ma-0 pa-0">
         <video :src="src" controls style="width: 100%; height: 100%">
-          Video file
+          {{$t('fallbacks.video_file')}}
         </video>
       </v-responsive>
     </div>

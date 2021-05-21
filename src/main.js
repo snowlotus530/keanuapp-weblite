@@ -13,6 +13,7 @@ import VueResize from 'vue-resize';
 import 'vue-resize/dist/vue-resize.css';
 import VueClipboard from 'vue-clipboard2'
 import VueSanitize from "vue-sanitize";
+import i18n from './plugins/lang';
 
 var defaultOptions = VueSanitize.defaults;
 defaultOptions.disallowedTagsMode = "recursiveEscape";
@@ -153,6 +154,7 @@ new Vue({
   vuetify,
   store,
   router,
+  i18n,
   matrix,
   cleaninsights,
   render: h => h(App)

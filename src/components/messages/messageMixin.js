@@ -2,7 +2,7 @@ import QuickReactions from './QuickReactions.vue';
 var linkify = require('linkifyjs');
 var linkifyHtml = require('linkifyjs/html');
 linkify.options.defaults.className = "link";
-linkify.options.defaults.target = null;
+linkify.options.defaults.target = { url: '_blank' };
 
 export default {
   components: {
@@ -102,7 +102,7 @@ export default {
         }
 
         // We don't have the original text (at the moment at least)
-        return  "<original text>";
+        return this.$t('fallbacks.original_text');
       }
       return null;
     },
@@ -169,7 +169,7 @@ export default {
      */
     stateEventDisplayName(event) {
       if (event.getSender() == this.$matrix.currentUserId) {
-        return "You";
+        return this.$t('message.you');
       }
       if (this.room) {
         const member = this.room.getMember(event.getSender());

@@ -1,7 +1,7 @@
 <template>
   <!-- ROOM AVATAR CHANGED -->
   <div class="statusEvent">
-    {{ stateEventDisplayName(event) }} made room history {{ history(event) }}
+    {{ $t('message.user_changed_room_history',{user: stateEventDisplayName(event), type: history(event)}) }}
   </div>
 </template>
 
@@ -15,13 +15,13 @@ export default {
       const visibility = event.getContent().history_visibility;
       switch (visibility) {
         case "world_readable":
-          return "readable by anyone";
+          return this.$t('message.room_history_world_readable');
         case "shared":
-          return "readable to all members in the room";
+          return this.$t('message.room_history_shared');
         case "invited":
-          return "readable to members from when they were invited";
+          return this.$t('message.room_history_invited');
         case "joined":
-          return "readable to members from when they joined";
+          return this.$t('message.room_history_joined');
       }
       return visibility;
     }

@@ -3,10 +3,9 @@
     <div class="dialog-content text-center">
       <template>
         <v-icon color="black" size="30">lock</v-icon>
-        <h2 class="dialog-title">Purge room?</h2>
+        <h2 class="dialog-title">{{$t('purge_room.title')}}</h2>
         <div class="dialog-text">
-          This operation will close the room for all members. It cannot be
-          undone.
+          {{$t('purge_room.info')}}
         </div>
       </template>
       <v-container fluid>
@@ -18,7 +17,7 @@
               block
               class="text-button"
               @click="showDialog = false"
-              >Cancel</v-btn
+              >{{$t('menu.cancel')}}</v-btn
             >
           </v-col>
           <v-col cols="6" align="center">
@@ -28,7 +27,7 @@
               block
               class="filled-button"
               @click.stop="onPurgeRoom()"
-              >Purge room</v-btn
+              >{{$t('purge_room.button')}}</v-btn
             >
           </v-col>
         </v-row>
