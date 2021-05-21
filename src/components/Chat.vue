@@ -406,6 +406,7 @@ import RoomTopicChanged from "./messages/RoomTopicChanged.vue";
 import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
 import RoomHistoryVisibility from "./messages/RoomHistoryVisibility.vue";
 import RoomJoinRules from "./messages/RoomJoinRules.vue";
+import RoomPowerLevelsChanged from "./messages/RoomPowerLevelsChanged.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
@@ -481,6 +482,7 @@ export default {
     RoomAvatarChanged,
     RoomHistoryVisibility,
     RoomJoinRules,
+    RoomPowerLevelsChanged,
     DebugEvent,
     MessageOperations,
     MessageOperationsPicker,
@@ -986,6 +988,9 @@ export default {
 
         case "m.room.join_rules":
           return RoomJoinRules;
+
+        case "m.room.power_levels":
+          return RoomPowerLevelsChanged;  
       }
       return this.debugging ? DebugEvent : null;
     },
