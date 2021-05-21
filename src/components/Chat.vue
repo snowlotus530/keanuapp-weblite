@@ -401,12 +401,15 @@ import ContactJoin from "./messages/ContactJoin.vue";
 import ContactLeave from "./messages/ContactLeave.vue";
 import ContactInvited from "./messages/ContactInvited.vue";
 import ContactChanged from "./messages/ContactChanged.vue";
+import RoomCreated from "./messages/RoomCreated.vue";
+import RoomAliased from "./messages/RoomAliased.vue";
 import RoomNameChanged from "./messages/RoomNameChanged.vue";
 import RoomTopicChanged from "./messages/RoomTopicChanged.vue";
 import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
 import RoomHistoryVisibility from "./messages/RoomHistoryVisibility.vue";
 import RoomJoinRules from "./messages/RoomJoinRules.vue";
 import RoomPowerLevelsChanged from "./messages/RoomPowerLevelsChanged.vue";
+import RoomEncrypted from "./messages/RoomEncrypted.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
@@ -477,12 +480,15 @@ export default {
     ContactLeave,
     ContactInvited,
     ContactChanged,
+    RoomCreated,
+    RoomAliased,
     RoomNameChanged,
     RoomTopicChanged,
     RoomAvatarChanged,
     RoomHistoryVisibility,
     RoomJoinRules,
     RoomPowerLevelsChanged,
+    RoomEncrypted,
     DebugEvent,
     MessageOperations,
     MessageOperationsPicker,
@@ -974,6 +980,12 @@ export default {
             return MessageOutgoingText;
           }
 
+        case "m.room.create":
+          return RoomCreated;
+
+        case "m.room.canonical_alias":
+          return RoomAliased;
+
         case "m.room.name":
           return RoomNameChanged;
 
@@ -991,6 +1003,9 @@ export default {
 
         case "m.room.power_levels":
           return RoomPowerLevelsChanged;  
+
+        case "m.room.encryption":
+          return RoomEncrypted;
       }
       return this.debugging ? DebugEvent : null;
     },
