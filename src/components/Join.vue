@@ -119,9 +119,7 @@
 </template>
 
 <script>
-import User from "../models/user";
 import util from "../plugins/utils";
-import config from "../assets/config";
 
 export default {
   name: "Join",
@@ -129,7 +127,6 @@ export default {
     return {
       roomName: null,
       roomAvatar: null,
-      guestUser: new User(config.defaultServer, "", "", true),
       loading: false,
       loadingMessage: null,
       waitingForInfo: true,
@@ -226,7 +223,7 @@ export default {
         const self = this;
           this.waitingForMembership = true;
         if (this.currentUser) {
-          this.getLoginPromise()
+          this.$matrix.getLoginPromise()
           .then(() => {
             self.$matrix.setCurrentRoomId(self.roomAliasOrId); // Go to this room, now or when joined.
             const room = self.$matrix.getRoom(self.roomAliasOrId);
@@ -263,19 +260,6 @@ export default {
   },
 
   methods: {
-    /**
-     * Returns a promise that will log us into the Matrix.
-     * 
-     * Will use a real account, if we have one, otherwise will create
-     * a random account.
-     */
-    getLoginPromise() {
-      if (this.$matrix.ready) {
-        return Promise.resolve(this.$matrix.currentUser);
-      }
-      return this.$store.dispatch("login", this.currentUser || this.guestUser);
-    },
-
     getRoomInfo() {
       if (this.roomId.startsWith("#")) {
         this.$matrix
@@ -328,7 +312,7 @@ export default {
       this.loadingMessage = this.$t('join.status_logging_in');
       const hasUser = this.currentUser ? true : false;
       var setProfileData = false;
-      return this.getLoginPromise()
+      return this.$matrix.getLoginPromise()
         .then(
           function (user) {
             if (user.is_guest && !hasUser) {

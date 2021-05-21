@@ -269,6 +269,19 @@ export default {
                         })
                 },
 
+                /**
+                * Returns a promise that will log us into the Matrix.
+                * 
+                * Will use a real account, if we have one, otherwise will create
+                * a random account.
+                */
+                getLoginPromise() {
+                    if (this.ready) {
+                        return Promise.resolve(this.currentUser);
+                    }
+                    return this.$store.dispatch("login", this.currentUser || new User(config.defaultServer, "", "", true));
+                },
+
                 addMatrixClientListeners(client) {
                     if (client) {
                         client.on("event", this.onEvent);

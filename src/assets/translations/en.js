@@ -15,9 +15,12 @@ export default {
   },
   message: {
     you: "You",
+    user_created_room: "{user} created the room",
+    user_aliased_room: "{user} made the room alias {alias}",
     user_changed_display_name: "{user} changed display name to {displayName}",
     user_changed_avatar: "{user} changed the avatar",
     user_changed_room_avatar: "{user} changed the room avatar",
+    user_encrypted_room: "{user} made the room encrypted",
     user_was_invited: "{user} was invited to the chat...",
     user_joined: "{user} joined the chat",
     user_left: "{user} left the chat",
