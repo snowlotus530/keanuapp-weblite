@@ -43,6 +43,8 @@ export default {
     scale_image: "Scale image",
     user_is_typing: "{user} is typing",
     users_are_typing: "{count} members are typing",
+    room_powerlevel_change: "{user} changed powerlevel of {changes}",
+    user_powerlevel_change_from_to: "{user} from {powerOld} to {powerNew}"
   },
   room: {
     members: "no members | 1 member | {count} members",
@@ -163,6 +165,13 @@ export default {
     swipe_to_cancel: "Swipe to cancel",
     release_to_cancel: "Release to cancel",
     failed_to_record: "Failed to record audio"
+  },
+  power_level: {
+    admin: "administrator",
+    moderator: "moderator",
+    default: "default",
+    custom: "custom ({level})",
+    restricted: "restricted"
   },
   fallbacks: {
     audio_file: "Audio file",
