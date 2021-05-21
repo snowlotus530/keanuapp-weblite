@@ -82,7 +82,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login'];
+  const publicPages = ['/login','/createroom'];
   var authRequired = !publicPages.includes(to.path);
   const loggedIn = router.app.$store.state.auth.user;
 

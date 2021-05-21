@@ -2,7 +2,7 @@
   <div class="create-room">
     <div>
       <v-container fluid>
-        <div class="room-name">{{$t('new_room.new_room')}}</div>
+        <div class="room-name">{{ $t("new_room.new_room") }}</div>
         <v-btn
           text
           class="header-button-left"
@@ -11,7 +11,7 @@
           :disabled="step > steps.NAME_SET"
         >
           <v-icon>arrow_back</v-icon>
-          <span>{{$t('menu.back')}}</span>
+          <span>{{ $t("menu.back") }}</span>
         </v-btn>
         <v-btn
           text
@@ -21,10 +21,58 @@
           class="header-button-right"
           @click.stop="next"
         >
-          <span>{{ step == steps.CREATED ? $t('new_room.done') : $t('new_room.next') }}</span>
+          <span>{{
+            step == steps.CREATED ? $t("new_room.done") : $t("new_room.next")
+          }}</span>
         </v-btn>
       </v-container>
     </div>
+    <v-container class="join-user-info">
+      <v-row v-if="canEditProfile">
+        <v-col class="flex-grow-0 flex-shrink-0">
+          <v-avatar @click="showAvatarPickerList">
+            <v-img v-if="selectedProfile" :src="selectedProfile.image" />
+          </v-avatar>
+        </v-col>
+        <v-col class="flex-shrink-1 flex-grow-1">
+          <v-select
+            ref="avatar"
+            :items="availableAvatars"
+            cache-items
+            :label="$t('join.user_name_label')"
+            outlined
+            dense
+            @change="selectAvatar"
+            :value="availableAvatars[0]"
+            single-line
+          >
+            <template v-slot:selection>
+              <v-text-field
+                background-color="transparent"
+                solo
+                flat
+                hide-details
+                @click.native.stop="
+                  {
+                  }
+                "
+                v-model="selectedProfile.name"
+              ></v-text-field>
+            </template>
+            <template v-slot:item="data">
+              <v-avatar size="32">
+                <v-img :src="data.item.image" />
+              </v-avatar>
+              <div class="ml-2">{{ data.item.name }}</div>
+            </template>
+          </v-select>
+          <v-switch
+            v-model="sharedComputer"
+            :label="$t('join.shared_computer')"
+          />
+        </v-col>
+      </v-row>
+    </v-container>
 
     <v-container fluid style="margin-top: 40px">
       <v-row>
@@ -49,9 +97,11 @@
 
     <v-fade-transition>
       <div class="section ma-3" flat v-if="step > steps.INITIAL">
-        <div class="h4 text-left">{{$t('new_room.join_permissions')}}</div>
-        <div class="h2 text-left">{{$t('new_room.set_join_permissions')}}</div>
-        <div>{{$t('new_room.join_permissions_info')}}</div>
+        <div class="h4 text-left">{{ $t("new_room.join_permissions") }}</div>
+        <div class="h2 text-left">
+          {{ $t("new_room.set_join_permissions") }}
+        </div>
+        <div>{{ $t("new_room.join_permissions_info") }}</div>
         <v-select
           :disabled="step >= steps.CREATING"
           :items="joinRules"
@@ -102,7 +152,8 @@
           depressed
           class="outlined-button"
           @click.stop="getPublicLink"
-          ><v-icon class="mr-2">link</v-icon>{{$t('new_room.get_link')}}</v-btn
+          ><v-icon class="mr-2">link</v-icon
+          >{{ $t("new_room.get_link") }}</v-btn
         >
         <v-btn
           v-else-if="joinRule == 'invite'"
@@ -110,10 +161,13 @@
           depressed
           class="outlined-button"
           @click.stop="addPeople"
-          ><v-icon class="mr-2">person_add</v-icon>{{$t('new_room.add_people')}}</v-btn
+          ><v-icon class="mr-2">person_add</v-icon
+          >{{ $t("new_room.add_people") }}</v-btn
         >
 
-        <div v-if="publicRoomLinkCopied" class="link-copied">{{$t('new_room.link_copied')}}</div>
+        <div v-if="publicRoomLinkCopied" class="link-copied">
+          {{ $t("new_room.link_copied") }}
+        </div>
 
         <div v-if="status">{{ status }}</div>
       </div>
@@ -155,24 +209,32 @@ export default {
       joinRules: [
         {
           id: "public",
-          text: this.$t('new_room.public_info'),
+          text: this.$t("new_room.public_info"),
           icon: "link",
-          descr: this.$t('new_room.public_description'),
+          descr: this.$t("new_room.public_description"),
         },
         {
           id: "invite",
-          text: this.$t('new_room.invite_info'),
+          text: this.$t("new_room.invite_info"),
           icon: "person_add",
-          descr: this.$t('new_room.invite_description'),
+          descr: this.$t("new_room.invite_description"),
         },
       ],
       publicRoomLink: null,
       publicRoomLinkCopied: false,
+      availableAvatars: [],
+      selectedProfile: null,
     };
   },
 
   mounted() {
     this.joinRule = this.joinRules[0].id; // Set default
+    this.availableAvatars = util.getDefaultAvatars();
+    this.selectAvatar(
+      this.availableAvatars[
+        Math.floor(Math.random() * this.availableAvatars.length)
+      ]
+    );
   },
 
   watch: {
@@ -186,6 +248,16 @@ export default {
         return null;
       }
       return this.roomName.substring(0, 1).toUpperCase();
+    },
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
+    canEditProfile() {
+      // If we have an account already, we can't edit profile here (need to go into profile view)
+      if (this.currentUser) {
+        return false;
+      }
+      return true;
     },
   },
 
@@ -261,8 +333,12 @@ export default {
     },
     createRoom() {
       this.step = steps.CREATING;
+
+      const hasUser = this.currentUser ? true : false;
+      var setProfileData = false;
+
       var roomId;
-      this.status = this.$t('new_room.status_creating');
+      this.status = this.$t("new_room.status_creating");
       var createRoomOptions = {};
       if (this.joinRule == "public") {
         createRoomOptions = {
@@ -308,26 +384,87 @@ export default {
         // Add topic
         createRoomOptions.topic = this.roomTopic;
       }
-      return this.$matrix.matrixClient
-        .createRoom(createRoomOptions)
-        .then(({ room_id, room_alias }) => {
-          roomId = room_alias || room_id;
-          if (!this.roomAvatarFile) {
-            return true;
-          }
-          const self = this;
-          return util.setRoomAvatar(
-            this.$matrix.matrixClient,
-            room_id,
-            this.roomAvatarFile,
-            function (p) {
-              if (p.total) {
-                self.status = this.$t('new_room.status_avatar_total', {count: (p.loaded || 0), total: p.total});
-              } else {
-                self.status = this.$t('new_room.status_avatar', {count: (p.loaded || 0)});
+
+      return this.$matrix
+        .getLoginPromise()
+        .then(
+          function (user) {
+            if (user.is_guest && !hasUser) {
+              // Newly created account, joining first room.
+              // Set avatar and display name to either the randomly chosen ones, or the
+              // ones the users has changed to.
+              setProfileData = true;
+
+              // Set display name and avatar directly on the matrix object.
+              if (
+                this.selectedProfile.name &&
+                this.selectedProfile.name.length > 0
+              ) {
+                this.$matrix.userDisplayName = this.selectedProfile.name;
               }
             }
-          );
+
+            if (
+              !setProfileData ||
+              !this.selectedProfile.name ||
+              this.selectedProfile.name.length == 0
+            ) {
+              return Promise.resolve(user);
+            } else {
+              console.log(
+                "CreateRoom: Set display name to: " + this.selectedProfile.name
+              );
+              return this.$matrix.matrixClient.setDisplayName(
+                this.selectedProfile.name,
+                undefined
+              );
+            }
+          }.bind(this)
+        )
+        .then(
+          function () {
+            if (!setProfileData || !this.selectedProfile.image) {
+              console.log("CreateRoom: No avatar change");
+              return Promise.resolve("no avatar");
+            } else {
+              console.log("CreateRoom: Updating avatar");
+              return util.setAvatar(
+                this.$matrix,
+                this.selectedProfile.image,
+                function (progress) {
+                  console.log("Progress: " + JSON.stringify(progress));
+                }
+              );
+            }
+          }.bind(this)
+        )
+        .then(() => {
+          return this.$matrix.matrixClient
+            .createRoom(createRoomOptions)
+            .then(({ room_id, room_alias }) => {
+              roomId = room_alias || room_id;
+              if (!this.roomAvatarFile) {
+                return true;
+              }
+              const self = this;
+              return util.setRoomAvatar(
+                this.$matrix.matrixClient,
+                room_id,
+                this.roomAvatarFile,
+                function (p) {
+                  if (p.total) {
+                    self.status = this.$t("new_room.status_avatar_total", {
+                      count: p.loaded || 0,
+                      total: p.total,
+                    });
+                  } else {
+                    self.status = this.$t("new_room.status_avatar", {
+                      count: p.loaded || 0,
+                    });
+                  }
+                }
+              );
+            });
         })
         .then(() => {
           this.status = "";
@@ -383,6 +520,14 @@ export default {
           console.log(e);
         }
       );
+    },
+
+    selectAvatar(value) {
+      this.selectedProfile = Object.assign({}, value); // Make a copy, so editing does not destroy data
+    },
+
+    showAvatarPickerList() {
+      this.$refs.avatar.$refs.input.click();
     },
   },
 };
