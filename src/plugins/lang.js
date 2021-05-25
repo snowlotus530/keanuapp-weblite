@@ -10,10 +10,10 @@ function importAll(r) {
       // Remove"./"
       const parts = res.split("/");
       const locale = parts[1].split(".")[0];
-      messages[locale] = r(res).default;
+      messages[locale] = r(res);
   });
 }
-importAll(require.context('@/assets/translations/', true, /\.js$/));
+importAll(require.context('@/assets/translations/', true, /\.json$/));
 
 
 export default new VueI18n({
