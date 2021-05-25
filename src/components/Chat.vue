@@ -135,7 +135,11 @@
 
       <v-row class="ma-0 pa-0">
         <div v-if="replyToEvent">
-          {{$t('message.replying_to_event',{message: replyToEvent.getContent().body}) }}
+          {{
+            $t("message.replying_to_event", {
+              message: replyToEvent.getContent().body,
+            })
+          }}
         </div>
 
         <!-- CONTACT IS TYPING -->
@@ -185,6 +189,7 @@
           v-if="!currentInput || currentInput.length == 0 || showRecorder"
         >
           <v-btn
+            v-if="canRecordAudio"
             class="mic-button"
             ref="mic_button"
             fab
@@ -192,8 +197,20 @@
             elevation="0"
             v-blur
             style="z-index: 10"
-            :disabled="!canRecordAudio"
             v-longTap:250="[showRecordingUI, startRecording]"
+          >
+            <v-icon :color="showRecorder ? 'white' : 'black'">mic</v-icon>
+          </v-btn>
+          <v-btn
+            v-else
+            class="mic-button"
+            ref="mic_button"
+            fab
+            small
+            elevation="0"
+            v-blur
+            style="z-index: 10"
+            @click.stop="showNoRecordingAvailableDialog = true"
           >
             <v-icon :color="showRecorder ? 'white' : 'black'">mic</v-icon>
           </v-btn>
@@ -266,7 +283,11 @@
     </v-container>
 
     <div v-if="currentImageInputPath">
-      <v-dialog v-model="currentImageInputPath" class="ma-0 pa-0" :width="$vuetify.breakpoint.smAndUp ? '50%' : '85%'">
+      <v-dialog
+        v-model="currentImageInputPath"
+        class="ma-0 pa-0"
+        :width="$vuetify.breakpoint.smAndUp ? '50%' : '85%'"
+      >
         <v-card class="ma-0 pa-0">
           <v-card-text class="ma-0 pa-2">
             <v-img
@@ -308,7 +329,7 @@
               >
               <v-switch
                 v-if="currentImageInput && currentImageInput.scaled"
-                :label="$('message.scale_image')"
+                :label="$t('message.scale_image')"
                 v-model="currentImageInput.useScaled"
               />
             </div>
@@ -318,25 +339,23 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="cancelSendAttachment"
-              >{{$t('menu.cancel')}}</v-btn
-            >
+            <v-btn color="primary" text @click="cancelSendAttachment">{{
+              $t("menu.cancel")
+            }}</v-btn>
             <v-btn
               color="primary"
               text
               @click="sendAttachment"
               v-if="currentSendShowSendButton"
               :disabled="currentSendOperation != null"
-              >{{$t('menu.send')}}</v-btn
+              >{{ $t("menu.send") }}</v-btn
             >
           </v-card-actions>
         </v-card>
       </v-dialog>
     </div>
 
-    <MessageOperationsBottomSheet
-      ref="messageOperationsSheet"
-    >
+    <MessageOperationsBottomSheet ref="messageOperationsSheet">
       <MessageOperationsPicker
         v-on:close="showEmojiPicker = false"
         v-if="selectedEvent"
@@ -379,6 +398,29 @@
     </v-container>
 
     <RoomInfoBottomSheet ref="roomInfoSheet" />
+
+    <!-- Dialog for audio recording not supported! -->
+    <v-dialog
+      v-model="showNoRecordingAvailableDialog"
+      class="ma-0 pa-0"
+      width="80%"
+    >
+      <v-card>
+        <v-card-title>{{ $t("voice_recorder.not_supported_title") }}</v-card-title>
+        <v-card-text>{{ $t("voice_recorder.not_supported_text") }}
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="showNoRecordingAvailableDialog = false"
+            >{{ $t("menu.ok") }}</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -523,6 +565,7 @@ export default {
       selectedEvent: null,
       editedEvent: null,
       replyToEvent: null,
+      showNoRecordingAvailableDialog: false,
       showContextMenu: false,
       showContextMenuAnchor: null,
       showAvatarMenu: false,
@@ -628,9 +671,11 @@ export default {
     typingMembersString() {
       const count = this.typingMembers.length;
       if (count > 1) {
-        return this.$t('message.users_are_typing',{count: count});
+        return this.$t("message.users_are_typing", { count: count });
       } else if (count > 0) {
-        return this.$t('message.user_is_typing',{user: this.typingMembers[0].name});
+        return this.$t("message.user_is_typing", {
+          user: this.typingMembers[0].name,
+        });
       } else {
         return "";
       }
@@ -1002,7 +1047,7 @@ export default {
           return RoomJoinRules;
 
         case "m.room.power_levels":
-          return RoomPowerLevelsChanged;  
+          return RoomPowerLevelsChanged;
 
         case "m.room.encryption":
           return RoomEncrypted;
@@ -1193,10 +1238,14 @@ export default {
 
     onUploadProgress(p) {
       if (p.total) {
-        this.currentSendProgress =
-          this.$t('message.upload_progress_with_total',{count: (p.loaded || 0), total: p.total});
+        this.currentSendProgress = this.$t(
+          "message.upload_progress_with_total",
+          { count: p.loaded || 0, total: p.total }
+        );
       } else {
-        this.currentSendProgress = this.$t('message.upload_progress',{count: (p.loaded || 0)});
+        this.currentSendProgress = this.$t("message.upload_progress", {
+          count: p.loaded || 0,
+        });
       }
     },
 
@@ -1382,7 +1431,8 @@ export default {
           const link = document.createElement("a");
           link.href = url;
           link.target = "_blank";
-          link.download = event.getContent().body || this.$t('fallbacks.download_name');
+          link.download =
+            event.getContent().body || this.$t("fallbacks.download_name");
           link.click();
           URL.revokeObjectURL(url);
         })

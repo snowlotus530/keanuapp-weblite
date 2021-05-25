@@ -40,7 +40,7 @@
     </v-card>
 
     <v-card class="account ma-3" flat>
-      <v-card-title class="h2">{{ $t("room_info.permissions") }})</v-card-title>
+      <v-card-title class="h2">{{ $t("room_info.permissions") }}</v-card-title>
       <v-card-text>
         <v-radio-group
           v-model="roomJoinRule"
@@ -71,7 +71,7 @@
           block
           class="filled-button"
           @click.stop="showPurgeConfirmation = true"
-          >{{ $("room_info.purge") }}</v-btn
+          >{{ $t("room_info.purge") }}</v-btn
         >
         <!-- <div v-if="anyoneCanJoin">
           <div>Anyone with a link can join.</div>
