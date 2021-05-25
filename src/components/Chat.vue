@@ -308,7 +308,7 @@
               >
               <v-switch
                 v-if="currentImageInput && currentImageInput.scaled"
-                :label="$('message.scale_image')"
+                :label="$t('message.scale_image')"
                 v-model="currentImageInput.useScaled"
               />
             </div>
