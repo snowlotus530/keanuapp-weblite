@@ -167,7 +167,9 @@
   "voice_recorder": {
     "swipe_to_cancel": "Swipe to cancel",
     "release_to_cancel": "Release to cancel",
-    "failed_to_record": "Failed to record audio"
+    "failed_to_record": "Failed to record audio",
+    "not_supported_title": "Not supported",
+    "not_supported_text": "Unfortunately, this browser does not support audio recording."
   },
   "power_level": {
     "admin": "administrator",
