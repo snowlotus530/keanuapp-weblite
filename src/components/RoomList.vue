@@ -1,6 +1,6 @@
 <template>
   <v-list dense class="room-list">
-    <div v-if="showInvites" class="h4">{{invitesTitle}}</div>
+    <div v-if="showInvites && $matrix.invites.length > 0" class="h4">{{invitesTitle}}</div>
     <v-list-item-group v-if="showInvites" v-model="currentRoomId" color="primary">
       <v-slide-y-transition group>
       <v-list-item :disabled="roomsProcessing[room.roomId]" v-for="room in $matrix.invites" :key="room.roomId" :value="room.roomId">
@@ -116,6 +116,10 @@ export default {
 
   watch: {
     currentRoomId() {
+      if (this.currentRoomId == null) {
+        // Ignore, this is caused by "new room" etc.
+        return;
+      }
       this.$emit("close");
       this.$navigation.push({name: 'Chat', params: { roomId: util.sanitizeRoomId(this.currentRoomId) }}, -1);
     },
