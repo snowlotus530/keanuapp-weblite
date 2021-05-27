@@ -451,6 +451,7 @@ import RoomAvatarChanged from "./messages/RoomAvatarChanged.vue";
 import RoomHistoryVisibility from "./messages/RoomHistoryVisibility.vue";
 import RoomJoinRules from "./messages/RoomJoinRules.vue";
 import RoomPowerLevelsChanged from "./messages/RoomPowerLevelsChanged.vue";
+import RoomGuestAccessChanged from "./messages/RoomGuestAccessChanged.vue";
 import RoomEncrypted from "./messages/RoomEncrypted.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
@@ -530,6 +531,7 @@ export default {
     RoomHistoryVisibility,
     RoomJoinRules,
     RoomPowerLevelsChanged,
+    RoomGuestAccessChanged,
     RoomEncrypted,
     DebugEvent,
     MessageOperations,
@@ -1048,6 +1050,9 @@ export default {
 
         case "m.room.power_levels":
           return RoomPowerLevelsChanged;
+
+        case "m.room.guest_access":
+          return RoomGuestAccessChanged;
 
         case "m.room.encryption":
           return RoomEncrypted;
