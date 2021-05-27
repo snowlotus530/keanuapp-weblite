@@ -48,11 +48,19 @@
     "user_is_typing": "{user} is typing",
     "users_are_typing": "{count} members are typing",
     "room_powerlevel_change": "{user} changed powerlevel of {changes}",
-    "user_powerlevel_change_from_to": "{user} from {powerOld} to {powerNew}"
+    "user_powerlevel_change_from_to": "{user} from {powerOld} to {powerNew}",
+    "user_changed_guest_access_closed": "{user} disallowed guests to join the room",
+    "user_changed_guest_access_open": "{user} allowed guests to join the room"
   },
   "room": {
     "members": "no members | 1 member | {count} members",
-    "leave": "Leave"
+    "leave": "Leave",
+    "purge_set_room_state": "Setting room state",
+    "purge_redacting_events": "Redacting events",
+    "purge_removing_members": "Removing members",
+    "purge_failed": "Failed to purge room!",
+    "room_list_invites": "Invites",
+    "room_list_rooms": "Rooms"
   },
   "room_welcome": {
     "welcome": "Welcome!",

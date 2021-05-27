@@ -24,7 +24,7 @@ Vue.config.productionTip = false
 
 Vue.use(VueResize);
 Vue.use(VEmojiPicker);
-Vue.use(matrix, { store: store });
+Vue.use(matrix, { store: store, i18n: i18n });
 Vue.use(cleaninsights);
 Vue.use(VueClipboard);
 
