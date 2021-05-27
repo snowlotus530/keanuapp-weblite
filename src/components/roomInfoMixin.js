@@ -41,6 +41,13 @@ export default {
       return "";
     },
 
+    roomIsEncrypted() {
+      if (this.room) {
+        return this.$matrix.matrixClient.isRoomEncrypted(this.room.roomId);
+      }
+      return false;
+    },
+
     publicRoomLink() {
       if (this.room && this.roomJoinRule == "public") {
         return this.$router.getRoomLink(
@@ -49,6 +56,13 @@ export default {
       }
       return null;
     },
+
+    roomHistory() {
+      if (this.room) {
+        return this.room.shouldEncryptForInvitedMembers()
+      }
+      return false;
+    }
   },
   watch: {
     room: {
