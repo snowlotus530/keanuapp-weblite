@@ -13,7 +13,12 @@
         "join_invite": "Solo st puedes unir a la sala mediante una invitación",
         "permissions": "Permisos",
         "created_by": "Creado por {user}",
-        "title": "Información"
+        "title": "Información",
+        "version_info": "Creado por Guardian Project. Version: {version}",
+        "leave_room_info": "Nota: este paso no se puede deshacer. Asegúrate de que deseas cerrar la sesión y eliminar el chat para siempre.",
+        "leave_room": "Salir del grupo",
+        "view_profile": "Vista",
+        "identity_temporary": "Tu identidad {displayName} es temporal. Puedes cambiar tu nombre o establecer una contraseña para conservarla."
     },
     "purge_room": {
         "button": "Purgar la sala",
@@ -152,5 +157,30 @@
         "start_private_chat": "Chat privado con este usuario",
         "edit": "Editar"
     },
-    "Keanu Weblite": "Keanu Weblite"
+    "Keanu Weblite": "Keanu Weblite",
+    "fallbacks": {
+        "download_name": "Descargar",
+        "original_text": "<original text>",
+        "video_file": "Archivo de video",
+        "audio_file": "Archivo de audio"
+    },
+    "power_level": {
+        "restricted": "Restringido",
+        "custom": "personalizado ({level})",
+        "default": "predeterminado",
+        "moderator": "Moderador",
+        "admin": "Administrador"
+    },
+    "voice_recorder": {
+        "not_supported_text": "Desafortunadamente, este navegador no admite la grabación de audio.",
+        "not_supported_title": "No esta permitido",
+        "failed_to_record": "No se pudo grabar el audio",
+        "release_to_cancel": "Suelta para cancelar",
+        "swipe_to_cancel": "Desliza para cancelar"
+    },
+    "room_info_sheet": {
+        "create_room": "Crear Grupo",
+        "view_details": "Ver detalles",
+        "this_room": "Este grupo"
+    }
 }
