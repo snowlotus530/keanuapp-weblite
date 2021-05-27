@@ -440,6 +440,17 @@ export default {
                     return null;
                 },
 
+                getRoomHistoryVisibility(room) {
+                    if (room) {
+                        const historyVisibility = room.currentState.getStateEvents(
+                            "m.room.history_visibility",
+                            ""
+                        );
+                        return historyVisibility && historyVisibility.getContent().history_visibility;
+                    }
+                    return null;
+                },
+
                 leaveRoom(roomId) {
                     return this.matrixClient.leave(roomId, undefined)
                         .then(() => {

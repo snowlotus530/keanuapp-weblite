@@ -11,7 +11,8 @@
     "send": "Send",
     "back": "BACK",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "new_room": "New Room"
   },
   "message": {
     "you": "You",
@@ -56,16 +57,19 @@
   "room_welcome": {
     "welcome": "Welcome!",
     "info": "Here are a few things to know about your group:",
-    "join_public": "Anyone can join by opening this link: {link}",
+    "encrypted": "Messages are end-to-end encrypted.",
+    "room_history_is": "Room history is {type}.",
+    "join_public": "Anyone can join by opening this link: {link}.",
     "join_invite": "Only people you invite can join.",
     "info_permissions": "You can change 'join permissions' and 'message history' at any time in the group settings.",
     "got_it": "Got it"
   },
   "new_room": {
-    "new_room": "New Group",
-    "done": "Done",
+    "new_room": "New Room",
+    "create": "Create",
     "next": "Next",
     "name_room": "Name group",
+    "room_topic": "Add a description if you like",
     "join_permissions": "Join permissions",
     "set_join_permissions": "Set Join Permissions",
     "join_permissions_info": "These permissions determine how people can join the group and how easily others can be invited. They can be changed anytime.",
@@ -161,8 +165,7 @@
   },
   "room_info_sheet": {
     "this_room": "This group",
-    "view_details": "View details",
-    "create_room": "Create group"
+    "view_details": "View details"
   },
   "voice_recorder": {
     "swipe_to_cancel": "Swipe to cancel",

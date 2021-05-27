@@ -13,7 +13,7 @@
           <v-icon>arrow_back</v-icon>
           <span>{{ $t("menu.back") }}</span>
         </v-btn>
-        <v-btn
+        <!-- <v-btn
           text
           :disabled="
             !roomName || (step != steps.INITIAL && step != steps.CREATED)
@@ -24,7 +24,7 @@
           <span>{{
             step == steps.CREATED ? $t("new_room.done") : $t("new_room.next")
           }}</span>
-        </v-btn>
+        </v-btn> -->
       </v-container>
     </div>
     <v-container class="join-user-info">
@@ -75,14 +75,16 @@
     </v-container>
 
     <v-container fluid style="margin-top: 40px">
-      <v-row>
-        <v-col cols="auto">
+      <v-row align="center">
+        <v-col align="center">
           <v-avatar size="50" color="#ededed" @click.stop="showAvatarPicker">
             <v-img v-if="roomAvatar" :src="roomAvatar" />
             <v-icon v-else>camera_alt</v-icon>
           </v-avatar>
         </v-col>
-        <v-col>
+      </v-row>
+      <v-row cols="12" align="center">
+        <v-col cols="8" offset="2" align="center">
           <v-text-field
             v-model="roomName"
             :label="$t('new_room.name_room')"
@@ -91,13 +93,30 @@
             v-on:keyup.enter="$refs.topic.focus()"
             :disabled="step > steps.INITIAL"
           ></v-text-field>
+          <v-text-field
+            v-model="roomTopic"
+            v-show="roomName.length > 0"
+            :label="$t('new_room.room_topic')"
+            color="black"
+            background-color="white"
+            v-on:keyup.enter="$refs.create.focus()"
+            :disabled="step > steps.INITIAL"
+          ></v-text-field>
+          <v-btn
+              color="black"
+              depressed
+              class="filled-button"
+              @click.stop="next"
+              :disabled="roomName.length == 0"
+              >{{$t('new_room.create')}}</v-btn
+            >
         </v-col>
       </v-row>
     </v-container>
 
     <v-fade-transition>
-      <div class="section ma-3" flat v-if="step > steps.INITIAL">
-        <div class="h4 text-left">{{ $t("new_room.join_permissions") }}</div>
+      <!-- <div class="section ma-3" flat v-if="step > steps.INITIAL"> -->
+    <!--    <div class="h4 text-left">{{ $t("new_room.join_permissions") }}</div>
         <div class="h2 text-left">
           {{ $t("new_room.set_join_permissions") }}
         </div>
@@ -168,9 +187,9 @@
         <div v-if="publicRoomLinkCopied" class="link-copied">
           {{ $t("new_room.link_copied") }}
         </div>
-
+-->
         <div v-if="status">{{ status }}</div>
-      </div>
+      <!-- </div> -->
     </v-fade-transition>
     <input
       ref="avatar"
@@ -188,7 +207,7 @@ import util from "../plugins/utils";
 
 const steps = Object.freeze({
   INITIAL: 0,
-  NAME_SET: 1,
+  //NAME_SET: 1,
   CREATING: 2,
   CREATED: 3,
 });
@@ -273,8 +292,8 @@ export default {
       if (this.step == steps.CREATED) {
         this.openRoom();
       } else if (this.step == steps.INITIAL) {
-        this.step = steps.NAME_SET;
-      } else if (this.step == steps.NAME_SET) {
+      //  this.step = steps.NAME_SET;
+      //} else if (this.step == steps.NAME_SET) {
         // Create room with deafult setting
         this.createRoom().then((roomId) => {
           this.roomId = roomId;
@@ -476,7 +495,7 @@ export default {
             (error.data && error.data.error) ||
             error.message ||
             error.toString();
-          this.step = steps.NAME_SET; // revert
+          this.step = steps.INITIAL; // revert
           return null;
         });
     },
