@@ -21,14 +21,7 @@
           >{{$t('room_info_sheet.view_details')}}</v-btn
         >
       </div>
-      <room-list :title="'Other groups'" v-on:close="close" />
-      <v-btn
-          height="20px"
-          color="black"
-          class="outlined-button"
-          @click.stop="createRoom"
-          >{{$t('room_info_sheet.create_room')}}</v-btn
-        >
+      <room-list :title="'Other groups'" v-on:close="close" v-on:newroom="createRoom" :showCreate="true" />
     </div>
   </BottomSheet>
 </template>

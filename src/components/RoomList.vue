@@ -20,6 +20,15 @@
     </v-list-item-group>
     <div class="h4">{{title}}</div>
     <v-list-item-group v-model="currentRoomId" color="primary">
+      <v-list-item v-if="showCreate" @click.stop="$emit('newroom')">
+        <v-list-item-avatar size="40" color="#e0e0e0">
+          <v-img />
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title>{{$t('menu.new_room')}}</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
       <v-list-item v-for="room in $matrix.joinedRooms" :key="room.roomId" :value="room.roomId">
         <v-list-item-avatar size="40" color="#e0e0e0">
           <v-img :src="room.avatar" />
@@ -51,6 +60,10 @@ export default {
       default: "Invites"
     },
     showInvites: {
+      type: Boolean,
+      default: false
+    },
+    showCreate: {
       type: Boolean,
       default: false
     }
