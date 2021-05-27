@@ -1,1 +1,155 @@
-{}
+{
+    "room_info": {
+        "identity": "Has iniciado sesión como {displayName}.",
+        "my_profile": "Mi perfil",
+        "show_all": "Mostrar todos",
+        "hide_all": "Ocultar",
+        "user_you": "{user} (you)",
+        "user": "{user}",
+        "members": "Miembros",
+        "purge": "Purgar la Sala",
+        "link_copied": "¡Liga copiada!",
+        "join_public": "Cualquiera con la liga se puede unir",
+        "join_invite": "Solo st puedes unir a la sala mediante una invitación",
+        "permissions": "Permisos",
+        "created_by": "Creado por {user}",
+        "title": "Información"
+    },
+    "purge_room": {
+        "button": "Purgar la sala",
+        "info": "Esta operación cerrará la sala para todos los miembros. No se puede deshacer.",
+        "title": "¿Purgar la sala?"
+    },
+    "leave": {
+        "leave": "Salir",
+        "go_back": "Regresar",
+        "create_account": "crea una cuenta",
+        "text_invite": "Este grupo está bloqueado. No puedes volver a unirte sin un permiso especial.",
+        "title_invite": "Estas seguro que deseeas salir?",
+        "text_public_lastroom": "Si desea unirse a este grupo nuevamente, puede unirse con una nueva identidad. Para mantener {user}, {action}.",
+        "text_public": "Siempre puedes volver a unirte a esta sala si conoces el enlace.",
+        "title_public": "Adios, [user}"
+    },
+    "invite": {
+        "status_error": "No se pudo invitar a uno o más amigos!",
+        "status_inviting": "Invitando amigo {index} de {count}",
+        "send_invites_to": "Enviar invitaciones a",
+        "done": "Listo",
+        "title": "Agregar Amigos"
+    },
+    "join": {
+        "status_joining": "Uniendose a la sala...",
+        "status_logging_in": "Iniciando sesión...",
+        "join_guest": "Unirse como invitado",
+        "join": "Unirse a la sala",
+        "joining_as": "Te estas uniendo como:",
+        "shared_computer": "Usando una computadora compartida",
+        "user_name_label": "Nombre de usuario",
+        "title": "Bienvenido a {roomName}"
+    },
+    "profile": {
+        "display_name": "Nombre para mostrar",
+        "password_repeat": "Repite la nueva contraseña",
+        "password_new": "Nueva contraseña",
+        "password_old": "Vieja contraseña",
+        "change_password": "Cambia la contraseña",
+        "change_name": "Cambia el nombre",
+        "set_password": "Crea una contraseña",
+        "temporary_identity": "Esta identidad es temporal. Establezca una contraseña para usarla nuevamente",
+        "title": "Mi perfil"
+    },
+    "login": {
+        "login": "Iniciar sesión",
+        "password_required": "Contraseña es necesaria",
+        "username_required": "Nombre de usuario es necesario",
+        "password": "Contraseña",
+        "username": "Nombre de Usuario",
+        "title": "Iniciar sesión"
+    },
+    "device_list": {
+        "not_verified": "No ha sido Verificado",
+        "verified": "Verificado",
+        "blocked": "Bloqueado",
+        "title": "DISPOSITIVOS"
+    },
+    "new_room": {
+        "status_avatar": "Subiendo avatar: {count}",
+        "status_avatar_total": "Subiendo Avatar: {count} de {total}",
+        "status_creating": "Creando Sala",
+        "invite_description": "Escoge de una lista o busca por ID de cuenta",
+        "invite_info": "Solo personas agregadas",
+        "public_description": "Obten la liga para compartirla",
+        "public_info": "Cualquiera con la liga",
+        "link_copied": "Liga copiada!",
+        "add_people": "Agregar personas",
+        "get_link": "Obtener la liga",
+        "join_permissions_info": "Estos permisos determinan cómo las personas pueden unirse al grupo y con qué facilidad se puede invitar a otras personas. Pueden cambiarse en cualquier momento.",
+        "set_join_permissions": "Establecer permisos para unirse",
+        "join_permissions": "Permisos para unirse",
+        "name_room": "Nombra el Grupo",
+        "next": "Siguiente",
+        "done": "Listo",
+        "new_room": "Nuevo Grupo"
+    },
+    "room_welcome": {
+        "join_public": "Cualquiera puede unirse abriendo esta liga: {link}",
+        "got_it": "Entiendo",
+        "info_permissions": "Puedes cambiar los 'permisos de participación' y el 'historial de mensajes' en cualquier momento en la configuración del grupo.",
+        "join_invite": "Solo personas que invitas se pueden unir.",
+        "info": "Aquí estan algunas cosas acerca de tu grupo:",
+        "welcome": "Bienvenido!"
+    },
+    "room": {
+        "leave": "Salir",
+        "members": "no miembros | 1 miembro| {count} miembros"
+    },
+    "message": {
+        "user_powerlevel_change_from_to": "{user} de {powerOld} a {powerNew}",
+        "room_powerlevel_change": "{user} cambio el powerlevel de {changes}",
+        "users_are_typing": "{count} miembros estan escribiendo",
+        "user_is_typing": "{user} esta escribiendo",
+        "scale_image": "Escala de imagen",
+        "your_message": "Tu mensaje...",
+        "replying_to_event": "RESPONDIENDO A UN EVENTO: {message}",
+        "unread_messages": "Mensajes no leídos",
+        "user_changed_room_name": "{user} cambió el nombre de la sala {name}",
+        "user_changed_room_topic": "{user} cambió el tema de la sala a {topic}",
+        "room_joinrule_public": "público",
+        "room_joinrule_invite": "sólo con invitación",
+        "user_changed_join_rules": "{user} creo la sala {type}",
+        "room_history_joined": "Todos los miembros de la sala pueden leerlo desde el momento en que se unieron",
+        "room_history_invited": "Puede ser leido por todos los miembros de la sala desde que fueron invitados",
+        "room_history_shared": "Todos los miembros de la sala pueden leerlo",
+        "room_history_world_readable": "cualquiera puede leerlo",
+        "user_changed_room_history": "{user} Hizo historia en la habitación {type}",
+        "upload_progress_with_total": "Subido {count} de {total}",
+        "upload_progress": "Subido {count}",
+        "download_progress": "{percentage}% descargado",
+        "edited": "(editado)",
+        "file_prefix": "Archivo: ",
+        "user_said": "{user} dijo:",
+        "user_left": "{user} abandono el chat",
+        "user_joined": "{user} se unio al chat",
+        "user_was_invited": "{user} fue invitado al chat...",
+        "user_encrypted_room": "{user} hizo la habitación encriptada",
+        "user_changed_room_avatar": "{user} cambio el avatar de la sala",
+        "user_changed_avatar": "{user} cambio su avatar",
+        "user_created_room": "{user} creo la sala",
+        "user_aliased_room": "{user} hizo el alias de la sala {alias}",
+        "user_changed_display_name": "{user}cambio su nombre para mostrar a {displayName}",
+        "you": "Tú"
+    },
+    "menu": {
+        "login": "Iniciar sesión",
+        "logout": "Cerrar sesión",
+        "back": "Regresar",
+        "send": "Enviar",
+        "cancel": "Cancelar",
+        "ok": "OK",
+        "download": "Descargar",
+        "delete": "Eliminar",
+        "reply": "Responder",
+        "start_private_chat": "Chat privado con este usuario",
+        "edit": "Editar"
+    }
+}
