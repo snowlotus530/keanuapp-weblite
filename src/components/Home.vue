@@ -1,6 +1,6 @@
 <template>
   <div class="pa-4">
-    <RoomList showInvites />
+    <RoomList showInvites showCreate :title="$t('room.room_list_rooms')" :invitesTitle="$t('room.room_list_invites')" v-on:newroom="createRoom" />
     <v-btn block depressed class="outlined-button" @click.stop="logout">{{$t('menu.logout')}}</v-btn>
 
     <!-- Loading indicator -->
@@ -42,6 +42,10 @@ export default {
         this.$navigation.push({path: "/login"}, -1);
       })
     },
+    
+    createRoom() {
+      this.$navigation.push({ name: "CreateRoom" });
+    }
   }
 };
 </script>
