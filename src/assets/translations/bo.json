@@ -1,1 +1,28 @@
-{}
+{
+    "fallbacks": {
+        "download_name": "ཕབ་ལེན།"
+    },
+    "room_info": {
+        "title": "གནས་ཚུལ།"
+    },
+    "invite": {
+        "done": "ཚར་སོང་།"
+    },
+    "login": {
+        "login": "ནང་འཛུལ།",
+        "password": "གསང་ཨང་།",
+        "username": "སྤྱོད་མིང།",
+        "title": "ནང་འཛུལ།"
+    },
+    "new_room": {
+        "next": "རྗེས་མ།",
+        "done": "ཚར་སོང་།"
+    },
+    "menu": {
+        "logout": "ཕྱིར་ཐོན།",
+        "login": "ནང་འཛུལ།",
+        "download": "ཕབ་ལེན།",
+        "delete": "སུབས།",
+        "edit": "ཕྱོགས་སྒྲིག"
+    }
+}
