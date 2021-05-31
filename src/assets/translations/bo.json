@@ -24,5 +24,8 @@
         "download": "ཕབ་ལེན།",
         "delete": "སུབས།",
         "edit": "ཕྱོགས་སྒྲིག"
+    },
+    "profile": {
+        "change_password": "གསང་ཨང་བརྗེས།"
     }
 }
