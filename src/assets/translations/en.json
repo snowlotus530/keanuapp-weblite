@@ -11,7 +11,8 @@
     "send": "Send",
     "back": "BACK",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "new_room": "New Room"
   },
   "message": {
     "you": "You",
@@ -47,25 +48,36 @@
     "user_is_typing": "{user} is typing",
     "users_are_typing": "{count} members are typing",
     "room_powerlevel_change": "{user} changed powerlevel of {changes}",
-    "user_powerlevel_change_from_to": "{user} from {powerOld} to {powerNew}"
+    "user_powerlevel_change_from_to": "{user} from {powerOld} to {powerNew}",
+    "user_changed_guest_access_closed": "{user} disallowed guests to join the room",
+    "user_changed_guest_access_open": "{user} allowed guests to join the room"
   },
   "room": {
     "members": "no members | 1 member | {count} members",
-    "leave": "Leave"
+    "leave": "Leave",
+    "purge_set_room_state": "Setting room state",
+    "purge_redacting_events": "Redacting events",
+    "purge_removing_members": "Removing members",
+    "purge_failed": "Failed to purge room!",
+    "room_list_invites": "Invites",
+    "room_list_rooms": "Rooms"
   },
   "room_welcome": {
     "welcome": "Welcome!",
     "info": "Here are a few things to know about your group:",
-    "join_public": "Anyone can join by opening this link: {link}",
+    "encrypted": "Messages are end-to-end encrypted.",
+    "room_history_is": "Room history is {type}.",
+    "join_public": "Anyone can join by opening this link: {link}.",
     "join_invite": "Only people you invite can join.",
     "info_permissions": "You can change 'join permissions' and 'message history' at any time in the group settings.",
     "got_it": "Got it"
   },
   "new_room": {
-    "new_room": "New Group",
-    "done": "Done",
+    "new_room": "New Room",
+    "create": "Create",
     "next": "Next",
     "name_room": "Name group",
+    "room_topic": "Add a description if you like",
     "join_permissions": "Join permissions",
     "set_join_permissions": "Set Join Permissions",
     "join_permissions_info": "These permissions determine how people can join the group and how easily others can be invited. They can be changed anytime.",
@@ -161,8 +173,7 @@
   },
   "room_info_sheet": {
     "this_room": "This group",
-    "view_details": "View details",
-    "create_room": "Create group"
+    "view_details": "View details"
   },
   "voice_recorder": {
     "swipe_to_cancel": "Swipe to cancel",

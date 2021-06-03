@@ -15,10 +15,11 @@ export default {
         }
 
         const store = options.store;
+        const i18n = options.i18n;
 
         const matrixService = new Vue({
             store,
-
+            i18n,
             data() {
                 return {
                     matrixClient: null,
@@ -440,6 +441,17 @@ export default {
                     return null;
                 },
 
+                getRoomHistoryVisibility(room) {
+                    if (room) {
+                        const historyVisibility = room.currentState.getStateEvents(
+                            "m.room.history_visibility",
+                            ""
+                        );
+                        return historyVisibility && historyVisibility.getContent().history_visibility;
+                    }
+                    return null;
+                },
+
                 leaveRoom(roomId) {
                     return this.matrixClient.leave(roomId, undefined)
                         .then(() => {
@@ -460,7 +472,8 @@ export default {
                  * - Kick all members
                  * @param roomId 
                  */
-                purgeRoom(roomId) {
+                purgeRoom(roomId, statusCallback) {
+                    const oldGlobalErrorSetting = this.matrixClient.getGlobalErrorOnUnknownDevices();
                     return new Promise((resolve, reject) => {
                         const room = this.getRoom(roomId);
                         if (!room) {
@@ -476,6 +489,7 @@ export default {
                         const self = this;
 
                         console.log("Purge: set invite only");
+                        statusCallback(this.$t('room.purge_set_room_state'));
                         this.matrixClient.sendStateEvent(
                             roomId,
                             "m.room.join_rules",
@@ -519,6 +533,9 @@ export default {
                             })
                             .then(() => {
                                 console.log("Purge: redact events");
+                                statusCallback(this.$t('room.purge_redacting_events'));
+                                // First ignore unknown device errors
+                                this.matrixClient.setGlobalErrorOnUnknownDevices(false);
                                 var redactionPromises = [];
                                 timelineWindow.getEvents().forEach(event => {
                                     if (!event.isRedacted() && !event.isRedaction() && !event.isState()) {
@@ -530,6 +547,7 @@ export default {
                             })
                             .then(() => {
                                 console.log("Purge: kick members");
+                                statusCallback(this.$t('room.purge_removing_members'));
                                 var joined = room.getMembersWithMembership("join");
                                 var invited = room.getMembersWithMembership("invite");
                                 var members = joined.concat(invited);
@@ -543,10 +561,13 @@ export default {
                                 return Promise.all(kickPromises);
                             })
                             .then(() => {
+                                statusCallback(null);
+                                this.matrixClient.setGlobalErrorOnUnknownDevices(oldGlobalErrorSetting);
                                 resolve(true); // Done!
                             })
                             .catch((err) => {
                                 console.error("Error purging room", err);
+                                this.matrixClient.setGlobalErrorOnUnknownDevices(oldGlobalErrorSetting);
                                 reject(err);
                             });
                     })
