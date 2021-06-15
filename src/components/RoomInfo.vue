@@ -2,7 +2,7 @@
   <div v-if="room" class="room-info">
     <div class="chat-header">
       <v-container fluid>
-        <div class="room-name">{{ $t("room_info.title") }}</div>
+        <div class="room-name no-upper">{{ $t("room_info.title") }}</div>
         <v-btn
           text
           class="header-button-left"
@@ -12,67 +12,97 @@
           <v-icon>arrow_back</v-icon>
           <span>{{ $t("menu.back") }}</span>
         </v-btn>
+        <v-btn
+          color="black"
+          depressed
+          class="header-button-right filled-button mr-3"
+          @click.stop="showLeaveConfirmation = true"
+          >👋 {{ $t("room_info.leave_room") }}</v-btn
+        >
       </v-container>
     </div>
 
-    <v-card class="members ma-3 pa-3" flat>
-      <div class="text-center">
-        <v-avatar class="room-avatar">
-          <v-img v-if="roomAvatar" :src="roomAvatar" />
-          <span v-else class="white--text headline">{{
-            roomName.substring(0, 1).toUpperCase()
-          }}</span>
-        </v-avatar>
-        <div class="h1">{{ roomName }}</div>
-        <div class="h3">{{ roomTopic }}</div>
-        <div class="small">
-          {{ $t("room_info.created_by", { user: creator }) }}
-        </div>
-        <v-expand-transition>
-          <canvas
-            v-show="publicRoomLink"
-            ref="roomQr"
-            class="qr"
-            id="room-qr"
-          ></canvas>
-        </v-expand-transition>
+    <div class="members ma-3 pa-3 mt-0 pt-0 text-center">
+      <v-avatar class="room-avatar">
+        <v-img v-if="roomAvatar" :src="roomAvatar" />
+        <span v-else class="white--text headline">{{
+          roomName.substring(0, 1).toUpperCase()
+        }}</span>
+      </v-avatar>
+      <div class="name">{{ roomName }}</div>
+      <div class="topic">{{ roomTopic }}</div>
+      <div class="created-by">
+        {{ $t("room_info.created_by", { user: creator }) }}
       </div>
-    </v-card>
+    </div>
+
+    <v-expand-transition>
+      <v-container fluid class="pa-0" v-show="publicRoomLink">
+        <v-row cols="12" class="qr-container ma-3">
+          <v-col cols="auto">
+            <canvas ref="roomQr" class="qr" id="room-qr"></canvas>
+          </v-col>
+          <v-col align-self="center">
+            <div class="link">{{ publicRoomLink }}</div>
+          </v-col>
+        </v-row>
+        <v-row align="center" class="mt-0 pt-0">
+          <v-col align="center" class="mt-0 pt-0">
+            <v-btn
+              v-if="publicRoomLinkCopied"
+              color="#DEE6FF"
+              depressed
+              class="filled-button link-copied-in-place"
+              style="min-width: 180px"
+              >{{ $t("room_info.link_copied") }}</v-btn
+            >
+            <v-btn
+              v-else
+              color="black"
+              depressed
+              class="filled-button"
+              style="min-width: 180px"
+              @click.stop="copyRoomLink"
+              >{{ $t("room_info.copy_link") }}</v-btn
+            >
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-expand-transition>
 
     <v-card class="account ma-3" flat>
       <v-card-title class="h2">{{ $t("room_info.permissions") }}</v-card-title>
       <v-card-text>
-        <v-radio-group
-          v-model="roomJoinRule"
+        <v-select
+          color="grey"
           v-if="roomJoinRule"
           :disabled="!userCanChangeJoinRule || updatingJoinRule"
+          :items="joinRules"
+          class="mt-4"
+          v-model="roomJoinRule"
+          item-value="id"
         >
-          <v-radio :label="$t('room_info.join_invite')" :value="'invite'" />
-          <v-radio :label="$t('room_info.join_public')" :value="'public'">
-          </v-radio>
-          <v-text-field
-            v-if="publicRoomLink"
-            :value="publicRoomLink"
-            readonly
-            append-icon="content_copy"
-            filled
-            type="text"
-            @click:append="copyRoomLink"
-          ></v-text-field>
-          <div v-if="publicRoomLinkCopied" class="link-copied">
-            {{ $t("room_info.link_copied") }}
-          </div>
-        </v-radio-group>
+          <template v-slot:selection="{ item }">
+            <v-icon color="black" class="mr-2">{{ item.icon }}</v-icon>
+            {{ item.text }}
+          </template>
+          <template v-slot:item="{ item, attrs, on }">
+            <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
+              <v-list-item-avatar>
+                <v-icon color="black">{{ item.icon }}</v-icon>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title v-text="item.text"></v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn icon v-if="active">
+                  <v-icon color="grey lighten-1">check</v-icon>
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </template>
+        </v-select>
 
-        <v-btn
-          v-if="userCanPurgeRoom"
-          color="red"
-          depressed
-          block
-          class="filled-button"
-          @click.stop="showPurgeConfirmation = true"
-          >{{ $t("room_info.purge") }}</v-btn
-        >
         <!-- <div v-if="anyoneCanJoin">
           <div>Anyone with a link can join.</div>
           <v-text-field
@@ -128,6 +158,18 @@
       </v-card-text>
     </v-card>
 
+    <!-- PURGE ROOM -->
+    <div class="members ma-3 pa-3 text-center">
+      <v-btn
+        v-if="userCanPurgeRoom"
+        color="red"
+        depressed
+        class="filled-button"
+        @click.stop="showPurgeConfirmation = true"
+        >{{ $t("room_info.purge") }}</v-btn
+      >
+    </div>
+
     <v-card class="account ma-3" flat>
       <v-card-title class="h2">{{ $t("room_info.my_profile") }}</v-card-title>
       <v-card-text>
@@ -151,27 +193,15 @@
             block
             class="outlined-button"
             @click.stop="viewProfile"
-            >{{$t('room_info.view_profile')}}</v-btn
+            >{{ $t("room_info.view_profile") }}</v-btn
           >
         </div>
       </v-card-text>
     </v-card>
 
-    <v-card class="account ma-3" flat>
-      <v-card-text>
-        <v-btn
-          color="red"
-          depressed
-          block
-          class="filled-button"
-          @click.stop="showLeaveConfirmation = true"
-          >{{$t('room_info.leave_room')}}</v-btn
-        >
-        <div>{{$t('room_info.leave_room_info')}}</div>
-      </v-card-text>
-    </v-card>
-
-    <div class="build-version">{{$t('room_info.version_info',{version: buildVersion})}}</div>
+    <div class="build-version">
+      {{ $t("room_info.version_info", { version: buildVersion }) }}
+    </div>
 
     <LeaveRoomDialog
       :show="showLeaveConfirmation"
@@ -214,6 +244,18 @@ export default {
       buildVersion: "",
       updatingJoinRule: false, // Flag if we are processing update curerntly
       publicRoomLinkCopied: false,
+      joinRules: [
+        {
+          id: "public",
+          text: this.$t("room_info.join_public"),
+          icon: "link",
+        },
+        {
+          id: "invite",
+          text: this.$t("room_info.join_invite"),
+          icon: "person_add",
+        },
+      ],
     };
   },
   mounted() {
@@ -314,7 +356,7 @@ export default {
           {
             type: "image/png",
             margin: 1,
-            width: canvas.clientWidth,
+            width: 60,
           },
           function (error) {
             if (error) console.error(error);
