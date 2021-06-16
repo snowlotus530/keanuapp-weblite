@@ -146,9 +146,9 @@
     "leave": "Leave"
   },
   "purge_room": {
-    "title": "Purge room?",
-    "info": "This operation will close the room for all members. It cannot be undone.",
-    "button": "Purge room"
+    "title": "Delete room?",
+    "info": "This will close the room for all members. It cannot be undone.",
+    "button": "Delete room"
   },
   "room_info": {
     "title": "Room Details",
