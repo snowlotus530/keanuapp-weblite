@@ -116,7 +116,16 @@
     "password_new": "New password",
     "password_repeat": "Repeat new password",
     "display_name": "Display name"
-    
+  },
+  "profile_info_popup": {
+    "you_are": "You are",
+    "identity": "{displayName}",
+    "identity_temporary": "{displayName}",
+    "edit_profile": "Edit profile",
+    "logout": "Logout",
+    "want_more": "Want more?",
+    "powered_by": "This room is powered by {product}. Learn more at {productLink} or go ahead and create another room!",
+    "new_room": "+ New room"
   },
   "join": {
     "title": "Welcome to {roomName}",
@@ -164,10 +173,6 @@
     "user_you": "{user} (you)",
     "hide_all": "Hide",
     "show_all": "Show all >",
-    "my_profile": "My Profile",
-    "identity": "You are logged in as {displayName}.",
-    "identity_temporary": "Your identity {displayName} is temporary. You can change your name or set a password to keep it.",
-    "view_profile": "View",
     "leave_room": "Leave",
     "version_info": "Powered by Guardian Project. Version: {version}"
   },

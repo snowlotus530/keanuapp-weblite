@@ -170,35 +170,6 @@
       >
     </div>
 
-    <v-card class="account ma-3" flat>
-      <v-card-title class="h2">{{ $t("room_info.my_profile") }}</v-card-title>
-      <v-card-text>
-        <div>
-          <div v-if="$matrix.currentUser.is_guest">
-            <i18n path="room_info.identity_temporary" tag="span">
-              <template v-slot:displayName>
-                <b>{{ displayName }}</b>
-              </template>
-            </i18n>
-          </div>
-          <div v-else>
-            <i18n path="room_info.identity" tag="span">
-              <template v-slot:displayName>
-                <b>{{ displayName }}</b>
-              </template>
-            </i18n>
-          </div>
-          <v-btn
-            depressed
-            block
-            class="outlined-button"
-            @click.stop="viewProfile"
-            >{{ $t("room_info.view_profile") }}</v-btn
-          >
-        </div>
-      </v-card-text>
-    </v-card>
-
     <div class="build-version">
       {{ $t("room_info.version_info", { version: buildVersion }) }}
     </div>

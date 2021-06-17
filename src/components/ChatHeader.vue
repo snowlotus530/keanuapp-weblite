@@ -18,26 +18,42 @@
       <v-col cols="auto" class="text-end ma-0 pa-0">
         <v-btn text class="leave-button" @click.stop="leaveRoom">{{$t('room.leave')}}</v-btn>
       </v-col>
+      <v-col cols="auto" class="text-end ma-0 pa-0 ml-2">
+        <v-avatar class="avatar-32 clickable" size="32" color="#e0e0e0" @click.stop="showProfileInfo = true">
+          <img v-if="userAvatar" :src="userAvatar" />
+            <span v-else class="white--text">{{
+              userAvatarLetter
+            }}</span>
+          </v-avatar>
+      </v-col>
     </v-row>
 
     <!-- "REALLY LEAVE?" dialog -->
     <LeaveRoomDialog :show="showLeaveConfirmation" :room="room" @close="showLeaveConfirmation = false" />
+
+    <!-- PROFILE INFO POPUP -->
+    <ProfileInfoPopup :show="showProfileInfo" @close="showProfileInfo = false" />
 
   </v-container>
 </template>
 
 <script>
 import LeaveRoomDialog from '../components/LeaveRoomDialog';
+import ProfileInfoPopup from '../components/ProfileInfoPopup';
+import profileInfoMixin from '../components/profileInfoMixin';
 
 export default {
   name: "ChatHeader",
+  mixins: [profileInfoMixin],
   components: {
-    LeaveRoomDialog
+    LeaveRoomDialog,
+    ProfileInfoPopup
   },
   data() {
     return {
       memberCount: null,
-      showLeaveConfirmation: false
+      showLeaveConfirmation: false,
+      showProfileInfo: false
     };
   },
   mounted() {
