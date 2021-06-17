@@ -35,8 +35,10 @@
         </v-row>
       </v-container>
 
-    <div class="action" @click="showEditPasswordDialog = true"><v-icon>lock</v-icon><span>{{$t('profile.set_password')}}</span></div>
-    <div class="action" @click="editValue = displayName;showEditDisplaynameDialog = true"><v-icon>edit</v-icon><span>{{$t('profile.change_name')}}</span></div>
+    <v-container class="mt-2 pa-5">
+      <ActionRow @click="showEditPasswordDialog = true" :icon="'lock'" :text="$t('profile.set_password')" />
+      <ActionRow @click="editValue = displayName;showEditDisplaynameDialog = true" :icon="'edit'" :text="$t('profile.change_name')" />
+    </v-container>
 
     <!-- edit password dialog -->
     <v-dialog v-model="showEditPasswordDialog" class="ma-0 pa-0" width="50%">
@@ -92,8 +94,13 @@
 </template>
 
 <script>
+import ActionRow from "./ActionRow.vue";
+
 export default {
   name: "Profile",
+  components: {
+    ActionRow
+  },
   data() {
     return {
       showEditPasswordDialog: false,
@@ -142,14 +149,6 @@ export default {
   },
 
   methods: {
-    logout() {
-      //TODO - For guest accounts, show warning about not being able to rejoin.
-      this.$store.dispatch("logout");
-      this.$nextTick(() => {
-        this.$navigation.push({path: "/login"}, -1);
-      })
-    },
-
     setDisplayName(name) {
       this.$matrix.matrixClient.setDisplayName(name);
     },
