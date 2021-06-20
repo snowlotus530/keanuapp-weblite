@@ -21,7 +21,9 @@
         "leave": "离开"
     },
     "message": {
-        "you": "你"
+        "you": "你",
+        "user_aliased_room": "{用户}",
+        "user_created_room": "{用户} 创建了房间"
     },
     "menu": {
         "login": "登录",
@@ -30,7 +32,10 @@
         "download": "下载",
         "delete": "删除",
         "edit": "编辑",
-        "start_private_chat": "与该用户的私人聊天"
+        "start_private_chat": "与该用户的私人聊天",
+        "logout": "退出",
+        "ok": "好的",
+        "reply": "回复"
     },
     "Keanu Weblite": "网络灯"
 }
