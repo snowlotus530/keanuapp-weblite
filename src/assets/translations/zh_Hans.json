@@ -22,7 +22,7 @@
     },
     "message": {
         "you": "你",
-        "user_aliased_room": "{用户}",
+        "user_aliased_room": "{用户} 创建了房间别名 {alias}",
         "user_created_room": "{用户} 创建了房间"
     },
     "menu": {
