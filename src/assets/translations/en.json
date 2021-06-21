@@ -116,7 +116,16 @@
     "password_new": "New password",
     "password_repeat": "Repeat new password",
     "display_name": "Display name"
-    
+  },
+  "profile_info_popup": {
+    "you_are": "You are",
+    "identity": "{displayName}",
+    "identity_temporary": "{displayName}",
+    "edit_profile": "Edit profile",
+    "logout": "Logout",
+    "want_more": "Want more?",
+    "powered_by": "This room is powered by {product}. Learn more at {productLink} or go ahead and create another room!",
+    "new_room": "+ New room"
   },
   "join": {
     "title": "Welcome to {roomName}",
@@ -146,29 +155,25 @@
     "leave": "Leave"
   },
   "purge_room": {
-    "title": "Purge room?",
-    "info": "This operation will close the room for all members. It cannot be undone.",
-    "button": "Purge room"
+    "title": "Delete room?",
+    "info": "This will close the room for all members. It cannot be undone.",
+    "button": "Delete room"
   },
   "room_info": {
-    "title": "Info",
+    "title": "Room Details",
     "created_by": "Created by {user}",
-    "permissions": "Permissions",
-    "join_invite": "Room can be joined by invitation only",
-    "join_public": "Anyone with the link can join",
+    "permissions": "Join Permissions",
+    "join_invite": "Only People Added",
+    "join_public": "Anyone with a link",
+    "copy_link": "Copy invite link",
     "link_copied": "Link copied!",
-    "purge": "Purge room",
+    "purge": "Delete room",
     "members": "Members",
     "user": "{user}",
     "user_you": "{user} (you)",
     "hide_all": "Hide",
-    "show_all": "Show all",
-    "my_profile": "My Profile",
-    "identity": "You are logged in as {displayName}.",
-    "identity_temporary": "Your identity {displayName} is temporary. You can change your name or set a password to keep it.",
-    "view_profile": "View",
-    "leave_room": "Leave group",
-    "leave_room_info": "Note: This step cannot be undone. Make sure you want to logout and delete the chat forever.",
+    "show_all": "Show all >",
+    "leave_room": "Leave",
     "version_info": "Powered by Guardian Project. Version: {version}"
   },
   "room_info_sheet": {

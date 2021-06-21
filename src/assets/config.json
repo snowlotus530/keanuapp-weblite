@@ -1,5 +1,7 @@
 {
     "appName": "Keanu Weblite",
+    "product": "Convene",
+    "productLink": "letsconvene.im",
     "defaultServer": "https://neo.keanu.im",
     "useShortCodeStickers": false,
     "analytics": {

@@ -16,13 +16,25 @@ $admin-fg: white;
         height: 100%;
     }
     .num-members {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 400;
         font-size: 12 * $chat-text-size;
         color: black;
     }
     .v-btn.leave-button {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 11 * $chat-text-size;
+        color: black;
+        background-color: white !important;
+        border: 1px solid black;
+        border-radius: $chat-standard-padding / 2;
+        height: $chat-standard-padding;
+        margin-top: $chat-standard-padding-xs;
+        margin-bottom: $chat-standard-padding-xs;
+    }
+    .v-btn.avatar {
+        font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 11 * $chat-text-size;
         color: black;
@@ -104,7 +116,7 @@ $admin-fg: white;
         padding-right: 2 * $chat-standard-padding-s;
         padding-top: 0px;
         .typing {
-            font-family: 'Inter', sans-serif;
+            font-family: "Inter", sans-serif;
             font-weight: 300;
             font-size: 12 * $chat-text-size;
             color: #1c242a;
@@ -127,7 +139,7 @@ $admin-fg: white;
             overflow-y: auto;
             padding: 0 0 0px 20px;
             margin: 6px 0;
-            font-family: 'Inter', sans-serif;
+            font-family: "Inter", sans-serif;
             font-weight: 300;
             font-size: 18 * $chat-text-size;
             .v-input__slot {
@@ -139,9 +151,9 @@ $admin-fg: white;
     }
 
     .scroll-to-end {
-        position:absolute;
-        top:-64px;
-        right:16px;
+        position: absolute;
+        top: -64px;
+        right: 16px;
     }
 
     .op-button {
@@ -158,7 +170,7 @@ $admin-fg: white;
 }
 
 .messageJoin {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 300;
     font-size: 15 * $chat-text-size;
     color: #1c242a;
@@ -215,7 +227,7 @@ $admin-fg: white;
         display: block;
     }
     .sender {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 400;
         font-style: normal;
         font-size: 10 * $chat-text-size;
@@ -225,7 +237,7 @@ $admin-fg: white;
         display: inline-block;
     }
     .time {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 400;
         font-style: normal;
         font-size: 10 * $chat-text-size;
@@ -268,7 +280,8 @@ $admin-fg: white;
         display: inline-block;
         width: 70%;
         max-width: 70%;
-        .v-image, video {
+        .v-image,
+        video {
             border-radius: 10px 10px 0 10px;
         }
     }
@@ -290,7 +303,7 @@ $admin-fg: white;
         display: block;
     }
     .sender {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 400;
         font-style: normal;
         font-size: 10 * $chat-text-size;
@@ -300,7 +313,7 @@ $admin-fg: white;
         margin-right: 8px;
     }
     .time {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 400;
         font-style: normal;
         font-size: 10 * $chat-text-size;
@@ -312,8 +325,9 @@ $admin-fg: white;
     }
 }
 
-.sender, .status {
-    font-family: 'Inter', sans-serif;
+.sender,
+.status {
+    font-family: "Inter", sans-serif;
     font-weight: 300;
     font-size: 15 * $chat-text-size;
     color: #1c242a;
@@ -321,7 +335,7 @@ $admin-fg: white;
 }
 
 .message {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 400;
     font-size: 16 * $chat-text-size;
     color: #000000;
@@ -349,7 +363,7 @@ $admin-fg: white;
     margin-bottom: 8px;
     user-select: text;
     .original-message-sender {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 13 * $chat-text-size;
         color: #000000;
@@ -357,7 +371,7 @@ $admin-fg: white;
         white-space: pre;
     }
     .original-message-text {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 400;
         font-size: 11 * $chat-text-size;
         color: #000000;
@@ -368,7 +382,7 @@ $admin-fg: white;
 }
 
 .time {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 300;
     font-style: italic;
     font-size: 15 * $chat-text-size;
@@ -377,7 +391,7 @@ $admin-fg: white;
 }
 
 .statusEvent {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 300;
     font-size: 15 * $chat-text-size;
     color: #1c242a;
@@ -405,7 +419,7 @@ $admin-fg: white;
         }
     }
     .play-time {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 400;
         font-size: 13 * $chat-text-size;
     }
@@ -420,7 +434,8 @@ $admin-fg: white;
     }
 }
 
-.message-operations-strut, .avatar-operations-strut {
+.message-operations-strut,
+.avatar-operations-strut {
     position: relative;
     height: 0px;
     z-index: 1;
@@ -499,9 +514,9 @@ $admin-fg: white;
     position: absolute;
     left: 0;
     top: 0;
-    width:100%;
-    height:100%;
-    background-color: rgba(0,0,0,0.4);
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
     align-items: center;
     display: flex;
     .download-text {
@@ -510,8 +525,9 @@ $admin-fg: white;
     }
 }
 
-.room-name, .room-name-inline {
-    font-family: 'Poppins', sans-serif;
+.room-name,
+.room-name-inline {
+    font-family: "Poppins", sans-serif;
     font-weight: 700;
     font-size: 18 * $chat-text-size;
     text-transform: uppercase;
@@ -523,6 +539,9 @@ $admin-fg: white;
     text-align: start;
 }
 
+.room-name.no-upper {
+    text-transform: none;
+}
 
 .read-marker {
     margin-left: 20px;
@@ -546,7 +565,7 @@ $admin-fg: white;
         position: absolute;
         top: -4px;
         background: white;
-        transform: translate(-50%,0);
+        transform: translate(-50%, 0);
         padding-left: 4px;
         padding-right: 4px;
         content: attr(title);
@@ -575,7 +594,7 @@ $admin-fg: white;
         position: absolute;
         top: -8px;
         background: white;
-        transform: translate(-50%,0);
+        transform: translate(-50%, 0);
         padding-left: 10px;
         padding-right: 10px;
         content: attr(title);
@@ -589,27 +608,60 @@ $admin-fg: white;
         background-color: transparent;
         border: none;
     }
+
     .room-avatar {
         background-color: #ededed;
-        width: 100px !important;
-        height: 100px !important;
+        width: 64px !important;
+        height: 64px !important;
         margin-bottom: 20px;
         .headline {
             font-size: 70 * $chat-text-size !important;
         }
     }
-    
+
+    .name {
+        font-family: "Poppins", sans-serif;
+        font-size: 32px;
+        font-weight: 800;
+    }
+
+    .topic {
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+    }
+
+    .created-by {
+        font-family: "Poppins", sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
     .avatar .headline {
         font-size: 16 * $chat-text-size !important;
     }
 
-    .qr {
-        width: 120px;
-        height: 120px;
-        width: min(30vw, 30vh); 
-        height: min(30vw, 30vh); 
-        background-color: #e0e0e0;
-        margin-top: 15px;
+    .qr-container {
+        background-color: white;
+        border-radius: 8px;
+        margin-top: 20px !important;
+        .qr {
+            width: 60px;
+            height: 60px;
+            background-color: #e0e0e0;
+        }
+        .link {
+            font-family: "Inter", sans-serif;
+            font-size: 16px;
+            text-decoration: underline;
+            color: #3d6eff;
+            overflow-wrap: anywhere;
+        }
+    }
+    .link-copied-in-place .v-btn__content {
+        font-family: "Inter", sans-serif !important;
+        font-size: 12px !important;
+        text-transform: none !important;
+        color: #3d6eff;
     }
 
     .v-card {
@@ -618,7 +670,7 @@ $admin-fg: white;
     }
 
     .member::after {
-        content: ' ';
+        content: " ";
         display: block;
         margin: 10px 0px;
         bottom: 0px;
@@ -632,6 +684,7 @@ $admin-fg: white;
         font-size: 14 * $chat-text-size;
         font-weight: bold;
         margin-left: 10px;
+        text-decoration: underline;
     }
 }
 
@@ -677,20 +730,29 @@ $admin-fg: white;
         font-weight: bold;
         margin-left: 10px;
     }
+}
 
-    .action {
-        padding: 4px 20px;
-        cursor: pointer;
-        &::after {
-            /* divider */
-            content: ' ';
-            display: block;
-            margin: 10px 0px;
-            bottom: 0px;
-            height: 1px;
-            background-color: #e1e1e1;
-            width: 100%;
-        }
+.action-row {
+    padding: 4px 20px;
+    cursor: pointer;
+    height: 55px;
+    font-family: "Inter", sans-serif;
+    font-size: 19px;
+    color: black;
+    position: relative;
+    .v-icon {
+        color: black !important;
+    }
+    &:not(:last-of-type):after {
+        /* divider */
+        position: absolute;
+        content: " ";
+        display: block;
+        margin: 0px 10px;
+        bottom: 0px;
+        height: 1px;
+        background-color: #e1e1e1;
+        width: 100%;
     }
 }
 
@@ -768,10 +830,10 @@ $admin-fg: white;
 
 .room-info-sheet {
     background-color: white;
-    
+
     .current-room {
         padding: 25px;
-        background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%), #F5F5F7;
+        background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0) 100%), #f5f5f7;
         box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.15);
         border-radius: 18px;
     }
@@ -805,7 +867,7 @@ $admin-fg: white;
     /* Remove text underline */
     border-style: none !important;
 }
-    
+
 .created-room-welcome-header {
     background-color: #e0e0e0;
     border-radius: 25px;
@@ -825,4 +887,14 @@ $admin-fg: white;
     text-align: center;
     vertical-align: middle;
     padding-top: 10px;
+}
+
+.avatar-32 {
+    font-size: 18 * $chat-text-size !important;
+    &.clickable {
+        cursor: pointer;
+        &:hover {
+            opacity: 0.7;
+        }
+    }
 }

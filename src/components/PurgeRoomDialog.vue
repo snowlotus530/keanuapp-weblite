@@ -2,7 +2,6 @@
   <v-dialog v-model="showDialog" v-show="room" class="ma-0 pa-0" width="80%">
     <div class="dialog-content text-center">
       <template>
-        <v-icon color="black" size="30">lock</v-icon>
         <h2 class="dialog-title">{{ $t("purge_room.title") }}</h2>
         <div class="dialog-text">
           {{ $t("purge_room.info") }}
