@@ -63,13 +63,13 @@
     "room_list_rooms": "Rooms"
   },
   "room_welcome": {
-    "welcome": "Welcome!",
-    "info": "Here are a few things to know about your group:",
+    "info": "Welcome! Here are a few things to know about your room:",
     "encrypted": "Messages are end-to-end encrypted.",
     "room_history_is": "Room history is {type}.",
+    "room_history_joined": "People can only see the messages sent after they join.",
     "join_public": "Anyone can join by opening this link: {link}.",
     "join_invite": "Only people you invite can join.",
-    "info_permissions": "You can change 'join permissions' and 'message history' at any time in the group settings.",
+    "info_permissions": "You can change ‘join permissions’ at any time in the room settings.",
     "got_it": "Got it"
   },
   "new_room": {
