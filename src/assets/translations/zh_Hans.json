@@ -23,7 +23,30 @@
     "message": {
         "you": "你",
         "user_aliased_room": "{用户} 创建了房间别名 {alias}",
-        "user_created_room": "{用户} 创建了房间"
+        "user_created_room": "{用户} 创建了房间",
+        "user_changed_room_topic": "{用户}把房间话题更改为{话题}",
+        "user_changed_room_name": "{用户} 把房间的名更改为{名}",
+        "room_joinrule_public": "公开",
+        "room_joinrule_invite": "只邀请",
+        "user_changed_join_rules": "{用户}已创建了房间{类型}",
+        "room_history_joined": "成员从加入时就可以阅读",
+        "room_history_invited": "成员从被邀请的那刻起可以阅读",
+        "room_history_shared": "房间里的所有成员都可以阅读",
+        "room_history_world_readable": "任何人都可读",
+        "user_changed_room_history": "{用户} 创建了房间历史 {类型}",
+        "upload_progress_with_total": "已上传 {总共}的{数}",
+        "upload_progress": "已上传 {数}",
+        "download_progress": "{百分数}% 已下载",
+        "edited": "(已编辑)",
+        "file_prefix": "文件： ",
+        "user_said": "{用户} 说:",
+        "user_left": "{用户} 已退出聊天",
+        "user_joined": "{用户} 已加入聊天...",
+        "user_was_invited": "{用户}被邀请加入聊天...",
+        "user_encrypted_room": "{用户}把房间加密了",
+        "user_changed_room_avatar": "{用户}更改了房间的头像",
+        "user_changed_avatar": "{用户}更改了头像",
+        "user_changed_display_name": "{用户}把显示名更改为{显示名}"
     },
     "menu": {
         "login": "登录",
@@ -35,7 +58,8 @@
         "start_private_chat": "与该用户的私人聊天",
         "logout": "退出",
         "ok": "好的",
-        "reply": "回复"
+        "reply": "回复",
+        "back": "返回"
     },
     "Keanu Weblite": "网络灯"
 }
