@@ -41,7 +41,7 @@
         "file_prefix": "文件： ",
         "user_said": "{用户} 说:",
         "user_left": "{用户} 已退出聊天",
-        "user_joined": "{用户} 已加入聊天...",
+        "user_joined": "{用户} 已加入聊天",
         "user_was_invited": "{user} 被邀请加入聊天...",
         "user_encrypted_room": "{user} 把聊天室加密了",
         "user_changed_room_avatar": "{user} 更改了聊天室的头像",
