@@ -14,6 +14,15 @@ export default {
             throw new Error('Please initialise plugin with a Vuex store.')
         }
 
+        // Set User-Agent headers.
+        // Update: browser do not allow this, "Refused to set unsafe header "User-Agent""
+        // Keep this code around however, since it's an example of how to add headers to a request...
+        // sdk.wrapRequest((orig, opts, callback) => {
+        //     opts.headers = opts.headers || {}
+        //     opts.headers['User-Agent'] = "Keanu";
+        //     var ret = orig(opts, callback);
+        //     return ret;
+        // });
         const store = options.store;
         const i18n = options.i18n;
 
@@ -107,6 +116,7 @@ export default {
                         promiseLogin = tempMatrixClient
                             .register(user, pass, null, {
                                 type: "m.login.dummy",
+                                initial_device_display_name: config.appName
                             })
                             .then((response) => {
                                 console.log("Response", response);
@@ -116,7 +126,7 @@ export default {
                                 return response;
                             })
                     } else {
-                        var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password" };
+                        var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password", initial_device_display_name: config.appName };
                         if (user.device_id) {
                             data.device_id = user.device_id;
                         }
@@ -721,6 +731,7 @@ export default {
                             clientPromise = tempMatrixClient
                                 .register(user, pass, null, {
                                     type: "m.login.dummy",
+                                    initial_device_display_name: config.appName
                                 })
                                 .then((response) => {
                                     console.log("Response", response);
@@ -733,7 +744,7 @@ export default {
 
                         // Get an access token
                         clientPromise = clientPromise.then(user => {
-                            var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password" };
+                            var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password", initial_device_display_name: config.appName };
                             if (user.device_id) {
                                 data.device_id = user.device_id;
                             }
