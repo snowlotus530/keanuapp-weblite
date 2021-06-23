@@ -22,8 +22,8 @@
     },
     "message": {
         "you": "你",
-        "user_aliased_room": "{用户} 创建了房间别名 {alias}",
-        "user_created_room": "{用户} 创建了房间",
+        "user_aliased_room": "{user} 把聊天室别名设为 {alias}",
+        "user_created_room": "{user} 创建了聊天室",
         "user_changed_room_topic": "{用户}把房间话题更改为{话题}",
         "user_changed_room_name": "{用户} 把房间的名更改为{名}",
         "room_joinrule_public": "公开",
@@ -42,11 +42,12 @@
         "user_said": "{用户} 说:",
         "user_left": "{用户} 已退出聊天",
         "user_joined": "{用户} 已加入聊天...",
-        "user_was_invited": "{用户}被邀请加入聊天...",
-        "user_encrypted_room": "{用户}把房间加密了",
-        "user_changed_room_avatar": "{用户}更改了房间的头像",
-        "user_changed_avatar": "{用户}更改了头像",
-        "user_changed_display_name": "{用户}把显示名更改为{显示名}"
+        "user_was_invited": "{user} 被邀请加入聊天...",
+        "user_encrypted_room": "{user} 把聊天室加密了",
+        "user_changed_room_avatar": "{user} 更改了聊天室的头像",
+        "user_changed_avatar": "{user} 更改了头像",
+        "user_changed_display_name": "{user} 把显示名更改为 {displayName}",
+        "unread_messages": "未读消息"
     },
     "menu": {
         "login": "登录",
@@ -55,7 +56,7 @@
         "download": "下载",
         "delete": "删除",
         "edit": "编辑",
-        "start_private_chat": "与该用户的私人聊天",
+        "start_private_chat": "与该用户私人聊天",
         "logout": "退出",
         "ok": "好的",
         "reply": "回复",
