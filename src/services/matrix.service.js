@@ -594,8 +594,9 @@ export default {
                             // Is the other member the one we are looking for?
                             if (this.isDirectRoomWith(room, userId)) {
                                 var member = room.getMember(userId);
-                                if (member && member.membership == "invite") {
-                                    // TODO Resend invite
+                                if (member && member.membership != "join") {
+                                    // Resend invite
+                                    this.matrixClient.invite(room.roomId, userId);
                                 }
                                 resolve(room);
                                 return;
