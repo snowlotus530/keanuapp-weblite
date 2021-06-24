@@ -891,10 +891,16 @@ $admin-fg: white;
 
 .avatar-32 {
     font-size: 18 * $chat-text-size !important;
-    &.clickable {
-        cursor: pointer;
-        &:hover {
-            opacity: 0.7;
-        }
+}
+
+.avatar-48 {
+    font-size: 27 * $chat-text-size !important;
+}
+
+.avatar-32.clickable,
+.avatar-48.clickable {
+    cursor: pointer;
+    &:hover {
+        opacity: 0.7;
     }
 }
