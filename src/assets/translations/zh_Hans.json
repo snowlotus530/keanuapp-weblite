@@ -1,0 +1,186 @@
+{
+    "fallbacks": {
+        "download_name": "下载",
+        "original_text": "<原文>",
+        "video_file": "视频文件",
+        "audio_file": "音频文件"
+    },
+    "room_info": {
+        "hide_all": "隐藏",
+        "title": "信息",
+        "version_info": "由守护者计划提供支持.版本：{version}",
+        "leave_room_info": "注意：此步骤无法撤消。 确保您要注销并永久删除聊天记录。",
+        "leave_room": "离开群组",
+        "view_profile": "查看",
+        "identity_temporary": "您的身份 {displayName} 是临时的。 您可以更改您的姓名或设置密码来保留它。",
+        "identity": "您以 {displayName} 的身份登录。",
+        "my_profile": "我的简历",
+        "show_all": "显示所有",
+        "user_you": "{user} (你)",
+        "user": "{user}",
+        "members": "成员",
+        "purge": "删除聊天室",
+        "link_copied": "链接已复制!",
+        "join_public": "知道链接的任何人都可以加入",
+        "join_invite": "聊天室只能通过邀请加入",
+        "permissions": "权限",
+        "created_by": "由 {user} 创建"
+    },
+    "leave": {
+        "leave": "离开",
+        "go_back": "返回",
+        "create_account": "创建一个帐户",
+        "text_invite": "此群组已锁定。未经特别许可，您不能重新加入。",
+        "title_invite": "你确定要离开吗？",
+        "text_public_lastroom": "如果您想再次加入此群组，您可以以新身份加入。 要保留{user}，{action}。",
+        "text_public": "如果您知道链接，您可以随时再次加入此聊天室。",
+        "title_public": "再见，{user}"
+    },
+    "login": {
+        "login": "登录",
+        "password": "密码",
+        "title": "登录",
+        "password_required": "需要密码",
+        "username_required": "需要用户名",
+        "username": "用户名"
+    },
+    "device_list": {
+        "title": "设备",
+        "not_verified": "未验证",
+        "verified": "已验证",
+        "blocked": "被封锁"
+    },
+    "room": {
+        "leave": "离开",
+        "members": "无成员 | 1 名成员 | {count} 名成员"
+    },
+    "message": {
+        "you": "你",
+        "user_aliased_room": "{user} 把聊天室别名设为 {alias}",
+        "user_created_room": "{user} 创建了聊天室",
+        "user_changed_room_topic": "{user} 把聊天室的话题更改为{topic}",
+        "user_changed_room_name": "{user} 把聊天室的名更改为 {name}",
+        "room_joinrule_public": "公开",
+        "room_joinrule_invite": "只邀请",
+        "user_changed_join_rules": "{user} 已创建了聊天室 {type}",
+        "room_history_joined": "成员从加入时就可以阅读",
+        "room_history_invited": "成员从被邀请的那刻起可以阅读",
+        "room_history_shared": "聊天室里的所有成员都可以阅读",
+        "room_history_world_readable": "任何人都可读",
+        "user_changed_room_history": "{user} 创建了聊天室的历史 {type}",
+        "upload_progress_with_total": "已上传 {total} 的 {count}",
+        "upload_progress": "已上传 {count}",
+        "download_progress": "{percentage}% 已下载",
+        "edited": "(已编辑)",
+        "file_prefix": "文件： ",
+        "user_said": "{user} 说:",
+        "user_left": "{user} 已退出聊天",
+        "user_joined": "{user} 已加入聊天",
+        "user_was_invited": "{user} 被邀请加入聊天...",
+        "user_encrypted_room": "{user} 把聊天室加密了",
+        "user_changed_room_avatar": "{user} 更改了聊天室的头像",
+        "user_changed_avatar": "{user} 更改了头像",
+        "user_changed_display_name": "{user} 把显示名更改为 {displayName}",
+        "unread_messages": "未读消息",
+        "user_powerlevel_change_from_to": "{user} 从 {powerOld} 到 {powerNew}",
+        "room_powerlevel_change": "{user}更改了{changes} 的能量等级",
+        "users_are_typing": "{count} 成员正在输入",
+        "user_is_typing": "{user} 正在输入",
+        "scale_image": "缩放图像",
+        "your_message": "你的信息...",
+        "replying_to_event": "回复事件：{message}"
+    },
+    "menu": {
+        "login": "登录",
+        "send": "发送",
+        "cancel": "取消",
+        "download": "下载",
+        "delete": "删除",
+        "edit": "编辑",
+        "start_private_chat": "与该用户私人聊天",
+        "logout": "退出",
+        "ok": "好的",
+        "reply": "回复",
+        "back": "返回"
+    },
+    "Keanu Weblite": "网络灯",
+    "power_level": {
+        "restricted": "被限制",
+        "custom": "自定义({level})",
+        "default": "默认",
+        "moderator": "版主",
+        "admin": "行政人员"
+    },
+    "voice_recorder": {
+        "not_supported_text": "很遗憾，此浏览器不支持录音。",
+        "not_supported_title": "不支持",
+        "failed_to_record": "无法录制音频",
+        "release_to_cancel": "释放取消",
+        "swipe_to_cancel": "滑动取消"
+    },
+    "room_info_sheet": {
+        "create_room": "创建群组",
+        "view_details": "查看详情",
+        "this_room": "这个群组"
+    },
+    "purge_room": {
+        "button": "删除聊天室",
+        "title": "删除聊天室?",
+        "info": "此操作将会关闭所有成员的聊天室。 它无法撤消。"
+    },
+    "invite": {
+        "title": "添加好友",
+        "status_inviting": "正在邀请好友{index} 的 {count}",
+        "status_error": "邀请一位或多位好友失败！",
+        "send_invites_to": "发送邀请至",
+        "done": "完毕"
+    },
+    "join": {
+        "status_joining": "正在加入聊天室...",
+        "status_logging_in": "正在登录中...",
+        "join_guest": "以访客身份加入",
+        "join": "加入聊天室",
+        "joining_as": "您以以下身份加入：",
+        "shared_computer": "正在使用一台共享的电脑",
+        "user_name_label": "用户名",
+        "title": "欢迎来到 {roomName}"
+    },
+    "profile": {
+        "display_name": "显示名称",
+        "password_repeat": "重复新密码",
+        "password_new": "新的密码",
+        "password_old": "旧密码",
+        "change_password": "更改密码",
+        "change_name": "更改名称",
+        "set_password": "设置密码",
+        "temporary_identity": "这个身份是暂时的。为了再次使用这个暂时身份，请设置密码",
+        "title": "我的简历"
+    },
+    "new_room": {
+        "status_avatar": "正在上传头像：{count}",
+        "status_avatar_total": "正在上传头像：{total}的 {count}",
+        "status_creating": "创建聊天室",
+        "invite_description": "从列表中选择或者按帐户 ID 搜索",
+        "invite_info": "仅添加人员",
+        "public_description": "获取链接以分享",
+        "public_info": "有链接的任何人",
+        "link_copied": "链接已复制！",
+        "add_people": "添加人员",
+        "get_link": "获取链接",
+        "join_permissions_info": "这些权限决定加入群组的方式以及邀请他人有多容易. 那些权限随时可以更改。",
+        "set_join_permissions": "设置加入权限",
+        "join_permissions": "加入权限",
+        "name_room": "为群组命名",
+        "next": "下一步",
+        "done": "完毕",
+        "new_room": "新的群组"
+    },
+    "room_welcome": {
+        "got_it": "知道了",
+        "info_permissions": "在群组设置中，您随时可以更改“加入权限”和“消息历史”。",
+        "info": "关于您的群组，您需要了解以下几点：",
+        "join_invite": "只有您邀请的人可以加入。",
+        "join_public": "任何人都可以加入通过打开此链接: {link}",
+        "welcome": "欢迎！"
+    }
+}
