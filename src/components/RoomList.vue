@@ -1,39 +1,61 @@
 <template>
   <v-list dense class="room-list">
-    <div v-if="showInvites && $matrix.invites.length > 0" class="h4">{{invitesTitle}}</div>
-    <v-list-item-group v-if="showInvites" v-model="currentRoomId" color="primary">
+    <div v-if="showInvites && $matrix.invites.length > 0" class="h4">
+      {{ invitesTitle }}
+    </div>
+    <v-list-item-group
+      v-if="showInvites"
+      v-model="currentRoomId"
+      color="primary"
+    >
       <v-slide-y-transition group>
-      <v-list-item :disabled="roomsProcessing[room.roomId]" v-for="room in $matrix.invites" :key="room.roomId" :value="room.roomId">
-        <v-list-item-avatar size="40" color="#e0e0e0">
-          <v-img :src="room.avatar" />
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title>{{ room.name || room.summary.info.title }}</v-list-item-title>
-          <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
-        </v-list-item-content>
-        <v-list-item-action>
-          <v-btn @click.stop="acceptInvitation(room)" icon><v-icon>check_circle</v-icon></v-btn>
-          <v-btn @click.stop="rejectInvitation(room)" icon><v-icon>cancel</v-icon></v-btn>
-        </v-list-item-action>
-      </v-list-item>
+        <v-list-item
+          :disabled="roomsProcessing[room.roomId]"
+          v-for="room in $matrix.invites"
+          :key="room.roomId"
+          :value="room.roomId"
+        >
+          <v-list-item-avatar size="40" color="#e0e0e0">
+            <v-img :src="room.avatar" />
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title>{{
+              room.name || room.summary.info.title
+            }}</v-list-item-title>
+            <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-btn @click.stop="acceptInvitation(room)" icon
+              ><v-icon>check_circle</v-icon></v-btn
+            >
+            <v-btn @click.stop="rejectInvitation(room)" icon
+              ><v-icon>cancel</v-icon></v-btn
+            >
+          </v-list-item-action>
+        </v-list-item>
       </v-slide-y-transition>
     </v-list-item-group>
-    <div class="h4">{{title}}</div>
+    <div class="h4">{{ title }}</div>
     <v-list-item-group v-model="currentRoomId" color="primary">
       <v-list-item v-if="showCreate" @click.stop="$emit('newroom')">
-        <v-list-item-avatar size="40" color="#e0e0e0">
-          <v-img />
-        </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title>{{$t('menu.new_room')}}</v-list-item-title>
+          <v-list-item-title class="new-room">{{
+            $t("menu.new_room")
+          }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item v-for="room in $matrix.joinedRooms" :key="room.roomId" :value="room.roomId">
+      <v-list-item
+        v-for="room in $matrix.joinedRooms"
+        :key="room.roomId"
+        :value="room.roomId"
+      >
         <v-list-item-avatar size="40" color="#e0e0e0">
           <v-img :src="room.avatar" />
         </v-list-item-avatar>
-        <div class="room-list-notification-count">{{ notificationCount(room) }}</div>
+        <div class="room-list-notification-count">
+          {{ notificationCount(room) }}
+        </div>
         <v-list-item-content>
           <v-list-item-title>{{ room.summary.info.title }}</v-list-item-title>
           <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
@@ -45,7 +67,7 @@
 
 <script>
 import util from "../plugins/utils";
-import Vue from 'vue';
+import Vue from "vue";
 
 export default {
   name: "RoomList",
@@ -53,20 +75,20 @@ export default {
   props: {
     title: {
       type: String,
-      default: "Rooms"
+      default: "Rooms",
     },
     invitesTitle: {
       type: String,
-      default: "Invites"
+      default: "Invites",
     },
     showInvites: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showCreate: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   data: () => ({
@@ -77,18 +99,23 @@ export default {
 
   methods: {
     notificationCount(room) {
-      return room.getUnreadNotificationCount('total') || 0;
+      return room.getUnreadNotificationCount("total") || 0;
     },
 
     acceptInvitation(room) {
       Vue.set(this.roomsProcessing, room.roomId, true);
-      this.$matrix.matrixClient.joinRoom(room.roomId)
+      this.$matrix.matrixClient
+        .joinRoom(room.roomId)
         .then((ignoredRoom) => {
           this.$nextTick(() => {
             this.$navigation.push(
               {
                 name: "Chat",
-                params: { roomId: util.sanitizeRoomId(room.getCanonicalAlias() || room.roomId) },
+                params: {
+                  roomId: util.sanitizeRoomId(
+                    room.getCanonicalAlias() || room.roomId
+                  ),
+                },
               },
               -1
             );
@@ -104,7 +131,8 @@ export default {
 
     rejectInvitation(room) {
       Vue.set(this.roomsProcessing, room.roomId, true);
-      this.$matrix.leaveRoom(room.roomId)
+      this.$matrix
+        .leaveRoom(room.roomId)
         .catch((err) => {
           console.error("Failed to reject invite: ", err);
         })
@@ -121,7 +149,13 @@ export default {
         return;
       }
       this.$emit("close");
-      this.$navigation.push({name: 'Chat', params: { roomId: util.sanitizeRoomId(this.currentRoomId) }}, -1);
+      this.$navigation.push(
+        {
+          name: "Chat",
+          params: { roomId: util.sanitizeRoomId(this.currentRoomId) },
+        },
+        -1
+      );
     },
   },
 };

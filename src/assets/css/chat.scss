@@ -869,7 +869,7 @@ $admin-fg: white;
 }
 
 .created-room-welcome-header {
-    background-color: #e0e0e0;
+    background-color: #f5f5f5;
     border-radius: 25px;
     margin: 20px;
     padding: 20px;
@@ -891,10 +891,29 @@ $admin-fg: white;
 
 .avatar-32 {
     font-size: 18 * $chat-text-size !important;
-    &.clickable {
-        cursor: pointer;
-        &:hover {
-            opacity: 0.7;
-        }
+}
+
+.avatar-48 {
+    font-size: 27 * $chat-text-size !important;
+}
+
+.avatar-32.clickable,
+.avatar-48.clickable {
+    cursor: pointer;
+    &:hover {
+        opacity: 0.7;
+    }
+}
+
+.new-room {
+    font-family: "Inter", sans-serif;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-decoration: underline;
+    color: black;
+    &::after {
+        content: "\00a0\00a0>";
+        display: inline-block;
+        text-decoration: none !important;
     }
 }
