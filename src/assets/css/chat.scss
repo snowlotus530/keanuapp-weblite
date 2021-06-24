@@ -904,3 +904,16 @@ $admin-fg: white;
         opacity: 0.7;
     }
 }
+
+.new-room {
+    font-family: "Inter", sans-serif;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-decoration: underline;
+    color: black;
+    &::after {
+        content: "\00a0\00a0>";
+        display: inline-block;
+        text-decoration: none !important;
+    }
+}
