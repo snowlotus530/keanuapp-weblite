@@ -1664,6 +1664,9 @@ export default {
     updateRecentEmojis() {
       if (this.$refs.emojiPicker) {
         this.recentEmojis = this.$refs.emojiPicker.mapEmojis["Frequently"];
+        if (this.recentEmojis.length < 20){
+          this.recentEmojis.push(this.$refs.emojiPicker.mapEmojis["Peoples"]);
+        }
         return;
       }
       this.recentEmojis = [];
