@@ -188,7 +188,15 @@
           {{ $t("new_room.link_copied") }}
         </div>
 -->
-      <div v-if="status">{{ status }}</div>
+      <div v-if="status" class="text-center">
+        <v-progress-circular
+          v-if="step == steps.CREATING"
+          indeterminate
+          color="primary"
+          size="20"
+        ></v-progress-circular>
+        {{ status }}
+      </div>
       <!-- </div> -->
     </v-fade-transition>
     <input
@@ -341,20 +349,13 @@ export default {
         );
       });
     },
-    createRoomDebug() {
-      this.step = steps.CREATING;
-      return new Promise((resolve, ignoredreject) => {
-        setTimeout(() => {
-          this.step = steps.CREATED;
-          resolve("#NpexPublicRoom2:neo.keanu.im");
-        }, 5000);
-      });
-    },
     createRoom() {
       this.step = steps.CREATING;
 
       const hasUser = this.currentUser ? true : false;
       var setProfileData = false;
+
+      var uniqueAliasPromise = Promise.resolve(true);
 
       var roomId;
       this.status = this.$t("new_room.status_creating");
@@ -362,7 +363,6 @@ export default {
       if (this.joinRule == "public") {
         createRoomOptions = {
           visibility: "private", // Not listed!
-          room_alias_name: this.roomName.replace(/\s/g, "").toLowerCase(),
           name: this.roomName,
           preset: "public_chat",
           initial_state: [
@@ -375,6 +375,18 @@ export default {
             },
           ],
         };
+
+        // Promise to get a unique alias and use it in room creation options.
+        //
+        uniqueAliasPromise = util
+          .getUniqueAliasForRoomName(
+            this.$matrix.matrixClient,
+            this.roomName,
+            this.$matrix.currentUserHomeServer
+          )
+          .then((alias) => {
+            createRoomOptions.room_alias_name = alias;
+          });
       } else {
         //if (this.joinRule == "invite") {
         createRoomOptions = {
@@ -457,6 +469,9 @@ export default {
             }
           }.bind(this)
         )
+        .then(() => {
+          return uniqueAliasPromise;
+        })
         .then(() => {
           return this.$matrix.matrixClient
             .createRoom(createRoomOptions)
