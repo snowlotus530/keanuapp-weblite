@@ -49,6 +49,7 @@
         v-for="room in $matrix.joinedRooms"
         :key="room.roomId"
         :value="room.roomId"
+        style="position: relative"
       >
         <v-list-item-avatar size="40" color="#e0e0e0">
           <v-img :src="room.avatar" />

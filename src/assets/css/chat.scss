@@ -51,6 +51,7 @@ $admin-fg: white;
     position: absolute;
     top: 10px;
     left: 40px;
+    right: initial;
     color: white;
     background-color: black;
     font-size: 10px;
@@ -61,6 +62,10 @@ $admin-fg: white;
     text-align: center;
     padding-left: 4px;
     padding-right: 4px;
+    [dir="rtl"] & {
+        right: 40px;
+        left: initial;
+    }
 }
 
 .chat-root {
@@ -138,6 +143,9 @@ $admin-fg: white;
             overflow-x: hidden;
             overflow-y: auto;
             padding: 0 0 0px 20px;
+            [dir="rtl"] & {
+                padding: 0 20px 0px 0px;
+            }
             margin: 6px 0;
             font-family: "Inter", sans-serif;
             font-weight: 300;
@@ -181,10 +189,16 @@ $admin-fg: white;
 .messageIn {
     margin: 8px;
     text-align: left;
+    [dir="rtl"] & {
+        text-align: right;
+    }
     position: relative;
     .bubble {
         background-color: #eeeeee;
         border-radius: 0px 10px 10px 10px;
+        [dir="rtl"] & {
+            border-radius: 10px 0px 10px 0px;
+        }
         padding: 8px;
         border-width: 1px !important;
         border-style: solid !important;
@@ -220,6 +234,10 @@ $admin-fg: white;
         display: inline-block;
         vertical-align: top !important;
         margin-right: 10px;
+        [dir="rtl"] & {
+            margin-right: initial;
+            margin-left: 10px;
+        }
         top: 0;
         border: 2px solid white;
     }
@@ -234,6 +252,10 @@ $admin-fg: white;
         color: rgba(#000000, 0.6);
         margin-left: 40px;
         margin-right: 8px;
+        [dir="rtl"] & {
+            margin-left: 8px;
+            margin-right: 40px;
+        }
         display: inline-block;
     }
     .time {
@@ -252,10 +274,16 @@ $admin-fg: white;
 .messageOut {
     margin: 8px;
     text-align: right;
+    [dir="rtl"] & {
+        text-align: left;
+    }
     position: relative;
     .bubble {
         background-color: #e5e5e5;
         border-radius: 10px 10px 0 10px;
+        [dir="rtl"] & {
+            border-radius: 10px 10px 10px 0px;
+        }
         padding: 8px;
         display: inline-block;
         position: relative;
@@ -264,6 +292,9 @@ $admin-fg: white;
     .audio-bubble {
         background-color: #e5e5e5;
         border-radius: 10px 10px 0 10px;
+        [dir="rtl"] & {
+            border-radius: 10px 10px 10px 0px;
+        }
         padding: 8px;
         display: inline-block;
         position: relative;
@@ -274,6 +305,9 @@ $admin-fg: white;
     .video2-bubble {
         background-color: #e5e5e5;
         border-radius: 10px 10px 0 10px;
+        [dir="rtl"] & {
+            border-radius: 10px 10px 10px 0px;
+        }
     }
     .bubble.image-bubble {
         padding: 0px;
@@ -283,6 +317,9 @@ $admin-fg: white;
         .v-image,
         video {
             border-radius: 10px 10px 0 10px;
+            [dir="rtl"] & {
+                border-radius: 10px 10px 10px 0px;
+            }
         }
     }
     .bubble.sticker-bubble {
@@ -296,6 +333,10 @@ $admin-fg: white;
         display: inline-block;
         vertical-align: bottom !important;
         margin-left: 10px;
+        [dir="rtl"] & {
+            margin-left: initial;
+            margin-right: 10px;
+        }
         bottom: 0;
         border: 2px solid white;
     }
@@ -311,6 +352,10 @@ $admin-fg: white;
         display: inline-block;
         margin-left: 40px;
         margin-right: 8px;
+        [dir="rtl"] & {
+            margin-left: 8px;
+            margin-right: 40px;
+        }
     }
     .time {
         font-family: "Inter", sans-serif;
@@ -438,6 +483,7 @@ $admin-fg: white;
 .avatar-operations-strut {
     position: relative;
     height: 0px;
+
     z-index: 1;
 }
 
@@ -445,7 +491,7 @@ $admin-fg: white;
     position: absolute;
     width: fit-content;
     background-color: white;
-    height: 40px;
+    height: 45px;
     border-radius: 20px;
     box-shadow: 4px 4px 8px #888888;
     // &.incoming {
@@ -566,6 +612,9 @@ $admin-fg: white;
         top: -4px;
         background: white;
         transform: translate(-50%, 0);
+        [dir="rtl"] & {
+            transform: translate(50%, 0);
+        }
         padding-left: 4px;
         padding-right: 4px;
         content: attr(title);
@@ -595,6 +644,9 @@ $admin-fg: white;
         top: -8px;
         background: white;
         transform: translate(-50%, 0);
+        [dir="rtl"] & {
+            transform: translate(50%, 0);
+        }
         padding-left: 10px;
         padding-right: 10px;
         content: attr(title);
@@ -684,6 +736,11 @@ $admin-fg: white;
         font-size: 14 * $chat-text-size;
         font-weight: bold;
         margin-left: 10px;
+        [dir="rtl"] & {
+            margin-left: initial;
+            margin-right: 10px;
+        }
+
         text-decoration: underline;
     }
 }
@@ -695,12 +752,24 @@ $admin-fg: white;
     margin: 10px 0px;
     font-weight: bold;
     font-size: 12 * $chat-text-size;
+    [dir="rtl"] & {
+        right: 0px;
+        left: unset;
+        .v-icon {
+            // Mirror the icon
+            transform: scale(-1, 1);
+        }
+    }
 }
 
 .header-button-right {
     position: absolute;
     top: 0px;
     right: 0px;
+    [dir="rtl"] & {
+        left: 0px;
+        right: unset;
+    }
     margin: 10px 0px;
     font-weight: bold;
     font-size: 12 * $chat-text-size;
@@ -729,6 +798,10 @@ $admin-fg: white;
         font-size: 14 * $chat-text-size;
         font-weight: bold;
         margin-left: 10px;
+        [dir="rtl"] & {
+            margin-left: initial;
+            margin-right: 10px;
+        }
     }
 }
 
@@ -881,7 +954,7 @@ $admin-fg: white;
     left: 20%;
     right: 20%;
     background-color: #888888;
-    height: 50px;
+    height: 40px;
     border-radius: 25px;
     color: white;
     text-align: center;
@@ -916,4 +989,8 @@ $admin-fg: white;
         display: inline-block;
         text-decoration: none !important;
     }
+}
+
+.recent-emoji {
+    color: black;
 }

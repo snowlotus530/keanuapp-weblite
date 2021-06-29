@@ -1,14 +1,14 @@
 <template>
   <div :class="{'message-operations':true,'incoming':incoming,'outgoing':!incoming}">
     <template v-for="(item,index) in emojis">
-      <v-btn v-if="index < maxRecents" :key="item.data" icon @click.stop="addQuickReaction(item.data)" class="ma-0 pa-0">
-        <span class="recent-emoji" >{{ item.data }}</span>
+      <v-btn v-if="index < maxRecents" :key="item.data" icon @click.stop="addQuickReaction(item.data)" class="ma-0 pa-0" dense>
+        <span class="recent-emoji">{{ item.data }}</span>
       </v-btn>
     </template>
-    <v-btn v-if="incoming" icon @click.stop="addReply" class="ma-0 pa-0">
+    <v-btn v-if="incoming" icon @click.stop="addReply" class="ma-0 pa-0" large>
       <v-icon>reply</v-icon>
     </v-btn>
-    <v-btn icon @click.stop="more" class="ma-0 pa-0">
+    <v-btn icon @click.stop="more" class="ma-0 pa-0" large>
       <v-icon>more_horiz</v-icon>
     </v-btn>  </div>
 </template>
@@ -46,9 +46,4 @@ export default {
 
 <style lang="scss">
 @import "@/assets/css/chat.scss";
-
-// .recent-emoji {
-//   width: 30px;
-// }
-
 </style>
