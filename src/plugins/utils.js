@@ -580,6 +580,36 @@ class Util {
     browserCanRecordAudio() {
         return _browserCanRecordAudio;
     }
+
+    getUniqueAliasForRoomName(matrixClient, roomName, homeServer, iterationCount) {
+        return new Promise((resolve, reject) => {
+            var preferredAlias = roomName.replace(/\s/g, "").toLowerCase();
+            var tryAlias = "#" + preferredAlias + ":" + homeServer;
+            matrixClient.getRoomIdForAlias(tryAlias)
+                .then(ignoredid => {
+                    // We got a response, this means the tryAlias already exists.
+                    // Try again, with appended random chars
+                    if (iterationCount) {
+                        // Not the first time around. Reached max tries?
+                        if (iterationCount == 5) {
+                            reject("Failed to get unique room alias");
+                            return;
+                        }
+                        // Else, strip random chars from end so we can try again
+                        roomName = roomName.substring(0, roomName.length - 5);
+                    }
+                    const randomChars = this.randomString(4, "abcdefghijklmnopqrstuvwxyz0123456789");
+                    resolve(this.getUniqueAliasForRoomName(matrixClient, roomName + "-" + randomChars, homeServer, (iterationCount || 0) + 1))
+                })
+                .catch(err => {
+                    if (err.errcode == 'M_NOT_FOUND') {
+                        resolve(preferredAlias);
+                    } else {
+                        reject(err);
+                    }
+                })
+        });
+    }
 }
 export default new Util();
 

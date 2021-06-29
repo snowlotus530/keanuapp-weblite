@@ -6,7 +6,7 @@ export default class User {
         this.is_guest = is_guest || false
     }
 
-    normalize = function() {
+    normalize = function () {
         if (this.user_id.startsWith('@') && this.user_id.includes(':')) {
             const parts = this.user_id.split(":");
             this.user_id = parts[0].substring(1);
@@ -14,7 +14,7 @@ export default class User {
         }
     };
 
-    static homeServerUrl = function(home_server) {
+    static homeServerUrl = function (home_server) {
         if (home_server && !home_server.startsWith("https://")) {
             return "https://" + home_server;
         }
@@ -25,6 +25,14 @@ export default class User {
         if (user_id && user_id.startsWith('@') && user_id.includes(':')) {
             const parts = user_id.split(":");
             return parts[0].substring(1);
+        }
+        return user_id;
+    }
+
+    static serverName(user_id) {
+        if (user_id && user_id.startsWith('@') && user_id.includes(':')) {
+            const parts = user_id.split(":");
+            return parts[1];
         }
         return user_id;
     }
