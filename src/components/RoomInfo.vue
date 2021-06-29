@@ -15,7 +15,7 @@
         <v-btn
           color="black"
           depressed
-          class="header-button-right filled-button mr-3"
+          class="header-button-right filled-button me-3"
           @click.stop="showLeaveConfirmation = true"
           >👋 {{ $t("room_info.leave_room") }}</v-btn
         >
@@ -83,7 +83,7 @@
           item-value="id"
         >
           <template v-slot:selection="{ item }">
-            <v-icon color="black" class="mr-2">{{ item.icon }}</v-icon>
+            <v-icon color="black" class="me-2">{{ item.icon }}</v-icon>
             {{ item.text }}
           </template>
           <template v-slot:item="{ item, attrs, on }">

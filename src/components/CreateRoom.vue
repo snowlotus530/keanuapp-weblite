@@ -63,7 +63,7 @@
               <v-avatar size="32">
                 <v-img :src="data.item.image" />
               </v-avatar>
-              <div class="ml-2">{{ data.item.name }}</div>
+              <div class="ms-2">{{ data.item.name }}</div>
             </template>
           </v-select>
           <v-switch
@@ -103,20 +103,20 @@
             :disabled="step > steps.INITIAL"
           ></v-text-field>
           <v-btn
-              color="black"
-              depressed
-              class="filled-button"
-              @click.stop="next"
-              :disabled="roomName.length == 0"
-              >{{$t('new_room.create')}}</v-btn
-            >
+            color="black"
+            depressed
+            class="filled-button"
+            @click.stop="next"
+            :disabled="roomName.length == 0"
+            >{{ $t("new_room.create") }}</v-btn
+          >
         </v-col>
       </v-row>
     </v-container>
 
     <v-fade-transition>
       <!-- <div class="section ma-3" flat v-if="step > steps.INITIAL"> -->
-    <!--    <div class="h4 text-left">{{ $t("new_room.join_permissions") }}</div>
+      <!--    <div class="h4 text-left">{{ $t("new_room.join_permissions") }}</div>
         <div class="h2 text-left">
           {{ $t("new_room.set_join_permissions") }}
         </div>
@@ -171,7 +171,7 @@
           depressed
           class="outlined-button"
           @click.stop="getPublicLink"
-          ><v-icon class="mr-2">link</v-icon
+          ><v-icon class="me-2">link</v-icon
           >{{ $t("new_room.get_link") }}</v-btn
         >
         <v-btn
@@ -180,7 +180,7 @@
           depressed
           class="outlined-button"
           @click.stop="addPeople"
-          ><v-icon class="mr-2">person_add</v-icon
+          ><v-icon class="me-2">person_add</v-icon
           >{{ $t("new_room.add_people") }}</v-btn
         >
 
@@ -188,7 +188,7 @@
           {{ $t("new_room.link_copied") }}
         </div>
 -->
-        <div v-if="status">{{ status }}</div>
+      <div v-if="status">{{ status }}</div>
       <!-- </div> -->
     </v-fade-transition>
     <input
@@ -292,8 +292,8 @@ export default {
       if (this.step == steps.CREATED) {
         this.openRoom();
       } else if (this.step == steps.INITIAL) {
-      //  this.step = steps.NAME_SET;
-      //} else if (this.step == steps.NAME_SET) {
+        //  this.step = steps.NAME_SET;
+        //} else if (this.step == steps.NAME_SET) {
         // Create room with deafult setting
         this.createRoom().then((roomId) => {
           this.roomId = roomId;

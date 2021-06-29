@@ -41,20 +41,36 @@
         </v-container>
 
         <v-container class="mt-4 pa-0">
-          <ActionRow @click="viewProfile" :icon="'account_circle'" :text="$t('profile_info_popup.edit_profile')" />
-          <ActionRow @click="logout" :icon="'logout'" :text="$t('profile_info_popup.logout')" />
+          <ActionRow
+            @click="viewProfile"
+            :icon="'account_circle'"
+            :text="$t('profile_info_popup.edit_profile')"
+          />
+          <ActionRow
+            @click="logout"
+            :icon="'logout'"
+            :text="$t('profile_info_popup.logout')"
+          />
         </v-container>
 
         <div class="more-container">
-          <div class="want_more">🙌 {{$t('profile_info_popup.want_more')}}</div>
+          <div class="want_more">
+            🙌 {{ $t("profile_info_popup.want_more") }}
+          </div>
           <i18n path="profile_info_popup.powered_by" tag="div">
             <template v-slot:product>{{ product }}</template>
             <template v-slot:productLink>
               <a :href="productLink">{{ productLink }}</a>
             </template>
           </i18n>
-          <div style="position:relative;width:100%;height: 40px">
-            <v-btn class="new_room" right absolute text @click="createRoom">{{ $t('profile_info_popup.new_room') }}</v-btn></div>
+          <div
+            style="position: relative; width: 100%; height: 40px"
+            class="text-end"
+          >
+            <v-btn class="new_room" text @click="createRoom">{{
+              $t("profile_info_popup.new_room")
+            }}</v-btn>
+          </div>
         </div>
       </v-card-text>
     </v-card>
@@ -69,7 +85,7 @@ export default {
   name: "ProfileInfoPopup",
   mixins: [profileInfoMixin],
   components: {
-    ActionRow
+    ActionRow,
   },
   props: {
     show: {
@@ -90,7 +106,7 @@ export default {
     },
     productLink() {
       return config.productLink;
-    }
+    },
   },
   watch: {
     show: {
@@ -113,7 +129,7 @@ export default {
     createRoom() {
       this.showDialog = false;
       this.$navigation.push({ name: "CreateRoom" });
-    }
+    },
   },
 };
 </script>
@@ -121,42 +137,50 @@ export default {
 <style lang="scss">
 @import "@/assets/css/chat.scss";
 .profile-info-popup {
-    font-family: "Inter", sans-serif !important;
-    font-size: 16px;
+  font-family: "Inter", sans-serif !important;
+  font-size: 16px;
+  position: fixed;
+  margin: 0px;
+  top: 70px;
+  right: 10px;
+  [dir="rtl"] & {
+    right: inherit;
+    left: 10px;
+  }
+  border-radius: 40px;
+  &::before {
+    content: "▲";
     position: fixed;
-    margin: 0px;
-    top: 70px;
-    right: 10px;
-    border-radius: 40px;
-    &::before {
-        content: '▲';
-        position: fixed;
-        top: 57px;
-        right: 22px;
-        color: white;
+    top: 57px;
+    right: 22px;
+    [dir="rtl"] & {
+      left: 22px;
+      right: inherit;
     }
-    .you-are {
-        padding-top: 20px;
-        font-size: 12px;
+    color: white;
+  }
+  .you-are {
+    padding-top: 20px;
+    font-size: 12px;
+  }
+  .username {
+    border-radius: 4px;
+    background-color: #f5f5f5;
+  }
+  .more-container {
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    padding: 20px;
+    .want_more {
+      font-family: "Poppins", sans-serif;
+      font-weight: 700;
+      font-size: 13 * $chat-text-size;
     }
-    .username {
-        border-radius: 4px;
-        background-color: #f5f5f5;
+    .new_room .v-btn__content {
+      font-family: "Poppins", sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 13 * $chat-text-size !important;
     }
-    .more-container {
-        border-radius: 10px;
-        background-color: #f5f5f5;
-        padding: 20px;
-        .want_more {
-            font-family: "Poppins", sans-serif;
-            font-weight: 700;
-            font-size: 13 * $chat-text-size;        
-        }
-        .new_room .v-btn__content {
-          font-family: "Poppins", sans-serif !important;
-            font-weight: 700 !important;
-            font-size: 13 * $chat-text-size !important;  
-        }
-    }
+  }
 }
 </style>

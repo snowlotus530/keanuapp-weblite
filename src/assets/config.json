@@ -4,6 +4,7 @@
     "productLink": "letsconvene.im",
     "defaultServer": "https://neo.keanu.im",
     "useShortCodeStickers": false,
+    "rtl": false,
     "analytics": {
         "enabled": true,
         "config": {
