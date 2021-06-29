@@ -355,8 +355,10 @@
       </v-dialog>
     </div>
 
-    <MessageOperationsBottomSheet ref="messageOperationsSheet"
-    style="background-color:#f776777;">
+    <MessageOperationsBottomSheet
+      ref="messageOperationsSheet"
+      style="background-color: #f776777"
+    >
       <MessageOperationsPicker
         v-on:close="showEmojiPicker = false"
         v-if="selectedEvent"
@@ -370,7 +372,7 @@
       />
       <VEmojiPicker
         ref="emojiPicker"
-        style="width: 100%;background-color:#ffffff;"
+        style="width: 100%; background-color: #ffffff"
         @select="emojiSelected"
       />
     </MessageOperationsBottomSheet>
@@ -407,8 +409,11 @@
       width="80%"
     >
       <v-card>
-        <v-card-title>{{ $t("voice_recorder.not_supported_title") }}</v-card-title>
-        <v-card-text>{{ $t("voice_recorder.not_supported_text") }}
+        <v-card-title>{{
+          $t("voice_recorder.not_supported_title")
+        }}</v-card-title>
+        <v-card-text
+          >{{ $t("voice_recorder.not_supported_text") }}
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
@@ -692,7 +697,8 @@ export default {
       if (ref && ref[0]) {
         if (this.showContextMenuAnchor) {
           var rectAnchor = this.showContextMenuAnchor.getBoundingClientRect();
-          var rectChat = this.$refs.messageOperationsStrut.getBoundingClientRect();
+          var rectChat =
+            this.$refs.messageOperationsStrut.getBoundingClientRect();
           top = rectAnchor.top - rectChat.top;
           left = rectAnchor.left - rectChat.left;
           if (left + 250 > rectChat.right) {
@@ -711,7 +717,8 @@ export default {
       if (ref && ref[0]) {
         if (this.showAvatarMenuAnchor) {
           var rectAnchor = this.showAvatarMenuAnchor.getBoundingClientRect();
-          var rectChat = this.$refs.avatarOperationsStrut.getBoundingClientRect();
+          var rectChat =
+            this.$refs.avatarOperationsStrut.getBoundingClientRect();
           top = rectAnchor.top - rectChat.top;
           left = rectAnchor.left - rectChat.left;
           // if (left + 250 > rectChat.right) {
@@ -1664,8 +1671,11 @@ export default {
     updateRecentEmojis() {
       if (this.$refs.emojiPicker) {
         this.recentEmojis = this.$refs.emojiPicker.mapEmojis["Frequently"];
-        if (this.recentEmojis.length < 20){
-          this.recentEmojis.push(this.$refs.emojiPicker.mapEmojis["Peoples"]);
+        if (this.recentEmojis.length < 20) {
+          let peoples = this.$refs.emojiPicker.mapEmojis["Peoples"];
+          for (var p of peoples) {
+            this.recentEmojis.push(p);
+          }
         }
         return;
       }
