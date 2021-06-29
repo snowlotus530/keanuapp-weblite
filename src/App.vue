@@ -12,7 +12,16 @@ import config from "./assets/config";
 export default {
   name: "App",
   mounted() {
-    if (window.location.protocol == "http" && !window.location.hostname.endsWith('.onion')) {
+    // Set RTL mode if flag given in config. TODO: this should be based on language, not a global setting.
+    //
+    if (config.rtl) {
+      this.$vuetify.rtl = true;
+      document.documentElement.setAttribute("dir", "rtl");
+    }
+    if (
+      window.location.protocol == "http" &&
+      !window.location.hostname.endsWith(".onion")
+    ) {
       // Redirect to HTTPS
       window.location.href = window.location.href.replace("http:", "https:");
       return;

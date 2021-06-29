@@ -8,7 +8,7 @@
         @click.stop="handleLogin"
         :loading="loading"
         v-if="!currentUser"
-        >{{$t('menu.login')}}</v-btn
+        >{{ $t("menu.login") }}</v-btn
       >
 
       <v-avatar class="join-avatar">
@@ -17,7 +17,9 @@
           roomName.substring(0, 1).toUpperCase()
         }}</span>
       </v-avatar>
-      <div class="join-title">{{$t('join.title', {roomName: roomName})}}</div>
+      <div class="join-title">
+        {{ $t("join.title", { roomName: roomName }) }}
+      </div>
       <div class="join-message">
         <!-- Join the group chat in a web browser or with the Keanu app. -->
       </div>
@@ -57,15 +59,18 @@
                 <v-avatar size="32">
                   <v-img :src="data.item.image" />
                 </v-avatar>
-                <div class="ml-2">{{ data.item.name }}</div>
+                <div class="ms-2">{{ data.item.name }}</div>
               </template>
             </v-select>
-            <v-switch v-model="sharedComputer" :label="$t('join.shared_computer')" />
+            <v-switch
+              v-model="sharedComputer"
+              :label="$t('join.shared_computer')"
+            />
           </v-col>
         </v-row>
         <v-row v-else>
           <v-col>
-            {{$t('join.joining_as')}}
+            {{ $t("join.joining_as") }}
             <div style="display: inline-block">
               <v-avatar color="#e0e0e0" style="">
                 <v-img v-if="userAvatar" :src="userAvatar" />
@@ -97,7 +102,7 @@
         @click.stop="handleJoin"
         :loading="loading"
         v-if="!currentUser"
-        >{{$t('join.join_guest')}}</v-btn
+        >{{ $t("join.join_guest") }}</v-btn
       >
       <v-btn
         class="btn-dark"
@@ -106,7 +111,7 @@
         @click.stop="handleJoin"
         :loading="loading"
         v-else
-        >{{$t('join.join')}}</v-btn
+        >{{ $t("join.join") }}</v-btn
       >
 
       <!-- <div class="join-privacy">
@@ -138,9 +143,11 @@ export default {
   mounted() {
     this.$matrix.on("Room.myMembership", this.onMyMembership);
     this.availableAvatars = util.getDefaultAvatars();
-    this.selectAvatar(this.availableAvatars[
-      Math.floor(Math.random() * this.availableAvatars.length)
-    ]);
+    this.selectAvatar(
+      this.availableAvatars[
+        Math.floor(Math.random() * this.availableAvatars.length)
+      ]
+    );
   },
   destroyed() {
     this.$matrix.off("Room.myMembership", this.onMyMembership);
@@ -194,7 +201,9 @@ export default {
       if (!this.currentUser || !this.currentUser.userId) {
         return null;
       }
-      return (this.currentUserDisplayName || this.currentUser.userId.substring(1))
+      return (
+        this.currentUserDisplayName || this.currentUser.userId.substring(1)
+      )
         .substring(0, 1)
         .toUpperCase();
     },
@@ -203,9 +212,9 @@ export default {
         return !this.$store.state.useLocalStorage;
       },
       set: function (sharedComputer) {
-        this.$store.commit('setUseLocalStorage', !sharedComputer);
+        this.$store.commit("setUseLocalStorage", !sharedComputer);
       },
-    }
+    },
   },
   watch: {
     roomId: {
@@ -221,41 +230,42 @@ export default {
 
         this.waitingForInfo = true;
         const self = this;
-          this.waitingForMembership = true;
+        this.waitingForMembership = true;
         if (this.currentUser) {
-          this.$matrix.getLoginPromise()
-          .then(() => {
-            self.$matrix.setCurrentRoomId(self.roomAliasOrId); // Go to this room, now or when joined.
-            const room = self.$matrix.getRoom(self.roomAliasOrId);
+          this.$matrix
+            .getLoginPromise()
+            .then(() => {
+              self.$matrix.setCurrentRoomId(self.roomAliasOrId); // Go to this room, now or when joined.
+              const room = self.$matrix.getRoom(self.roomAliasOrId);
 
-            // Already joined?
-            if (
-              room &&
-              room.hasMembershipState(self.currentUser.user_id, "join")
-            ) {
-              // Yes, go to room
-              self.$navigation.push(
-                {
-                  name: "Chat",
-                  params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) },
-                },
-                -1
-              );
-              return;
-            }
-          })
-          .catch(err => {
-            console.log("Error logging in: ", err)
-          })
-          .finally(() => {
-            this.waitingForMembership = false;
-            this.getRoomInfo();
-          });
+              // Already joined?
+              if (
+                room &&
+                room.hasMembershipState(self.currentUser.user_id, "join")
+              ) {
+                // Yes, go to room
+                self.$navigation.push(
+                  {
+                    name: "Chat",
+                    params: { roomId: util.sanitizeRoomId(this.roomAliasOrId) },
+                  },
+                  -1
+                );
+                return;
+              }
+            })
+            .catch((err) => {
+              console.log("Error logging in: ", err);
+            })
+            .finally(() => {
+              this.waitingForMembership = false;
+              this.getRoomInfo();
+            });
         } else {
           this.waitingForMembership = false;
           this.getRoomInfo();
         }
-      }
+      },
     },
   },
 
@@ -300,7 +310,7 @@ export default {
     },
 
     handleLogin() {
-      this.$navigation.push({path: "/login"}, 1);
+      this.$navigation.push({ path: "/login" }, 1);
     },
 
     handleOpenApp() {
@@ -309,10 +319,11 @@ export default {
 
     handleJoin() {
       this.loading = true;
-      this.loadingMessage = this.$t('join.status_logging_in');
+      this.loadingMessage = this.$t("join.status_logging_in");
       const hasUser = this.currentUser ? true : false;
       var setProfileData = false;
-      return this.$matrix.getLoginPromise()
+      return this.$matrix
+        .getLoginPromise()
         .then(
           function (user) {
             if (user.is_guest && !hasUser) {
@@ -322,15 +333,24 @@ export default {
               setProfileData = true;
 
               // Set display name and avatar directly on the matrix object.
-              if (this.selectedProfile.name && this.selectedProfile.name.length > 0) {
+              if (
+                this.selectedProfile.name &&
+                this.selectedProfile.name.length > 0
+              ) {
                 this.$matrix.userDisplayName = this.selectedProfile.name;
               }
             }
 
-            if (!setProfileData || !this.selectedProfile.name || this.selectedProfile.name.length == 0) {
+            if (
+              !setProfileData ||
+              !this.selectedProfile.name ||
+              this.selectedProfile.name.length == 0
+            ) {
               return Promise.resolve(user);
             } else {
-              console.log("Join: Set display name to: " + this.selectedProfile.name);
+              console.log(
+                "Join: Set display name to: " + this.selectedProfile.name
+              );
               return this.$matrix.matrixClient.setDisplayName(
                 this.selectedProfile.name,
                 undefined
@@ -358,7 +378,7 @@ export default {
         .then(
           function (ignoreduser) {
             console.log("Join: joining room");
-            this.loadingMessage = this.$t('join.status_joining');
+            this.loadingMessage = this.$t("join.status_joining");
             return this.$matrix.matrixClient.joinRoom(this.roomId);
           }.bind(this)
         )
