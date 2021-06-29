@@ -355,7 +355,8 @@
       </v-dialog>
     </div>
 
-    <MessageOperationsBottomSheet ref="messageOperationsSheet">
+    <MessageOperationsBottomSheet ref="messageOperationsSheet"
+    style="background-color:#f776777;">
       <MessageOperationsPicker
         v-on:close="showEmojiPicker = false"
         v-if="selectedEvent"
@@ -369,7 +370,7 @@
       />
       <VEmojiPicker
         ref="emojiPicker"
-        style="width: 100%"
+        style="width: 100%;background-color:#ffffff;"
         @select="emojiSelected"
       />
     </MessageOperationsBottomSheet>
@@ -1663,6 +1664,9 @@ export default {
     updateRecentEmojis() {
       if (this.$refs.emojiPicker) {
         this.recentEmojis = this.$refs.emojiPicker.mapEmojis["Frequently"];
+        if (this.recentEmojis.length < 20){
+          this.recentEmojis.push(this.$refs.emojiPicker.mapEmojis["Peoples"]);
+        }
         return;
       }
       this.recentEmojis = [];

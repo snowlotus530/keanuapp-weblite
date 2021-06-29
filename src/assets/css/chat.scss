@@ -483,6 +483,7 @@ $admin-fg: white;
 .avatar-operations-strut {
     position: relative;
     height: 0px;
+
     z-index: 1;
 }
 
@@ -490,7 +491,7 @@ $admin-fg: white;
     position: absolute;
     width: fit-content;
     background-color: white;
-    height: 40px;
+    height: 45px;
     border-radius: 20px;
     box-shadow: 4px 4px 8px #888888;
     // &.incoming {
@@ -953,7 +954,7 @@ $admin-fg: white;
     left: 20%;
     right: 20%;
     background-color: #888888;
-    height: 50px;
+    height: 40px;
     border-radius: 25px;
     color: white;
     text-align: center;
@@ -988,4 +989,8 @@ $admin-fg: white;
         display: inline-block;
         text-decoration: none !important;
     }
+}
+
+.recent-emoji {
+    color: black;
 }
