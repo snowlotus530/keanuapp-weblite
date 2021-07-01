@@ -66,6 +66,10 @@ export default {
                     return null;
                 },
 
+                currentUserHomeServer() {
+                    return User.serverName(this.currentUserId);
+                },
+
                 currentRoomId() {
                     return this.$store.state.currentRoomId;
                 },
