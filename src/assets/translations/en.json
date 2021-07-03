@@ -76,11 +76,11 @@
     "new_room": "New Room",
     "create": "Create",
     "next": "Next",
-    "name_room": "Name group",
+    "name_room": "Name room",
     "room_topic": "Add a description if you like",
     "join_permissions": "Join permissions",
     "set_join_permissions": "Set Join Permissions",
-    "join_permissions_info": "These permissions determine how people can join the group and how easily others can be invited. They can be changed anytime.",
+    "join_permissions_info": "These permissions determine how people can join the room and how easily others can be invited. They can be changed anytime.",
     "get_link": "Get link",
     "add_people": "Add people",
     "link_copied": "Link copied!",
@@ -147,9 +147,9 @@
   "leave": {
     "title_public": "Goodbye, {user}",
     "text_public": "You can always join this room again if you know the link.",
-    "text_public_lastroom": "If you want to join this group again, you can join under a new identity. To keep {user}, {action}.",
+    "text_public_lastroom": "If you want to join this room again, you can join under a new identity. To keep {user}, {action}.",
     "title_invite": "Are you sure you want to leave?",
-    "text_invite": "This group is locked. You cannot rejoin without a special permission.",
+    "text_invite": "This room is locked. You cannot rejoin without a special permission.",
     "create_account": "create an account",
     "go_back": "Go back",
     "leave": "Leave"
@@ -177,7 +177,7 @@
     "version_info": "Powered by Guardian Project. Version: {version}"
   },
   "room_info_sheet": {
-    "this_room": "This group",
+    "this_room": "This room",
     "view_details": "View details"
   },
   "voice_recorder": {
