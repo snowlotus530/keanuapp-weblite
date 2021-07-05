@@ -4,27 +4,35 @@
       <template v-if="roomJoinRule == 'public'">
         <h1>👋</h1>
         <h2 class="dialog-title">
-          {{$t('leave.title_public',{user: $matrix.currentUserDisplayName})}}
+          {{
+            $t("leave.title_public", { user: $matrix.currentUserDisplayName })
+          }}
         </h2>
         <div
           v-if="$matrix.currentUser.is_guest && lastRoom"
           class="dialog-text"
         >
-        <i18n path="leave.text_public_lastroom" tag="p">
-          <template v-slot:user>
-            <span>{{ $matrix.currentUserDisplayName }}</span>
-          </template>
-          <template v-slot:action>
-            <a @click.prevent="viewProfile">{{ $t('leave.create_account') }}</a>
-          </template>
+          <i18n path="leave.text_public_lastroom" tag="p">
+            <template v-slot:user>
+              <span>{{ $matrix.currentUserDisplayName }}</span>
+            </template>
+            <template v-slot:action>
+              <a @click.prevent="viewProfile">{{
+                $t("leave.create_account")
+              }}</a>
+            </template>
           </i18n>
         </div>
-        <div v-else class="dialog-text">{{$t('leave.text_public')}}</div>
+        <div v-else class="dialog-text">{{ $t("leave.text_public") }}</div>
       </template>
       <template v-else>
         <v-icon color="black" size="30">lock</v-icon>
-        <h2 class="dialog-title">{{$t('leave.title_invite',{user: $matrix.currentUserDisplayName})}}</h2>
-        <div class="dialog-text">{{$t('leave.text_invite')}}</div>
+        <h2 class="dialog-title">
+          {{
+            $t("leave.title_invite", { user: $matrix.currentUserDisplayName })
+          }}
+        </h2>
+        <div class="dialog-text">{{ $t("leave.text_invite") }}</div>
       </template>
       <v-container fluid>
         <v-row cols="12">
@@ -35,7 +43,7 @@
               block
               class="text-button"
               @click="showDialog = false"
-              >{{$t('leave.go_back')}}</v-btn
+              >{{ $t("leave.go_back") }}</v-btn
             >
           </v-col>
           <v-col cols="6" align="center">
@@ -45,7 +53,7 @@
               block
               class="filled-button"
               @click.stop="onLeaveRoom()"
-              >{{$t('leave.leave')}}</v-btn
+              >{{ $t("leave.leave") }}</v-btn
             >
           </v-col>
         </v-row>

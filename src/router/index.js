@@ -74,6 +74,7 @@ const routes = [
     path: '/goodbye',
     name: 'Goodbye',
     component: () => import('../components/QuoteView.vue'),
+    props: true
   }
 ]
 
@@ -82,7 +83,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login','/createroom'];
+  const publicPages = ['/login', '/createroom'];
   var authRequired = !publicPages.includes(to.path);
   const loggedIn = router.app.$store.state.auth.user;
 
@@ -113,7 +114,7 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-router.getRoomLink = function(roomId) {
+router.getRoomLink = function (roomId) {
   return window.location.origin + window.location.pathname + "#/room/" + encodeURIComponent(util.sanitizeRoomId(roomId));
 }
 
