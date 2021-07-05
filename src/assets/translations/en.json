@@ -156,8 +156,13 @@
   },
   "purge_room": {
     "title": "Delete room?",
-    "info": "This will close the room for all members. It cannot be undone.",
-    "button": "Delete room"
+    "info": "All members and messages will be removed. This action cannot be undone.",
+    "button": "Delete"
+  },
+  "goodbye": {
+    "room_deleted": "Room deleted.",
+    "close_tab": "Close browser tab",
+    "view_other_rooms": "View other rooms"
   },
   "room_info": {
     "title": "Room Details",

@@ -2,6 +2,7 @@
   <v-dialog v-model="showDialog" v-show="room" class="ma-0 pa-0" width="80%">
     <div class="dialog-content text-center">
       <template>
+        <v-img contain height="28" src="@/assets/icons/trash_black.svg" />
         <h2 class="dialog-title">{{ $t("purge_room.title") }}</h2>
         <div class="dialog-text">
           {{ $t("purge_room.info") }}
@@ -101,4 +102,4 @@ export default {
 
 <style lang="scss">
 @import "@/assets/css/chat.scss";
-</style> 
+</style>
