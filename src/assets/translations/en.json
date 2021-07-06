@@ -136,7 +136,8 @@
     "join": "Join room",
     "join_guest": "Join as guest",
     "status_logging_in": "Logging in...",
-    "status_joining": "Joining room..."
+    "status_joining": "Joining room...",
+    "join_failed": "Failed to join room."
   },
   "invite": {
     "title": "Add Friends",

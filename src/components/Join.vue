@@ -399,7 +399,7 @@ export default {
           // TODO - handle error
           console.log("Failed to join room", err);
           this.loading = false;
-          this.loadingMessage = err.toString();
+          this.loadingMessage = this.$t("join.join_failed");
         });
     },
 
