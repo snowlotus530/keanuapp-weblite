@@ -303,7 +303,6 @@ export default {
                         client.on("Room", this.onRoom);
                         client.on("Session.logged_out", this.onSessionLoggedOut);
                         client.on("Room.myMembership", this.onRoomMyMembership);
-                        client.on("RoomMember.membership", this.onRoomMemberMembership);
                     }
                 },
 
@@ -313,7 +312,6 @@ export default {
                         client.off("Room", this.onRoom);
                         client.off("Session.logged_out", this.onSessionLoggedOut);
                         client.off("Room.myMembership", this.onRoomMyMembership);
-                        client.off("RoomMember.membership", this.onRoomMemberMembership);
                     }
                 },
 
@@ -334,6 +332,17 @@ export default {
                             }
                         }
                             break;
+
+                        case "m.room.member": {
+                            if (this.currentRoom && event.getRoomId() == this.currentRoom.roomId) { // Don't use this.currentRoomId, may be an alias. We need the real id!
+                                if (event.getContent().membership == "leave" && (event.getPrevContent() || {}).membership == "join" && event.getStateKey() == this.currentUserId && event.getSender() != this.currentUserId) {
+                                    // We were kicked
+                                    const wasPurged = (event.getContent().reason == "Room Deleted");
+                                    this.$navigation.push({ name: "Goodbye", params: { roomWasPurged: wasPurged } }, -1);
+                                }
+                            }
+                        }
+                            break;
                     }
                     this.updateNotificationCount();
                 },
@@ -350,17 +359,6 @@ export default {
                         // up room name, not sure why exactly.
                         room.recalculate();
                         this.reloadRooms();
-                    }
-                },
-
-                onRoomMemberMembership(event, member, ignoredoldMembership) {
-                    if (member.userId == this.currentUserId && member.isKicked()) {
-                        if (this.currentRoomId == event.getRoomId()) {
-                            // We were kicked! Look at "reason", maybe a purge?
-                            const reason = event.getContent().reason || "";
-                            const roomWasPurged = (reason == "Room Deleted");
-                            this.$navigation.push({ name: "Goodbye", params: { roomWasPurged: roomWasPurged } }, -1);
-                        }
                     }
                 },
 
@@ -582,7 +580,7 @@ export default {
                                 var kickPromises = [];
                                 members.forEach(member => {
                                     if (member.userId != self.currentUserId) {
-                                        kickPromises.push(this.matrixClient.kick(roomId, member.userId));
+                                        kickPromises.push(this.matrixClient.kick(roomId, member.userId, "Room Deleted"));
                                     }
                                 });
                                 return Promise.all(kickPromises);
