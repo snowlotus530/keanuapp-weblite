@@ -11,13 +11,11 @@ import config from "./assets/config";
 
 export default {
   name: "App",
+  beforeMount() {
+    // Set language
+    this.$i18n.locale = this.$store.state.language || "en";
+  },
   mounted() {
-    // Set RTL mode if flag given in config. TODO: this should be based on language, not a global setting.
-    //
-    if (config.rtl) {
-      this.$vuetify.rtl = true;
-      document.documentElement.setAttribute("dir", "rtl");
-    }
     if (
       window.location.protocol == "http" &&
       !window.location.hostname.endsWith(".onion")
@@ -63,6 +61,20 @@ export default {
     },
   },
   watch: {
+    "$i18n.locale": {
+      handler(val) {
+        // Locale changed, check file if RTL
+        var isRTL = this.$i18n.messages[val].language_is_rtl || false;
+        if (isRTL) {
+          this.$vuetify.rtl = true;
+          document.documentElement.setAttribute("dir", "rtl");
+        } else {
+          this.$vuetify.rtl = false;
+          document.documentElement.removeAttribute("dir");
+        }
+      },
+      immediate: true,
+    },
     title(title) {
       document.title = title;
     },

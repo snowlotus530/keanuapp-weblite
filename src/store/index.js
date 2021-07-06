@@ -37,6 +37,7 @@ const vuexPersistLocalStorage = new VuexPersist({
     reducer: state => {
         if (state.useLocalStorage) {
             return {
+                language: state.language,
                 currentRoomId: state.currentRoomId,
             };
         } else {
@@ -51,6 +52,7 @@ const vuexPersistSessionStorage = new VuexPersist({
     reducer: state => {
         if (!state.useLocalStorage) {
             return {
+                language: state.language,
                 currentRoomId: state.currentRoomId,
             };
         } else {
@@ -62,7 +64,7 @@ const vuexPersistSessionStorage = new VuexPersist({
 const defaultUseSessionStorage = (sessionStorage.getItem('user') != null);
 
 export default new Vuex.Store({
-    state: { currentRoomId: null, auth: null, tempuser: null, useLocalStorage: !defaultUseSessionStorage },
+    state: { language: 'en', currentRoomId: null, auth: null, tempuser: null, useLocalStorage: !defaultUseSessionStorage },
     mutations: {
         loginSuccess(state, user) {
             state.auth.status.loggedIn = true;
@@ -75,6 +77,9 @@ export default new Vuex.Store({
         logout(state) {
             state.auth.status.loggedIn = false;
             state.auth.user = null;
+        },
+        setLanguage(state, locale) {
+            state.language = locale;
         },
         setCurrentRoomId(state, roomId) {
             state.currentRoomId = roomId;
