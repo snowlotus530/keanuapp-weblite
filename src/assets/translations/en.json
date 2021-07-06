@@ -12,7 +12,8 @@
     "back": "BACK",
     "login": "Login",
     "logout": "Logout",
-    "new_room": "New Room"
+    "new_room": "New Room",
+    "undo": "Undo"
   },
   "message": {
     "you": "You",
@@ -157,7 +158,12 @@
   "purge_room": {
     "title": "Delete room?",
     "info": "All members and messages will be removed. This action cannot be undone.",
-    "button": "Delete"
+    "button": "Delete",
+    "n_seconds": "{seconds} seconds",
+    "self_destruct": "Room will self destruct in seconds.",
+    "deleting": "Deleting room:",
+    "notified": "We've notified members.",
+    "room_deletion_notice": "Time to say goodbye! This room has been deleted by {user}. It will self destruct in seconds."
   },
   "goodbye": {
     "room_deleted": "Room deleted.",

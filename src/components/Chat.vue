@@ -459,6 +459,7 @@ import RoomJoinRules from "./messages/RoomJoinRules.vue";
 import RoomPowerLevelsChanged from "./messages/RoomPowerLevelsChanged.vue";
 import RoomGuestAccessChanged from "./messages/RoomGuestAccessChanged.vue";
 import RoomEncrypted from "./messages/RoomEncrypted.vue";
+import RoomDeletionNotice from "./messages/RoomDeletionNotice.vue";
 import DebugEvent from "./messages/DebugEvent.vue";
 import util from "../plugins/utils";
 import MessageOperations from "./messages/MessageOperations.vue";
@@ -539,6 +540,7 @@ export default {
     RoomPowerLevelsChanged,
     RoomGuestAccessChanged,
     RoomEncrypted,
+    RoomDeletionNotice,
     DebugEvent,
     MessageOperations,
     MessageOperationsPicker,
@@ -1064,6 +1066,23 @@ export default {
 
         case "m.room.encryption":
           return RoomEncrypted;
+
+        case "im.keanu.room_deletion_notice": {
+          // Custom event for notice 30 seconds before a room is deleted/purged.
+          const deletionNotices = this.room.currentState.getStateEvents(
+            "im.keanu.room_deletion_notice"
+          );
+          if (
+            deletionNotices &&
+            deletionNotices.length > 0 &&
+            deletionNotices[deletionNotices.length - 1] == event
+          ) {
+            // This is the latest/last one. Look at the status flag. Show nothing if it is "cancel".
+            if (event.getContent().status != "cancel") {
+              return RoomDeletionNotice;
+            }
+          }
+        }
       }
       return this.debugging ? DebugEvent : null;
     },

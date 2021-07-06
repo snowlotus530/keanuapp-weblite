@@ -445,6 +445,19 @@ $admin-fg: white;
     user-select: text;
 }
 
+.notice {
+    font-family: "Inter", sans-serif;
+    font-weight: 300;
+    font-size: 15 * $chat-text-size;
+    background-color: #090909;
+    color: white;
+    text-align: start;
+    margin: 20px;
+    user-select: text;
+    padding: 16px;
+    border-radius: 20px;
+}
+
 .audio-player {
     width: 100%;
     position: absolute;
