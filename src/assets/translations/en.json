@@ -1,4 +1,5 @@
 {
+  "language_display_name": "English",
   "Keanu Weblite": "Keanu Weblite",
   "menu": {
     "start_private_chat": "Private chat with this user",
@@ -113,6 +114,7 @@
     "set_password": "Set password",
     "change_name": "Change name",
     "change_password": "Change password",
+    "select_language": "Language",
     "password_old": "Old password",
     "password_new": "New password",
     "password_repeat": "Repeat new password",
