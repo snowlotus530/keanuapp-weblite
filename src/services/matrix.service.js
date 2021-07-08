@@ -332,6 +332,17 @@ export default {
                             }
                         }
                             break;
+
+                        case "m.room.member": {
+                            if (this.currentRoom && event.getRoomId() == this.currentRoom.roomId) { // Don't use this.currentRoomId, may be an alias. We need the real id!
+                                if (event.getContent().membership == "leave" && (event.getPrevContent() || {}).membership == "join" && event.getStateKey() == this.currentUserId && event.getSender() != this.currentUserId) {
+                                    // We were kicked
+                                    const wasPurged = (event.getContent().reason == "Room Deleted");
+                                    this.$navigation.push({ name: "Goodbye", params: { roomWasPurged: wasPurged } }, -1);
+                                }
+                            }
+                        }
+                            break;
                     }
                     this.updateNotificationCount();
                 },
@@ -502,7 +513,7 @@ export default {
                         );
                         const self = this;
 
-                        console.log("Purge: set invite only");
+                        //console.log("Purge: set invite only");
                         statusCallback(this.$t('room.purge_set_room_state'));
                         this.matrixClient.sendStateEvent(
                             roomId,
@@ -511,7 +522,7 @@ export default {
                             ""
                         )
                             .then(() => {
-                                console.log("Purge: forbid guest access");
+                                //console.log("Purge: forbid guest access");
                                 return this.matrixClient.sendStateEvent(
                                     roomId,
                                     "m.room.guest_access",
@@ -520,20 +531,20 @@ export default {
                                 );
                             })
                             .then(() => {
-                                console.log("Purge: set history visibility to 'joined'");
+                                //console.log("Purge: set history visibility to 'joined'");
                                 return this.matrixClient.sendStateEvent(roomId, "m.room.history_visibility", {
                                     history_visibility: "joined",
                                 });
                             })
                             .then(() => {
-                                console.log("Purge: create timeline");
+                                //console.log("Purge: create timeline");
                                 return timelineWindow.load(null, 100)
                             })
                             .then(() => {
                                 const getMoreIfAvailable = function _getMoreIfAvailable() {
                                     if (timelineWindow.canPaginate(EventTimeline.BACKWARDS)
                                     ) {
-                                        console.log("Purge: page back");
+                                        //console.log("Purge: page back");
                                         return timelineWindow
                                             .paginate(EventTimeline.BACKWARDS, 100, true, 5)
                                             .then((ignoredsuccess) => {
@@ -546,7 +557,7 @@ export default {
                                 return getMoreIfAvailable();
                             })
                             .then(() => {
-                                console.log("Purge: redact events");
+                                //console.log("Purge: redact events");
                                 statusCallback(this.$t('room.purge_redacting_events'));
                                 // First ignore unknown device errors
                                 this.matrixClient.setGlobalErrorOnUnknownDevices(false);
@@ -560,7 +571,7 @@ export default {
                                 return Promise.all(redactionPromises);
                             })
                             .then(() => {
-                                console.log("Purge: kick members");
+                                //console.log("Purge: kick members");
                                 statusCallback(this.$t('room.purge_removing_members'));
                                 var joined = room.getMembersWithMembership("join");
                                 var invited = room.getMembersWithMembership("invite");
@@ -569,7 +580,7 @@ export default {
                                 var kickPromises = [];
                                 members.forEach(member => {
                                     if (member.userId != self.currentUserId) {
-                                        kickPromises.push(this.matrixClient.kick(roomId, member.userId));
+                                        kickPromises.push(this.matrixClient.kick(roomId, member.userId, "Room Deleted"));
                                     }
                                 });
                                 return Promise.all(kickPromises);
@@ -577,6 +588,9 @@ export default {
                             .then(() => {
                                 statusCallback(null);
                                 this.matrixClient.setGlobalErrorOnUnknownDevices(oldGlobalErrorSetting);
+                                return this.leaveRoom(roomId);
+                            })
+                            .then(() => {
                                 resolve(true); // Done!
                             })
                             .catch((err) => {

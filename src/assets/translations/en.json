@@ -1,4 +1,5 @@
 {
+  "language_display_name": "English",
   "Keanu Weblite": "Keanu Weblite",
   "menu": {
     "start_private_chat": "Private chat with this user",
@@ -12,7 +13,8 @@
     "back": "BACK",
     "login": "Login",
     "logout": "Logout",
-    "new_room": "New Room"
+    "new_room": "New Room",
+    "undo": "Undo"
   },
   "message": {
     "you": "You",
@@ -112,6 +114,7 @@
     "set_password": "Set password",
     "change_name": "Change name",
     "change_password": "Change password",
+    "select_language": "Language",
     "password_old": "Old password",
     "password_new": "New password",
     "password_repeat": "Repeat new password",
@@ -135,7 +138,8 @@
     "join": "Join room",
     "join_guest": "Join as guest",
     "status_logging_in": "Logging in...",
-    "status_joining": "Joining room..."
+    "status_joining": "Joining room...",
+    "join_failed": "Failed to join room."
   },
   "invite": {
     "title": "Add Friends",
@@ -156,8 +160,18 @@
   },
   "purge_room": {
     "title": "Delete room?",
-    "info": "This will close the room for all members. It cannot be undone.",
-    "button": "Delete room"
+    "info": "All members and messages will be removed. This action cannot be undone.",
+    "button": "Delete",
+    "n_seconds": "{seconds} seconds",
+    "self_destruct": "Room will self destruct in seconds.",
+    "deleting": "Deleting room:",
+    "notified": "We've notified members.",
+    "room_deletion_notice": "Time to say goodbye! This room has been deleted by {user}. It will self destruct in seconds."
+  },
+  "goodbye": {
+    "room_deleted": "Room deleted.",
+    "close_tab": "Close browser tab",
+    "view_other_rooms": "View other rooms"
   },
   "room_info": {
     "title": "Room Details",

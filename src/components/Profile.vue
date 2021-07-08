@@ -62,6 +62,11 @@
         :icon="'edit'"
         :text="$t('profile.change_name')"
       />
+      <ActionRow
+        @click="showSelectLanguageDialog = true"
+        :icon="'language'"
+        :text="$t('profile.select_language')"
+      />
     </v-container>
 
     <!-- edit password dialog -->
@@ -138,10 +143,16 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <SelectLanguageDialog
+      v-model="showSelectLanguageDialog"
+      v-on:close="showSelectLanguageDialog = false"
+    />
   </div>
 </template>
 
 <script>
+import SelectLanguageDialog from "./SelectLanguageDialog.vue";
 import dataUriToBuffer from "data-uri-to-buffer";
 import ActionRow from "./ActionRow.vue";
 import ImageResize from "image-resize";
@@ -153,11 +164,13 @@ export default {
   name: "Profile",
   components: {
     ActionRow,
+    SelectLanguageDialog,
   },
   data() {
     return {
       showEditPasswordDialog: false,
       showEditDisplaynameDialog: false,
+      showSelectLanguageDialog: false,
       editValue: null,
       password: null,
       newPassword1: null,
