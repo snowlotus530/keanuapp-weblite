@@ -1,11 +1,30 @@
 <template>
-  <div class="login-root">
-    <v-btn v-if="showBackArrow" icon @click.stop="$navigation.pop">
-      <v-icon>arrow_back</v-icon>
-    </v-btn>
+  <div class="pa-4">
+    <div class="chat-header">
+      <v-container fluid>
+        <v-row no-gutters>
+          <v-col>
+        <v-img src="@/assets/logo.svg" width="32" height="32" xclass="d-inline-block header-button-left" />
+          </v-col>
+          <v-col>
+        <div class="room-name">{{ $t("login.title") }}</div>
+          </v-col>
+          <v-col class="text-right">
+        <v-btn
+          text
+          v-if="showCloseButton"
+          @click.stop="$navigation.pop"
+        >
+          <v-icon>close</v-icon>
+        </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
+
+
 
     <div color="rgba(255,255,255,0.1)" class="text-center">
-      <div class="h2">{{$t('login.title')}}</div>
       <v-form v-model="isValid">
         <v-text-field
           v-model="user.user_id"
@@ -71,7 +90,7 @@ export default {
     currentUser() {
       return this.$store.state.auth.user;
     },
-    showBackArrow() {
+    showCloseButton() {
       return this.$navigation && this.$navigation.canPop();
     }
   },
