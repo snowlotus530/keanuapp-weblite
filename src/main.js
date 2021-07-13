@@ -87,12 +87,12 @@ Vue.directive('longTap', {
     };
 
     const touchStart = function (e) {
-        el.longTapHandled = false;
-        el.longTapStartX = touchX(e);
-        el.longTapStartY = touchY(e);
-        el.longTapTimer = setTimeout(touchTimerElapsed, el.longTapTimeout);
-        el.classList.add("waiting-for-long-tap");
-        e.preventDefault();
+      el.longTapHandled = false;
+      el.longTapStartX = touchX(e);
+      el.longTapStartY = touchY(e);
+      el.longTapTimer = setTimeout(touchTimerElapsed, el.longTapTimeout);
+      el.classList.add("waiting-for-long-tap");
+      e.preventDefault();
     };
 
     const touchCancel = function () {
@@ -145,6 +145,91 @@ Vue.directive('longTap', {
     el.removeEventListener("mousedown", el.longTapTouchStart);
     el.removeEventListener("mouseup", el.longTapTouchEnd);
     el.removeEventListener("mousemove", el.longTapTouchMove);
+  },
+});
+
+
+/**
+ * Handle pans in y direction. Call with the callback function.
+ * 
+ * Like this: v-dragUpDown="callback"
+ */
+Vue.directive('dragUpDown', {
+  update: function (el, binding, ignoredvnode) {
+    console.log("Dir update, arg", binding.arg);
+    el.dragUpDownArg = binding.arg;
+  },
+  bind: function (el, binding, ignoredvnode) {
+    el.dragUpDownCallback = binding.value;
+    el.dragUpDownArg = binding.arg;
+
+    const touchX = function (event) {
+      if (event.type.indexOf("mouse") !== -1) {
+        return event.clientX;
+      }
+      return event.touches[0].clientX;
+    };
+    const touchY = function (event) {
+      if (event.type.indexOf("mouse") !== -1) {
+        return event.clientY;
+      }
+      return event.touches[0].clientY;
+    };
+
+    const touchStart = function (e) {
+      el.dragUpDownStartX = touchX(e);
+      el.dragUpDownStartY = touchY(e);
+      el.dragUpDownCallback && el.dragUpDownCallback.call(el, true, 0);
+      el.classList.add("draggingUpDown");
+      if (el.dragUpDownArg == 'prevent') {
+        console.log("Preventing default");
+        e.preventDefault();
+      } else {
+        console.log("Not preventing default");
+      }
+    };
+
+    const touchCancel = function () {
+      el.classList.remove("draggingUpDown");
+    };
+
+    const touchEnd = function () {
+      el.dragUpDownCallback && el.dragUpDownCallback.call(el, false, 0);
+      el.classList.remove("draggingUpDown");
+    };
+
+    const touchMove = function (e) {
+      el.dragUpDownCurrentX = touchX(e);
+      el.dragUpDownCurrentY = touchY(e);
+      el.dragUpDownCallback && el.dragUpDownCallback.call(el, true, el.dragUpDownCurrentY - el.dragUpDownStartY);
+      // var touchMoved =
+      //   Math.abs(el.longTapStartX - el.longTapCurrentX) > tapTolerance ||
+      //   Math.abs(el.longTapStartY - el.longTapCurrentY) > tapTolerance;
+      // if (touchMoved) {
+      //   touchCancel();
+      // }
+    };
+
+    el.dragUpDownTouchStart = touchStart;
+    el.dragUpDownTouchEnd = touchEnd;
+    el.dragUpDownTouchCancel = touchCancel;
+    el.dragUpDownTouchMove = touchMove;
+    el.addEventListener("touchstart", touchStart);
+    el.addEventListener("touchend", touchEnd);
+    el.addEventListener("touchcancel", touchCancel);
+    el.addEventListener("touchmove", touchMove);
+    el.addEventListener("mousedown", touchStart);
+    el.addEventListener("mouseup", touchEnd);
+    el.addEventListener("mousemove", touchMove);
+  },
+  unbind: function (el) {
+    el.removeEventListener("touchstart", el.dragUpDownTouchStart);
+    el.removeEventListener("touchend", el.dragUpDownTouchEnd);
+    el.removeEventListener("touchcancel", el.dragUpDownTouchCancel);
+    el.removeEventListener("touchmove", el.dragUpDownTouchMove);
+    el.removeEventListener("mousedown", el.dragUpDownTouchStart);
+    el.removeEventListener("mouseup", el.dragUpDownTouchEnd);
+    el.removeEventListener("mousemove", el.dragUpDownTouchMove);
   },
 });
 
