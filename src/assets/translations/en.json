@@ -188,7 +188,8 @@
     "hide_all": "Hide",
     "show_all": "Show all >",
     "leave_room": "Leave",
-    "version_info": "Powered by Guardian Project. Version: {version}"
+    "version_info": "Powered by Guardian Project. Version: {version}",
+    "scan_code": "Scan to join the room"
   },
   "room_info_sheet": {
     "this_room": "This group",

@@ -40,7 +40,12 @@
       <v-container fluid class="pa-0" v-show="publicRoomLink">
         <v-row cols="12" class="qr-container ma-3">
           <v-col cols="auto">
-            <canvas ref="roomQr" class="qr" id="room-qr"></canvas>
+            <canvas
+              @click.stop="showFullScreenQR = true"
+              ref="roomQr"
+              class="qr"
+              id="room-qr"
+            ></canvas>
           </v-col>
           <v-col align-self="center">
             <div class="link">{{ publicRoomLink }}</div>
@@ -185,6 +190,9 @@
       :room="room"
       @close="showPurgeConfirmation = false"
     />
+
+    <QRCodePopup :show="showFullScreenQR" :message="publicRoomLink" @close="showFullScreenQR = false" />
+
   </div>
 </template>
 
@@ -194,6 +202,7 @@ import PurgeRoomDialog from "../components/PurgeRoomDialog";
 import DeviceList from "../components/DeviceList";
 import QRCode from "qrcode";
 import roomInfoMixin from "./roomInfoMixin";
+import QRCodePopup from './QRCodePopup.vue';
 
 export default {
   name: "RoomInfo",
@@ -202,6 +211,7 @@ export default {
     LeaveRoomDialog,
     PurgeRoomDialog,
     DeviceList,
+    QRCodePopup,
   },
   data() {
     return {
@@ -211,6 +221,7 @@ export default {
       showAllMembers: false,
       showLeaveConfirmation: false,
       showPurgeConfirmation: false,
+      showFullScreenQR: false,
       expandedMembers: [],
       buildVersion: "",
       updatingJoinRule: false, // Flag if we are processing update curerntly
