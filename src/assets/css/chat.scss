@@ -215,7 +215,7 @@ $admin-fg: white;
     }
     position: relative;
     .bubble {
-        background-color: #eeeeee;
+        background-color: #ededed;
         border-radius: 0px 10px 10px 10px;
         [dir="rtl"] & {
             border-radius: 10px 0px 10px 0px;
@@ -223,7 +223,7 @@ $admin-fg: white;
         padding: 8px;
         border-width: 1px !important;
         border-style: solid !important;
-        border-color: #eeeeee !important;
+        border-color: #ededed !important;
         display: inline-block;
         position: relative;
         max-width: 70%;
@@ -554,19 +554,19 @@ $admin-fg: white;
 
 .quick-reaction-container {
     display: inline-block;
-    position: absolute;
-    top: -12px;
-    left: 50px;
+    position: relative;
+    vertical-align: bottom;
+    transform: translateX(-20px) translateX(-100%);
+    top: 18px;
     z-index: 2;
-    background-color: #000000;
-    border: 2px solid white;
+    background-color: #f7f7f7;
+    border: 1px solid rgba(white, 0.9);
     border-radius: 13px;
     height: 26px;
     width: max-content;
     padding: 0px 6px;
     .messageOut & {
-        left: unset;
-        right: 50px;
+        transform: translateX(20px) translateX(100%);
     }
     .quick-reaction {
         position: relative;
@@ -575,7 +575,7 @@ $admin-fg: white;
         padding: 1px;
         font-size: 10px;
         &:hover {
-            border: 1px solid #888888;
+            //border: 1px solid #888888;
             background-color: #e2e2e2;
         }
         .quick-reaction-count {
@@ -584,7 +584,7 @@ $admin-fg: white;
         }
     }
     .sent .quick-reaction-count {
-        color: white;
+        color: black;
         font-weight: 700;
         // background-color: palegreen;
     }

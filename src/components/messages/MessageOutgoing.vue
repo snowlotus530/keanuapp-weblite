@@ -1,12 +1,19 @@
 <template>
   <!-- BASE CLASS FOR OUTGOING MESSAGE -->
   <div class="messageOut">
+    <div class="senderAndTime">
+      <div class="time">
+        {{ formatTime(event.event.origin_server_ts) }}
+      </div>
+      <div class="status">{{ event.status }}</div>
+    </div>
+
+    <QuickReactions :event="event" :reactions="reactions" />
     <div class="op-button" ref="opbutton">
       <v-btn icon @click.stop="showContextMenu($refs.opbutton)"
         ><v-icon>more_vert</v-icon></v-btn
       >
     </div>
-    <QuickReactions :event="event" :reactions="reactions" />
     <!-- SLOT FOR CONTENT -->
     <slot></slot>
     <v-avatar
@@ -18,13 +25,6 @@
       <img v-if="userAvatar" :src="userAvatar" />
       <span v-else class="white--text headline">{{ userAvatarLetter }}</span>
     </v-avatar>
-    <!-- <div class="sender">{{ $t('message.you') }}</div> -->
-    <div class="senderAndTime">
-      <div class="time">
-        {{ formatTime(event.event.origin_server_ts) }}
-      </div>
-      <div class="status">{{ event.status }}</div>
-    </div>
   </div>
 </template>
 
