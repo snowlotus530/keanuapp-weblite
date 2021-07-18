@@ -1,6 +1,6 @@
 {
     "menu": {
-        "ok": "Ok",
+        "ok": "OK",
         "loading": "Se încarcă {appName}",
         "undo": "Anulează",
         "new_room": "Cameră nouă",
