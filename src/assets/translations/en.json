@@ -14,7 +14,8 @@
     "login": "Login",
     "logout": "Logout",
     "new_room": "New Room",
-    "undo": "Undo"
+    "undo": "Undo",
+    "loading": "Loading {appName}"
   },
   "message": {
     "you": "You",
