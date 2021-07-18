@@ -59,7 +59,7 @@
             }
           "
         ></v-text-field>
-        <v-checkbox v-model="sharedComputer" :label="$t('join.shared_computer')" />
+        <v-checkbox class="mt-0" v-model="sharedComputer" :label="$t('join.shared_computer')" />
         <v-btn
           :disabled="!isValid || loading"
           primary
@@ -67,6 +67,7 @@
           block
           @click.stop="handleLogin"
           :loading="loading"
+          class="mt-8"
           >{{ $t("login.login") }}</v-btn
         >
       </v-form>
