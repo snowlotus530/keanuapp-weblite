@@ -11,8 +11,8 @@
         "cancel": "Cancel",
         "send": "Send",
         "back": "BACK",
-        "login": "Login",
-        "logout": "Logout",
+        "login": "Log in",
+        "logout": "Log out",
         "new_room": "New Room",
         "undo": "Undo",
         "loading": "Loading {appName}"
@@ -25,7 +25,7 @@
         "user_changed_avatar": "{user} changed the avatar",
         "user_changed_room_avatar": "{user} changed the room avatar",
         "user_encrypted_room": "{user} made the room encrypted",
-        "user_was_invited": "{user} was invited to the chat...",
+        "user_was_invited": "{user} was invited to the chat…",
         "user_joined": "{user} joined the chat",
         "user_left": "{user} left the chat",
         "user_said": "{user} said:",
@@ -46,7 +46,7 @@
         "user_changed_room_topic": "{user} changed room topic to {topic}",
         "unread_messages": "Unread messages",
         "replying_to_event": "REPLYING TO EVENT: {message}",
-        "your_message": "Your message...",
+        "your_message": "Your message…",
         "scale_image": "Scale image",
         "user_is_typing": "{user} is typing",
         "users_are_typing": "{count} members are typing",
@@ -96,7 +96,7 @@
         "status_avatar": "Uploading avatar: {count}"
     },
     "device_list": {
-        "title": "DEVICES",
+        "title": "Devices",
         "blocked": "Blocked",
         "verified": "Verified",
         "not_verified": "Not verified"
@@ -126,7 +126,7 @@
         "identity": "{displayName}",
         "identity_temporary": "{displayName}",
         "edit_profile": "Edit profile",
-        "logout": "Logout",
+        "logout": "Log out",
         "want_more": "Want more?",
         "powered_by": "This room is powered by {product}. Learn more at {productLink} or go ahead and create another room!",
         "new_room": "+ New room"
@@ -138,8 +138,8 @@
         "joining_as": "You are joining as:",
         "join": "Join room",
         "join_guest": "Join as guest",
-        "status_logging_in": "Logging in...",
-        "status_joining": "Joining room...",
+        "status_logging_in": "Logging in…",
+        "status_joining": "Joining room…",
         "join_failed": "Failed to join room."
     },
     "invite": {
