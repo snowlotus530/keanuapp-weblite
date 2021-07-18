@@ -103,8 +103,8 @@
   },
   "login": {
     "title": "Login",
-    "username": "Username",
-    "password": "Password",
+    "username": "Username (ex: marta)",
+    "password": "Enter Password",
     "username_required": "Username is required",
     "password_required": "Password is required",
     "login": "Login"
@@ -134,7 +134,7 @@
   "join": {
     "title": "Welcome to {roomName}",
     "user_name_label": "User name",
-    "shared_computer": "Using a shared computer",
+    "shared_computer": "This is a shared device",
     "joining_as": "You are joining as:",
     "join": "Join room",
     "join_guest": "Join as guest",

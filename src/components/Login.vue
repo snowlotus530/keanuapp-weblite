@@ -4,34 +4,34 @@
       <v-container fluid>
         <v-row no-gutters>
           <v-col>
-        <v-img src="@/assets/logo.svg" width="32" height="32" xclass="d-inline-block header-button-left" />
+            <v-img
+              src="@/assets/logo.svg"
+              width="32"
+              height="32"
+              xclass="d-inline-block header-button-left"
+            />
           </v-col>
           <v-col>
-        <div class="room-name">{{ $t("login.title") }}</div>
+            <div class="room-name no-upper">{{ $t("login.title") }}</div>
           </v-col>
           <v-col class="text-right">
-        <v-btn
-          text
-          v-if="showCloseButton"
-          @click.stop="$navigation.pop"
-        >
-          <v-icon>close</v-icon>
-        </v-btn>
+            <v-btn text v-if="showCloseButton" @click.stop="$navigation.pop">
+              <v-icon>close</v-icon>
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
     </div>
 
-
-
     <div color="rgba(255,255,255,0.1)" class="text-center">
       <v-form v-model="isValid">
         <v-text-field
+          prepend-inner-icon="$vuetify.icons.user"
           v-model="user.user_id"
           :label="$t('login.username')"
           color="black"
           background-color="white"
-          outlined
+          solo
           :rules="[(v) => !!v || $t('login.username_required')]"
           :error="userErrorMessage != null"
           :error-messages="userErrorMessage"
@@ -39,28 +39,36 @@
           v-on:keyup.enter="$refs.password.focus()"
         ></v-text-field>
         <v-text-field
+          prepend-inner-icon="$vuetify.icons.password"
           ref="password"
           v-model="user.password"
           :label="$t('login.password')"
           color="black"
-          background-color="white"
-          outlined
+          background-color="#f5f5f5"
+          filled
           type="password"
           :rules="[(v) => !!v || $t('login.password_required')]"
           :error="passErrorMessage != null"
           :error-messages="passErrorMessage"
           required
-          v-on:keyup.enter="() => { if (isValid && !loading) { handleLogin() }}"
+          v-on:keyup.enter="
+            () => {
+              if (isValid && !loading) {
+                handleLogin();
+              }
+            }
+          "
         ></v-text-field>
-          <v-btn
-            :disabled="!isValid || loading"
-            primary
-            large
-            block
-            @click.stop="handleLogin"
-            :loading="loading"
-            >{{$t('login.login')}}</v-btn
-          >
+        <v-checkbox v-model="sharedComputer" :label="$t('join.shared_computer')" />
+        <v-btn
+          :disabled="!isValid || loading"
+          primary
+          large
+          block
+          @click.stop="handleLogin"
+          :loading="loading"
+          >{{ $t("login.login") }}</v-btn
+        >
       </v-form>
     </div>
   </div>
@@ -92,11 +100,25 @@ export default {
     },
     showCloseButton() {
       return this.$navigation && this.$navigation.canPop();
-    }
+    },
+    sharedComputer: {
+      get: function () {
+        return !this.$store.state.useLocalStorage;
+      },
+      set: function (sharedComputer) {
+        this.$store.commit("setUseLocalStorage", !sharedComputer);
+      },
+    },
   },
   created() {
     if (this.loggedIn) {
-      this.$navigation.push({name: "Chat", params: { roomId: util.sanitizeRoomId(this.$matrix.currentRoomId) }}, -1);
+      this.$navigation.push(
+        {
+          name: "Chat",
+          params: { roomId: util.sanitizeRoomId(this.$matrix.currentRoomId) },
+        },
+        -1
+      );
     }
   },
   watch: {
@@ -109,18 +131,12 @@ export default {
       deep: true,
     },
     message() {
-      if (
-        this.message &&
-        this.message.toLowerCase().includes("user")
-      ) {
+      if (this.message && this.message.toLowerCase().includes("user")) {
         this.userErrorMessage = this.message;
       } else {
         this.userErrorMessage = null;
       }
-      if (
-        this.message &&
-        this.message.toLowerCase().includes("pass")
-      ) {
+      if (this.message && this.message.toLowerCase().includes("pass")) {
         this.passErrorMessage = this.message;
       } else {
         this.passErrorMessage = null;
@@ -130,9 +146,8 @@ export default {
   methods: {
     handleLogin() {
       if (this.user.user_id && this.user.password) {
-
-      // Reset errors
-      this.message = null;
+        // Reset errors
+        this.message = null;
 
         // Is it a full matrix user id? Modify a copy, so that the UI will still show the full ID.
         var user = Object.assign({}, this.user);
@@ -142,9 +157,17 @@ export default {
         this.$store.dispatch("login", user).then(
           () => {
             if (this.$matrix.currentRoomId) {
-              this.$navigation.push({name: "Chat", params: { roomId: util.sanitizeRoomId(this.$matrix.currentRoomId) }}, -1);
+              this.$navigation.push(
+                {
+                  name: "Chat",
+                  params: {
+                    roomId: util.sanitizeRoomId(this.$matrix.currentRoomId),
+                  },
+                },
+                -1
+              );
             } else {
-              this.$navigation.push({name: "Home"}, -1);            
+              this.$navigation.push({ name: "Home" }, -1);
             }
           },
           (error) => {
