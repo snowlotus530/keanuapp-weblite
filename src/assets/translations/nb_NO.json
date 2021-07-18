@@ -1,1 +1,150 @@
-{}
+{
+    "message": {
+        "user_changed_guest_access_open": "{user} tillot gjester å ta del i rommet",
+        "user_powerlevel_change_from_to": "{user} fra {powerOld} til {powerNew}",
+        "room_powerlevel_change": "{user} endret maktnivå for {changes}",
+        "room_history_world_readable": "lesbart for hvem som helst",
+        "room_history_shared": "lesbart for alle rommets medlemmer",
+        "user_left": "{user} forlot sludringen",
+        "user_joined": "{user} tok del i sludringen",
+        "user_was_invited": "{user} ble invitert til sludringen …",
+        "user_changed_room_avatar": "{user} endret romavataren",
+        "user_encrypted_room": "{user} gjorde rommet kryptert",
+        "user_changed_avatar": "{user} endret avataren",
+        "user_changed_display_name": "{user} endret visningsnavn til {displayName}",
+        "user_aliased_room": "{user} lagde et rom ved navn {alias}",
+        "your_message": "Din melding …",
+        "user_changed_room_topic": "{user} endret rom-emne til {topic}",
+        "room_joinrule_public": "offentlig",
+        "room_joinrule_invite": "kun ved invitasjon",
+        "upload_progress_with_total": "Opplastet {count} av {total}",
+        "upload_progress": "Opplastet {count}",
+        "download_progress": "{percentage}% nedlastet",
+        "edited": "(redigert)",
+        "file_prefix": "Fil: ",
+        "user_said": "{user} sa:",
+        "user_created_room": "{user} opprettet rommet",
+        "you": "Deg"
+    },
+    "device_list": {
+        "title": "Enheter",
+        "not_verified": "Ikke bekreftet",
+        "verified": "Bekreftet",
+        "blocked": "Blokkert"
+    },
+    "fallbacks": {
+        "original_text": "<opprinnelig tekst>",
+        "video_file": "Videofil",
+        "audio_file": "Lydfil"
+    },
+    "power_level": {
+        "restricted": "begrenset",
+        "default": "forvalg",
+        "moderator": "moderator",
+        "admin": "administrator"
+    },
+    "voice_recorder": {
+        "release_to_cancel": "Slipp for å avbryte"
+    },
+    "room_info_sheet": {
+        "this_room": "Denne gruppen",
+        "view_details": "Vis detaljer"
+    },
+    "room_info": {
+        "hide_all": "Skjul",
+        "members": "Medlemmer",
+        "purge": "Slett rom",
+        "link_copied": "Lenke kopiert.",
+        "copy_link": "Kopier invitasjonslenke",
+        "created_by": "Opprettet av {user}",
+        "title": "Romdetaljer"
+    },
+    "goodbye": {
+        "view_other_rooms": "Vis andre rom",
+        "room_deleted": "Rom slettet."
+    },
+    "join": {
+        "join": "Ta del i rom",
+        "status_joining": "Tar del i rom…",
+        "status_logging_in": "Logger inn …",
+        "join_guest": "Ta del som gjest",
+        "title": "Velkommen til {roomName}"
+    },
+    "profile_info_popup": {
+        "identity_temporary": "{displayName}",
+        "identity": "{displayName}",
+        "logout": "Logg ut",
+        "edit_profile": "Rediger profil",
+        "you_are": "Du er"
+    },
+    "profile": {
+        "password_new": "Nytt passord",
+        "password_old": "Gammelt passord",
+        "select_language": "Språk",
+        "change_password": "Endre passord",
+        "change_name": "Endre navn",
+        "set_password": "Sett passord",
+        "title": "Min profil",
+        "display_name": "Visningsnavn",
+        "password_repeat": "Gjenta nytt passord"
+    },
+    "login": {
+        "password_required": "Passord kreves",
+        "username_required": "Brukernavn kreves",
+        "password": "Passord",
+        "username": "Brukernavn"
+    },
+    "new_room": {
+        "add_people": "Legg til folk",
+        "link_copied": "Lenke kopiert.",
+        "next": "Neste",
+        "create": "Opprett",
+        "new_room": "Nytt rom"
+    },
+    "room_welcome": {
+        "room_history_is": "Romhistorikken er {type}.",
+        "encrypted": "Meldinger er ende-til-ende -kryptert.",
+        "got_it": "Skjønner",
+        "join_invite": "Kun folk du inviterer kan ta del."
+    },
+    "room": {
+        "room_list_rooms": "Rom",
+        "room_list_invites": "Invitasjoner",
+        "purge_set_room_state": "Setter romtilstand",
+        "leave": "Forlat"
+    },
+    "purge_room": {
+        "n_seconds": "{seconds} sekunder",
+        "button": "Slett",
+        "title": "Slett rom?"
+    },
+    "leave": {
+        "go_back": "Gå tilbake",
+        "create_account": "opprett en konto",
+        "title_public": "Adjø, {user}"
+    },
+    "invite": {
+        "status_inviting": "Inviterer venn {index} av {count}",
+        "send_invites_to": "Send invitasjoner til",
+        "done": "Ferdig",
+        "title": "Legg til venner"
+    },
+    "menu": {
+        "logout": "Logg ut",
+        "back": "Tilbake",
+        "loading": "Laster inn {appName}",
+        "undo": "Angre",
+        "new_room": "Nytt rom",
+        "login": "Logg inn",
+        "send": "Send",
+        "ok": "OK",
+        "cancel": "Avbryt",
+        "download": "last ned",
+        "delete": "Slett",
+        "edit": "Rediger",
+        "reply": "Svar",
+        "start_private_chat": "Privat sludring med denne brukeren"
+    },
+    "Keanu Weblite": "Keanu Weblite",
+    "language_display_name": "Engelsk"
+}
