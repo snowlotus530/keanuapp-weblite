@@ -19,7 +19,7 @@
         "restricted": "restricționat",
         "custom": "personalizat ({nivel})",
         "default": "implicit",
-        "moderator": "moderator",
+        "moderator": "coordonator",
         "admin": "administrator"
     },
     "voice_recorder": {
@@ -85,8 +85,8 @@
     },
     "join": {
         "join_failed": "Nu a reușit să intre în cameră.",
-        "status_joining": "Intrarea în cameră...",
-        "status_logging_in": "Autentificare...",
+        "status_joining": "Intrarea în cameră…",
+        "status_logging_in": "Autentificare…",
         "join_guest": "Alăturați-vă ca invitat",
         "join": "Alăturați-vă camerei",
         "joining_as": "Vă înscrieți ca:",
@@ -178,7 +178,7 @@
         "users_are_typing": "{count} membrii tastează",
         "user_is_typing": "{user} tastează",
         "scale_image": "Imagine la scară",
-        "your_message": "Mesajul dumneavoastră...",
+        "your_message": "Mesajul dumneavoastră…",
         "replying_to_event": "RĂSPUNS LA EVENIMENT: {message}",
         "unread_messages": "Mesaje necitite",
         "user_changed_room_topic": "{user} a schimbat subiectul camerei în {topic}",
@@ -199,7 +199,7 @@
         "user_said": "{user} a spus:",
         "user_left": "{user} a părăsit chat-ul",
         "user_joined": "{user} s-a alăturat chat-ului",
-        "user_was_invited": "{user} a fost invitat la chat...",
+        "user_was_invited": "{user} a fost invitat la chat…",
         "user_encrypted_room": "{user} a făcut camera criptată",
         "user_changed_room_avatar": "{user} a schimbat avatarul camerei",
         "user_changed_avatar": "{user} a schimbat avatarul",
@@ -209,5 +209,11 @@
         "you": "Tu"
     },
     "Keanu Weblite": "Keanu Weblite",
-    "language_display_name": "Engleză"
+    "language_display_name": "Engleză",
+    "fallbacks": {
+        "download_name": "Descărcați",
+        "original_text": "<original text>",
+        "video_file": "Fișier video",
+        "audio_file": "Fișier audio"
+    }
 }
