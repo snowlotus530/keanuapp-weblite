@@ -62,12 +62,12 @@
         <v-checkbox class="mt-0" v-model="sharedComputer" :label="$t('join.shared_computer')" />
         <v-btn
           :disabled="!isValid || loading"
-          primary
-          large
+          color="black"
+          depressed
           block
           @click.stop="handleLogin"
           :loading="loading"
-          class="mt-8"
+          class="filled-button mt-8"
           >{{ $t("login.login") }}</v-btn
         >
       </v-form>

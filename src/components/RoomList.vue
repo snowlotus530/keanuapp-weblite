@@ -1,40 +1,5 @@
 <template>
   <v-list dense class="room-list">
-    <div v-if="showInvites && $matrix.invites.length > 0" class="h4">
-      {{ invitesTitle }}
-    </div>
-    <v-list-item-group
-      v-if="showInvites"
-      v-model="currentRoomId"
-      color="primary"
-    >
-      <v-slide-y-transition group>
-        <v-list-item
-          :disabled="roomsProcessing[room.roomId]"
-          v-for="room in $matrix.invites"
-          :key="room.roomId"
-          :value="room.roomId"
-        >
-          <v-list-item-avatar size="40" color="#e0e0e0">
-            <v-img :src="room.avatar" />
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title>{{
-              room.name || room.summary.info.title
-            }}</v-list-item-title>
-            <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-btn @click.stop="acceptInvitation(room)" icon
-              ><v-icon>check_circle</v-icon></v-btn
-            >
-            <v-btn @click.stop="rejectInvitation(room)" icon
-              ><v-icon>cancel</v-icon></v-btn
-            >
-          </v-list-item-action>
-        </v-list-item>
-      </v-slide-y-transition>
-    </v-list-item-group>
     <div class="h4">{{ title }}</div>
     <v-list-item-group v-model="currentRoomId" color="primary">
       <v-list-item v-if="showCreate" @click.stop="$emit('newroom')">
@@ -45,8 +10,34 @@
         </v-list-item-content>
       </v-list-item>
 
+      <!-- invites -->
       <v-list-item
-        v-for="room in $matrix.joinedRooms"
+        :disabled="roomsProcessing[room.roomId]"
+        v-for="room in invitedRooms"
+        :key="room.roomId"
+        :value="room.roomId"
+      >
+        <v-list-item-avatar size="40" color="#e0e0e0">
+          <v-img :src="room.avatar" />
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title>{{
+            room.name || room.summary.info.title
+          }}</v-list-item-title>
+          <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
+        </v-list-item-content>
+        <v-list-item-action>
+          <v-btn class="filled-button" depressed color="black" @click.stop="acceptInvitation(room)"
+            >{{$t('menu.join')}}</v-btn
+          >
+          <v-btn class="filled-button" color="black" @click.stop="rejectInvitation(room)" text
+            >{{$t('menu.ignore')}}</v-btn
+          >
+        </v-list-item-action>
+      </v-list-item>
+
+      <v-list-item
+        v-for="room in joinedRooms"
         :key="room.roomId"
         :value="room.roomId"
         style="position: relative"
@@ -78,10 +69,6 @@ export default {
       type: String,
       default: "Rooms",
     },
-    invitesTitle: {
-      type: String,
-      default: "Invites",
-    },
     showInvites: {
       type: Boolean,
       default: false,
@@ -98,7 +85,32 @@ export default {
     roomsProcessing: {},
   }),
 
+  computed: {
+    invitedRooms() {
+      return this.sortItemsOnName(this.$matrix.invites);
+    },
+    joinedRooms() {
+      return this.sortItemsOnName(this.$matrix.joinedRooms);
+    },
+  },
+
   methods: {
+    sortItemsOnName(items) {
+      if (items == null) {
+        return [];
+      }
+      return items.sort(function(a, b) {
+        const titleA = a.name || a.summary.info.title;
+        const titleB = b.name || b.summary.info.title
+        if (titleA == null) {
+          return 1;
+        } else if (titleB == null) {
+          return -1;
+        }
+        return titleA.localeCompare(titleB);
+      });
+    },
+
     notificationCount(room) {
       return room.getUnreadNotificationCount("total") || 0;
     },

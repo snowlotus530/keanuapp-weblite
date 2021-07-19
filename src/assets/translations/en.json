@@ -15,6 +15,8 @@
     "logout": "Logout",
     "new_room": "New Room",
     "undo": "Undo",
+    "join": "Join",
+    "ignore": "Ignore",
     "loading": "Loading {appName}"
   },
   "message": {
