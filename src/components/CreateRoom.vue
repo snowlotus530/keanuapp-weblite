@@ -2,7 +2,7 @@
   <div class="create-room">
     <div>
       <v-container fluid>
-        <div class="room-name">{{ $t("new_room.new_room") }}</div>
+        <div class="room-name no-upper">{{ $t("new_room.new_room") }}</div>
         <v-btn
           text
           class="header-button-left"
@@ -66,10 +66,7 @@
               <div class="ms-2">{{ data.item.name }}</div>
             </template>
           </v-select>
-          <v-switch
-            v-model="sharedComputer"
-            :label="$t('join.shared_computer')"
-          />
+          <v-checkbox class="mt-0" v-model="sharedComputer" :label="$t('join.shared_computer')" />
         </v-col>
       </v-row>
     </v-container>
