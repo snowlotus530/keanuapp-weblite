@@ -525,9 +525,9 @@ $admin-fg: white;
     position: absolute;
     width: fit-content;
     background-color: white;
-    height: 45px;
-    border-radius: 20px;
-    box-shadow: 4px 4px 8px #888888;
+    height: 44px;
+    border-radius: 22px;
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.15);
     // &.incoming {
     //     right: 30%;
     // }
@@ -544,7 +544,7 @@ $admin-fg: white;
     height: 40px;
     border-radius: 20px;
     padding: 0px 20px;
-    box-shadow: 4px 4px 8px #888888;
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.15);
 }
 
 .message-operations-picker {

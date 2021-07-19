@@ -20,7 +20,7 @@
             showContextMenu = false;
             showContextMenuAnchor = null;
           "
-          v-if="selectedEvent && showContextMenu"
+          v-if="showMessageOperations"
           v-on:addreaction="addReaction"
           v-on:addquickreaction="addQuickReaction"
           v-on:addreply="addReply(selectedEvent)"
@@ -609,6 +609,9 @@ export default {
 
       /** An array of recent emojis. Used in the "message operations" popup. */
       recentEmojis: [],
+
+      /** Calculated style for message operations. We position the "popup" at the selected message. */
+      opStyle: "",
     };
   },
 
@@ -690,25 +693,8 @@ export default {
         return "";
       }
     },
-    opStyle() {
-      // Calculate where to show the context menu.
-      //
-      const ref = this.selectedEvent && this.$refs[this.selectedEvent.getId()];
-      var top = 0;
-      var left = 0;
-      if (ref && ref[0]) {
-        if (this.showContextMenuAnchor) {
-          var rectAnchor = this.showContextMenuAnchor.getBoundingClientRect();
-          var rectChat =
-            this.$refs.messageOperationsStrut.getBoundingClientRect();
-          top = rectAnchor.top - rectChat.top;
-          left = rectAnchor.left - rectChat.left;
-          if (left + 250 > rectChat.right) {
-            left = rectChat.right - 250; // Pretty ugly, but we want to make sure it does not escape the screen, and we don't have the exakt width of it (yet)!
-          }
-        }
-      }
-      return "top:" + top + "px;left:" + left + "px";
+    showMessageOperations() {
+      return this.selectedEvent && this.showContextMenu;
     },
     avatarOpStyle() {
       // Calculate where to show the context menu.
@@ -782,6 +768,34 @@ export default {
           this.onRoomNotJoined();
         }
       },
+    },
+    showMessageOperations() {
+      if (this.showMessageOperations) {
+        this.$nextTick(() => {
+          // Calculate where to show the context menu.
+          //
+          const ref =
+            this.selectedEvent && this.$refs[this.selectedEvent.getId()];
+          var top = 0;
+          var left = 0;
+          if (ref && ref[0]) {
+            if (this.showContextMenuAnchor) {
+              var rectAnchor =
+                this.showContextMenuAnchor.getBoundingClientRect();
+              var rectChat =
+                this.$refs.messageOperationsStrut.getBoundingClientRect();
+              var rectOps =
+                this.$refs.messageOperations.$el.getBoundingClientRect();
+              top = rectAnchor.top - rectChat.top;
+              left = rectAnchor.left - rectChat.left;
+              if (left + rectOps.width >= rectChat.right) {
+                left = rectChat.right - rectOps.width - 10; // No overflow
+              }
+            }
+          }
+          this.opStyle = "top:" + top + "px;left:" + left + "px";
+        });
+      }
     },
   },
 
