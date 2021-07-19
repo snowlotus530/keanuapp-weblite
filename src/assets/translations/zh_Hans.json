@@ -7,24 +7,25 @@
     },
     "room_info": {
         "hide_all": "隐藏",
-        "title": "信息",
+        "title": "聊天室详情",
         "version_info": "由守护者计划提供支持.版本：{version}",
         "leave_room_info": "注意：此步骤无法撤消。 确保您要注销并永久删除聊天记录。",
-        "leave_room": "离开群组",
+        "leave_room": "离开",
         "view_profile": "查看",
         "identity_temporary": "您的身份 {displayName} 是临时的。 您可以更改您的姓名或设置密码来保留它。",
         "identity": "您以 {displayName} 的身份登录。",
         "my_profile": "我的简历",
-        "show_all": "显示所有",
+        "show_all": "显示所有 >",
         "user_you": "{user} (你)",
         "user": "{user}",
         "members": "成员",
         "purge": "删除聊天室",
         "link_copied": "链接已复制!",
-        "join_public": "知道链接的任何人都可以加入",
-        "join_invite": "聊天室只能通过邀请加入",
-        "permissions": "权限",
-        "created_by": "由 {user} 创建"
+        "join_public": "知道链接的任何人",
+        "join_invite": "仅添加人员",
+        "permissions": "加入权限",
+        "created_by": "由 {user} 创建",
+        "copy_link": "复制邀请链接"
     },
     "leave": {
         "leave": "离开",
@@ -52,10 +53,16 @@
     },
     "room": {
         "leave": "离开",
-        "members": "无成员 | 1 名成员 | {count} 名成员"
+        "members": "无成员 | 1 名成员 | {count} 名成员",
+        "room_list_rooms": "聊天室",
+        "room_list_invites": "邀请",
+        "purge_failed": "删除聊天室失败了！",
+        "purge_removing_members": "移除成员",
+        "purge_redacting_events": "编辑事件",
+        "purge_set_room_state": "设置聊天室状态"
     },
     "message": {
-        "you": "你",
+        "you": "您",
         "user_aliased_room": "{user} 把聊天室别名设为 {alias}",
         "user_created_room": "{user} 创建了聊天室",
         "user_changed_room_topic": "{user} 把聊天室的话题更改为{topic}",
@@ -81,14 +88,16 @@
         "user_changed_room_avatar": "{user} 更改了聊天室的头像",
         "user_changed_avatar": "{user} 更改了头像",
         "user_changed_display_name": "{user} 把显示名更改为 {displayName}",
-        "unread_messages": "未读消息",
+        "unread_messages": "未读信息",
         "user_powerlevel_change_from_to": "{user} 从 {powerOld} 到 {powerNew}",
         "room_powerlevel_change": "{user}更改了{changes} 的能量等级",
         "users_are_typing": "{count} 成员正在输入",
         "user_is_typing": "{user} 正在输入",
         "scale_image": "缩放图像",
         "your_message": "你的信息...",
-        "replying_to_event": "回复事件：{message}"
+        "replying_to_event": "回复事件：{message}",
+        "user_changed_guest_access_open": "{user} 允许客人加入聊天室",
+        "user_changed_guest_access_closed": "{user} 不允许客人加入聊天室"
     },
     "menu": {
         "login": "登录",
@@ -101,7 +110,8 @@
         "logout": "退出",
         "ok": "好的",
         "reply": "回复",
-        "back": "返回"
+        "back": "返回",
+        "new_room": "新的聊天室"
     },
     "Keanu Weblite": "网络灯",
     "power_level": {
@@ -124,9 +134,9 @@
         "this_room": "这个群组"
     },
     "purge_room": {
-        "button": "删除聊天室",
+        "button": "删除",
         "title": "删除聊天室?",
-        "info": "此操作将会关闭所有成员的聊天室。 它无法撤消。"
+        "info": "所有成员和消息将被删除。无法撤销这一操作。"
     },
     "invite": {
         "title": "添加好友",
@@ -173,14 +183,29 @@
         "name_room": "为群组命名",
         "next": "下一步",
         "done": "完毕",
-        "new_room": "新的群组"
+        "new_room": "新的聊天室",
+        "room_topic": "如果您愿意，请添加说明",
+        "create": "创建"
     },
     "room_welcome": {
         "got_it": "知道了",
-        "info_permissions": "在群组设置中，您随时可以更改“加入权限”和“消息历史”。",
-        "info": "关于您的群组，您需要了解以下几点：",
+        "info_permissions": "在群组设置中，您随时可以更改“加入权限”。",
+        "info": "欢迎！关于您的群组，您需要了解以下几点：",
         "join_invite": "只有您邀请的人可以加入。",
-        "join_public": "任何人都可以加入通过打开此链接: {link}",
-        "welcome": "欢迎！"
+        "join_public": "任何人都可以加入通过打开此链接: {link}。",
+        "welcome": "欢迎！",
+        "room_history_joined": "只有加入后，人们才可以看到发送的信息。",
+        "room_history_is": "聊天室纪录是{type}.",
+        "encrypted": "信息是端到端加密的。"
+    },
+    "profile_info_popup": {
+        "new_room": "+ 新的聊天室",
+        "powered_by": "这个聊天室由 {product} 提供支持。 在 {productLink} 了解更多信息或继续创建另一个聊天室！",
+        "want_more": "想要更多？",
+        "logout": "退出登录",
+        "edit_profile": "编辑个人资料",
+        "identity_temporary": "{displayName}",
+        "identity": "{displayName}",
+        "you_are": "您是"
     }
 }
