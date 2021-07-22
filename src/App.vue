@@ -2,6 +2,28 @@
   <v-app>
     <v-main>
       <router-view />
+
+      <!-- Loading indicator -->
+      <v-container
+        fluid
+        fill-height
+        style="
+          position: absolute;
+          z-index: 20;
+          background-color: rgba(255, 255, 255, 1);
+        "
+        v-if="loading"
+      >
+        <v-row align="center" justify="center">
+          <v-col class="text-center">
+            <v-progress-circular
+              indeterminate
+              color="primary"
+            ></v-progress-circular>
+            <div>{{$t('menu.loading', {appName: appName})}}</div>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-main>
   </v-app>
 </template>
@@ -11,6 +33,11 @@ import config from "./assets/config";
 
 export default {
   name: "App",
+  data() {
+    return {
+      loading: true,
+    };
+  },
   beforeMount() {
     // Set language
     this.$i18n.locale = this.$store.state.language || "en";
@@ -32,12 +59,20 @@ export default {
         })
         .catch((error) => {
           console.log("Error creating client", error);
+        })
+        .finally(() => {
+          this.loading = false;
         });
+    } else {
+      this.loading = false;
     }
   },
   computed: {
     currentUser() {
       return this.$store.state.auth.user;
+    },
+    appName() {
+      return config.appName;
     },
     title() {
       var title = this.$t(config.appName);

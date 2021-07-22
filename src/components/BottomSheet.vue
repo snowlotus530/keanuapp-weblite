@@ -18,7 +18,7 @@
       :style="{ top: `${isMove ? y : calcY()}px` }"
     >
       <div class="bottom-sheet-handle"><div class="bottom-sheet-handle-decoration" /></div>
-      <div style="position:absolute;top:20px;left:0;right:0;bottom:0;overflow-y:auto;padding:20px">
+      <div ref="sheetContent" style="position:absolute;top:20px;left:0;right:0;bottom:0;overflow-y:auto;padding:20px">
         <slot></slot>
       </div>
     </div>
@@ -119,12 +119,21 @@ export default {
     },
     setState(state) {
       this.state = state;
+      if (state == "closed") {
+        this.scrollToTop();
+      }
     },
     onBackgroundClick() {
       if (this.state == "open") {
         this.setState("small");
       } else {
         this.setState("closed");
+      }
+    },
+    scrollToTop() {
+      const container = this.$refs.sheetContent;
+      if (container) {
+        container.scrollTo(0, 0);
       }
     },
   },

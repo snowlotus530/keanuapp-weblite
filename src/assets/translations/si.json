@@ -1,0 +1,23 @@
+{
+    "menu": {
+        "ok": "හරි",
+        "download": "බාගන්න",
+        "edit": "සංස්කරණය",
+        "reply": "පිලිතුර",
+        "start_private_chat": "මෙම පරිශීලක සමඟ පුද්ගලික සංවාදය",
+        "undo": "පෙරසේ",
+        "new_room": "නව කාමරය",
+        "logout": "නික්මෙන්න",
+        "login": "පිවිසෙන්න",
+        "back": "ආපසු",
+        "send": "යවන්න",
+        "cancel": "අවලංගු කරන්න"
+    },
+    "language_display_name": "ඉංග්‍රීසි",
+    "Keanu Weblite": "කීනු වෙබ්ලයිට්",
+    "message": {
+        "download_progress": "{percentage}% බාගත වී ඇත",
+        "file_prefix": "ගොනුව: ",
+        "you": "ඔබ"
+    }
+}

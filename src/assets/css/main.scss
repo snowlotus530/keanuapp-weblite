@@ -78,7 +78,8 @@ body { position:absolute; top:0; bottom:0; right:0; left:0; }
     color: white;
     border: none;
     border-radius: $chat-standard-padding / 2;
-    height: $chat-standard-padding;
+    height: $chat-standard-padding !important;
+    min-height: $chat-standard-padding !important;
     margin-top: $chat-standard-padding-xs;
     margin-bottom: $chat-standard-padding-xs;
 }

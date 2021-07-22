@@ -2,7 +2,7 @@
   <div class="chat-root fill-height d-flex flex-column" ma-0 pa-0>
     <ChatHeader
       class="chat-header flex-grow-0 flex-shrink-0"
-      v-on:header-click="$refs.roomInfoSheet.open()"
+      v-on:header-click="onHeaderClick"
     />
     <div
       class="chat-content flex-grow-1 flex-shrink-1"
@@ -1703,6 +1703,20 @@ export default {
 
     formatBytes(bytes) {
       return prettyBytes(bytes);
+    },
+
+    onHeaderClick() {
+      const joinedRooms = this.$matrix.joinedRooms;
+      if (
+        joinedRooms &&
+        joinedRooms.length == 1 &&
+        joinedRooms[0].roomId == this.room.roomId
+      ) {
+        // Only joined to this room, go directly to room details!
+        this.$navigation.push({ name: "RoomInfo" });
+        return;
+      }
+      this.$refs.roomInfoSheet.open();
     },
   },
 };
