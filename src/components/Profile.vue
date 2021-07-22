@@ -2,7 +2,7 @@
   <div v-if="user" class="profile">
     <div class="chat-header">
       <v-container fluid>
-        <div class="room-name">{{ $t("profile.title") }}</div>
+        <div class="room-name no-upper">{{ $t("profile.title") }}</div>
         <v-btn
           text
           class="header-button-right"
@@ -38,9 +38,9 @@
         <v-col class="flex-shrink-1 flex-grow-1">
           <div class="h1">{{ displayName }}</div>
           <div class="text-center">{{ $matrix.currentUser.user_id }}</div>
-          <div v-if="$matrix.currentUser.is_guest">
+          <!-- <div v-if="$matrix.currentUser.is_guest">
             {{ $t("profile.temporary_identity") }}
-          </div>
+          </div> -->
           <v-btn depressed block class="outlined-button" @click.stop="logout">{{
             $t("menu.logout")
           }}</v-btn>
@@ -51,7 +51,7 @@
     <v-container class="mt-2 pa-5">
       <ActionRow
         @click="showEditPasswordDialog = true"
-        :icon="'lock'"
+        :icon="'$vuetify.icons.password'"
         :text="$t('profile.set_password')"
       />
       <ActionRow
@@ -59,12 +59,12 @@
           editValue = displayName;
           showEditDisplaynameDialog = true;
         "
-        :icon="'edit'"
+        :icon="'$vuetify.icons.edit'"
         :text="$t('profile.change_name')"
       />
       <ActionRow
         @click="showSelectLanguageDialog = true"
-        :icon="'language'"
+        :icon="'$vuetify.icons.globe'"
         :text="$t('profile.select_language')"
       />
     </v-container>

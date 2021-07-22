@@ -62,10 +62,7 @@
                 <div class="ms-2">{{ data.item.name }}</div>
               </template>
             </v-select>
-            <v-switch
-              v-model="sharedComputer"
-              :label="$t('join.shared_computer')"
-            />
+            <v-checkbox class="mt-0" v-model="sharedComputer" :label="$t('join.shared_computer')" />
           </v-col>
         </v-row>
         <v-row v-else>
