@@ -25,7 +25,8 @@
         "join_invite": "仅添加人员",
         "permissions": "加入权限",
         "created_by": "由 {user} 创建",
-        "copy_link": "复制邀请链接"
+        "copy_link": "复制邀请链接",
+        "scan_code": "扫一扫加入聊天室"
     },
     "leave": {
         "leave": "离开",
@@ -111,7 +112,11 @@
         "ok": "好的",
         "reply": "回复",
         "back": "返回",
-        "new_room": "新的聊天室"
+        "new_room": "新的聊天室",
+        "loading": "正在加载 {appName}",
+        "ignore": "忽略",
+        "join": "加入",
+        "undo": "撤销"
     },
     "Keanu Weblite": "网络灯",
     "power_level": {
@@ -136,7 +141,12 @@
     "purge_room": {
         "button": "删除",
         "title": "删除聊天室?",
-        "info": "所有成员和消息将被删除。无法撤销这一操作。"
+        "info": "所有成员和消息将被删除。无法撤销这一操作。",
+        "room_deletion_notice": "该说再见了！此聊天室已被{user}删除。 它将在几秒钟内自毁。",
+        "notified": "我们已经通知了会员。",
+        "deleting": "删除聊天室：",
+        "self_destruct": "聊天室将在几秒钟内自毁。",
+        "n_seconds": "{seconds} 秒"
     },
     "invite": {
         "title": "添加好友",
@@ -153,7 +163,8 @@
         "joining_as": "您以以下身份加入：",
         "shared_computer": "这是一台共享设备",
         "user_name_label": "用户名",
-        "title": "欢迎来到 {roomName}"
+        "title": "欢迎来到 {roomName}",
+        "join_failed": "加入聊天室失败。"
     },
     "profile": {
         "display_name": "显示名称",
@@ -164,7 +175,8 @@
         "change_name": "更改名称",
         "set_password": "设置密码",
         "temporary_identity": "这个身份是暂时的。为了再次使用这个暂时身份，请设置密码",
-        "title": "我的简历"
+        "title": "我的简历",
+        "select_language": "语言"
     },
     "new_room": {
         "status_avatar": "正在上传头像：{count}",
@@ -207,5 +219,11 @@
         "identity_temporary": "{displayName}",
         "identity": "{displayName}",
         "you_are": "您是"
-    }
+    },
+    "goodbye": {
+        "view_other_rooms": "查看其它聊天室",
+        "close_tab": "关闭浏览器标签",
+        "room_deleted": "聊天室已删除。"
+    },
+    "language_display_name": "英语"
 }
