@@ -13,7 +13,9 @@
         "delete": "Ștergeți",
         "edit": "Editați",
         "reply": "Răspuns",
-        "start_private_chat": "Chat privat cu acest utilizator"
+        "start_private_chat": "Chat privat cu acest utilizator",
+        "ignore": "Ignoră",
+        "join": "Alătură-te"
     },
     "power_level": {
         "restricted": "restricționat",
