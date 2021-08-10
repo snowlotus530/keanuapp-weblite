@@ -33,7 +33,7 @@
     },
     "room_info_sheet": {
         "view_details": "Vezi detalii",
-        "this_room": "Acest grup"
+        "this_room": "Această cameră"
     },
     "room_info": {
         "scan_code": "Scanare pentru a intra în cameră",
@@ -72,9 +72,9 @@
         "leave": "Lăsați",
         "go_back": "Înapoi",
         "create_account": "creați un cont",
-        "text_invite": "Acest grup este blocat. Nu vă puteți alătura fără o permisiune specială.",
+        "text_invite": "Această cameră este închisă. Nu puteți intra din nou fără o permisiune specială.",
         "title_invite": "Ești sigur că vrei să pleci?",
-        "text_public_lastroom": "Dacă doriți să vă înscrieți din nou în acest grup, vă puteți înscrie sub o nouă identitate. Pentru a păstra {user}, {action}.",
+        "text_public_lastroom": "Dacă doriți să vă înscrieți din nou în această cameră, vă puteți înscrie sub o nouă identitate. Pentru a păstra {user}, {action}.",
         "text_public": "Puteți oricând să vă alăturați din nou acestei camere dacă știți link-ul.",
         "title_public": "La revedere, {user}"
     },
@@ -87,12 +87,12 @@
     },
     "join": {
         "join_failed": "Nu a reușit să intre în cameră.",
-        "status_joining": "Intrarea în cameră…",
-        "status_logging_in": "Autentificare…",
+        "status_joining": "Intrarea în cameră...",
+        "status_logging_in": "Autentificare...",
         "join_guest": "Alăturați-vă ca invitat",
         "join": "Alăturați-vă camerei",
         "joining_as": "Vă înscrieți ca:",
-        "shared_computer": "Utilizarea unui computer partajat",
+        "shared_computer": "Acesta este un dispozitiv partajat",
         "user_name_label": "Numele utilizatorului",
         "title": "Bine ați venit la {roomName}"
     },
@@ -100,7 +100,7 @@
         "new_room": "+ Cameră nouă",
         "powered_by": "Această cameră este alimentată de {product}. Aflați mai multe la {productLink} sau mergeți mai departe și creați o altă cameră!",
         "want_more": "Vrei mai mult?",
-        "logout": "Ieșire",
+        "logout": "Deconectare",
         "edit_profile": "Editați profilul",
         "identity_temporary": "{displayName}",
         "identity": "{displayName}",
@@ -122,15 +122,15 @@
         "login": "Autentificare",
         "password_required": "Parola este necesară",
         "username_required": "Numele de utilizator este necesar",
-        "password": "Parola",
-        "username": "Nume utilizator",
+        "password": "Introduceți Parola",
+        "username": "Nume utilizator (ex: marta)",
         "title": "Autentificare"
     },
     "device_list": {
         "not_verified": "Nu a fost verificat",
         "verified": "Verificat",
         "blocked": "Blocat",
-        "title": "DISPOZITIVE"
+        "title": "DEVICES"
     },
     "new_room": {
         "status_avatar": "Încărcarea avatarului: {count}",
@@ -143,11 +143,11 @@
         "link_copied": "Link copiat!",
         "add_people": "Adăugați persoane",
         "get_link": "Obțineți link-ul",
-        "join_permissions_info": "Aceste permisiuni determină modul în care persoanele se pot alătura grupului și cât de ușor pot fi invitate alte persoane. Acestea pot fi modificate oricând.",
+        "join_permissions_info": "Aceste permisiuni determină modul în care oamenii se pot alătura camerei și cât de ușor pot fi invitați alții. Acestea pot fi modificate oricând.",
         "set_join_permissions": "Setați permisiunile de asociere",
         "join_permissions": "Permisiuni de aderare",
         "room_topic": "Adăugați o descriere dacă doriți",
-        "name_room": "Nume grup",
+        "name_room": "Nume cameră",
         "next": "Următorul",
         "create": "Creați",
         "new_room": "Cameră nouă"
@@ -180,7 +180,7 @@
         "users_are_typing": "{count} membrii tastează",
         "user_is_typing": "{user} tastează",
         "scale_image": "Imagine la scară",
-        "your_message": "Mesajul dumneavoastră…",
+        "your_message": "Mesajul dumneavoastră...",
         "replying_to_event": "RĂSPUNS LA EVENIMENT: {message}",
         "unread_messages": "Mesaje necitite",
         "user_changed_room_topic": "{user} a schimbat subiectul camerei în {topic}",
@@ -201,7 +201,7 @@
         "user_said": "{user} a spus:",
         "user_left": "{user} a părăsit chat-ul",
         "user_joined": "{user} s-a alăturat chat-ului",
-        "user_was_invited": "{user} a fost invitat la chat…",
+        "user_was_invited": "{user} a fost invitat la chat...",
         "user_encrypted_room": "{user} a făcut camera criptată",
         "user_changed_room_avatar": "{user} a schimbat avatarul camerei",
         "user_changed_avatar": "{user} a schimbat avatarul",
