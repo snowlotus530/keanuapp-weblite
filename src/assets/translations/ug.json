@@ -4,7 +4,38 @@
         "ok": "تامام",
         "download": "چۈشۈرۈش",
         "delete": "ئۆچۈرۈش",
-        "edit": "تەھرىر"
+        "edit": "تەھرىر",
+        "loading": "يۈكلەۋاتىدۇ",
+        "ignore": "سەل قاراڭ",
+        "join": "قوشۇلۇش",
+        "undo": "بىكارلاش",
+        "new_room": "يېڭى ئۆي",
+        "logout": "چېكىنىش",
+        "login": "كىرىش",
+        "back": "قايتۇرۇش",
+        "send": "يوللاش",
+        "cancel": "ئەمەلدىن قالدۇرۇڭ",
+        "reply": "جاۋاب",
+        "start_private_chat": "قوللانغۇچى بىلەن شەخسى ئۇچۇرلاشماق"
     },
-    "Keanu Weblite": "Keanu Weblite"
+    "Keanu Weblite": "Keanu Weblite",
+    "message": {
+        "upload_progress_with_total": "{ئومۇمىي} نىڭ {سان} يۈكلەندى",
+        "upload_progress": "يۈكلەندى {سان}",
+        "download_progress": "{پىرسەنت}% چۈشۈرۈلدى",
+        "edited": "تەھرىرلەندى",
+        "file_prefix": "ھۆججەت ",
+        "user_said": "قوللانغۇچى سۆزلىدى:",
+        "user_left": "قوللانغۇچى مۇنازىرىدىن چېكىندى",
+        "user_joined": "قوللانغۇچى مۇنازىرىغا قاتناشتى",
+        "user_was_invited": "قوللانغۇچى مۇنازىرەخانىنغا تەكلىپ قىلىندى",
+        "user_encrypted_room": "قوللانغۇچى مۇنازىرە-خانىنى سىفىرلاشتۇردى",
+        "user_changed_room_avatar": "قوللانغۇچى مۇنازىرە-خانىدىكى كۆرىنىشىنى ئۆزگەرتتى",
+        "user_changed_avatar": "قوللانغۇچى كۆرىنىشىنى ئۆزگەرتتى",
+        "user_changed_display_name": "قوللانغۇچىنىڭ ئىسمى«يېڭى ئىسىمغا» ئۆزگەرتىلدى",
+        "user_aliased_room": "مۇنازىرە خانىنىڭ ئىسمى ئۆزگەرتىلدى",
+        "user_created_room": "يېڭى مۇنازىرە خانا قۇرۇلدى",
+        "you": "سىز"
+    },
+    "language_display_name": "ئىنگىلزچە"
 }
