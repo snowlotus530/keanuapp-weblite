@@ -25,25 +25,26 @@
         "join_invite": "仅添加人员",
         "permissions": "加入权限",
         "created_by": "由 {user} 创建",
-        "copy_link": "复制邀请链接"
+        "copy_link": "复制邀请链接",
+        "scan_code": "扫一扫加入聊天室"
     },
     "leave": {
         "leave": "离开",
         "go_back": "返回",
         "create_account": "创建一个帐户",
-        "text_invite": "此群组已锁定。未经特别许可，您不能重新加入。",
+        "text_invite": "此聊天室已锁定。未经特别许可，您不能重新加入。",
         "title_invite": "你确定要离开吗？",
-        "text_public_lastroom": "如果您想再次加入此群组，您可以以新身份加入。 要保留{user}，{action}。",
+        "text_public_lastroom": "如果您想再次加入此聊天室，您可以以新身份加入。 要保留{user}，{action}。",
         "text_public": "如果您知道链接，您可以随时再次加入此聊天室。",
         "title_public": "再见，{user}"
     },
     "login": {
         "login": "登录",
-        "password": "密码",
+        "password": "输入密码",
         "title": "登录",
         "password_required": "需要密码",
         "username_required": "需要用户名",
-        "username": "用户名"
+        "username": "用户名 (如: marta)"
     },
     "device_list": {
         "title": "设备",
@@ -111,7 +112,11 @@
         "ok": "好的",
         "reply": "回复",
         "back": "返回",
-        "new_room": "新的聊天室"
+        "new_room": "新的聊天室",
+        "loading": "正在加载 {appName}",
+        "ignore": "忽略",
+        "join": "加入",
+        "undo": "撤销"
     },
     "Keanu Weblite": "网络灯",
     "power_level": {
@@ -131,12 +136,17 @@
     "room_info_sheet": {
         "create_room": "创建群组",
         "view_details": "查看详情",
-        "this_room": "这个群组"
+        "this_room": "这个聊天室"
     },
     "purge_room": {
         "button": "删除",
         "title": "删除聊天室?",
-        "info": "所有成员和消息将被删除。无法撤销这一操作。"
+        "info": "所有成员和消息将被删除。无法撤销这一操作。",
+        "room_deletion_notice": "该说再见了！此聊天室已被{user}删除。 它将在几秒钟内自毁。",
+        "notified": "我们已经通知了会员。",
+        "deleting": "删除聊天室：",
+        "self_destruct": "聊天室将在几秒钟内自毁。",
+        "n_seconds": "{seconds} 秒"
     },
     "invite": {
         "title": "添加好友",
@@ -151,9 +161,10 @@
         "join_guest": "以访客身份加入",
         "join": "加入聊天室",
         "joining_as": "您以以下身份加入：",
-        "shared_computer": "正在使用一台共享的电脑",
+        "shared_computer": "这是一台共享设备",
         "user_name_label": "用户名",
-        "title": "欢迎来到 {roomName}"
+        "title": "欢迎来到 {roomName}",
+        "join_failed": "加入聊天室失败。"
     },
     "profile": {
         "display_name": "显示名称",
@@ -164,7 +175,8 @@
         "change_name": "更改名称",
         "set_password": "设置密码",
         "temporary_identity": "这个身份是暂时的。为了再次使用这个暂时身份，请设置密码",
-        "title": "我的简历"
+        "title": "我的简历",
+        "select_language": "语言"
     },
     "new_room": {
         "status_avatar": "正在上传头像：{count}",
@@ -177,10 +189,10 @@
         "link_copied": "链接已复制！",
         "add_people": "添加人员",
         "get_link": "获取链接",
-        "join_permissions_info": "这些权限决定加入群组的方式以及邀请他人有多容易. 那些权限随时可以更改。",
+        "join_permissions_info": "这些权限决定了人们如何加入聊天室以及邀请其他人的难易程度。 你可以随时更改它们。",
         "set_join_permissions": "设置加入权限",
         "join_permissions": "加入权限",
-        "name_room": "为群组命名",
+        "name_room": "命名聊天室",
         "next": "下一步",
         "done": "完毕",
         "new_room": "新的聊天室",
@@ -207,5 +219,11 @@
         "identity_temporary": "{displayName}",
         "identity": "{displayName}",
         "you_are": "您是"
-    }
+    },
+    "goodbye": {
+        "view_other_rooms": "查看其它聊天室",
+        "close_tab": "关闭浏览器标签",
+        "room_deleted": "聊天室已删除。"
+    },
+    "language_display_name": "英语"
 }
