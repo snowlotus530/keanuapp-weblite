@@ -9,7 +9,7 @@
         "enabled": true,
         "config": {
             "server": "https://metrics.cleaninsights.org/cleaninsights.php",
-            "siteid": 14,
+            "siteId": 14,
             "timeout": 5,
             "persistEveryNTimes": 1,
             "debug": true,
