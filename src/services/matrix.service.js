@@ -124,10 +124,12 @@ export default {
                             })
                             .then((response) => {
                                 console.log("Response", response);
-                                response.password = pass;
-                                response.is_guest = true;
-                                this.$store.commit("setUser", response);
-                                return response;
+                                var u = Object.assign({}, response);
+                                u.home_server = tempMatrixClient.baseUrl; // Don't use deprecated field from response.
+                                u.password = pass;
+                                u.is_guest = true;
+                                this.$store.commit("setUser", u);
+                                return u;
                             })
                     } else {
                         var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password", initial_device_display_name: config.appName };
@@ -137,13 +139,14 @@ export default {
                         promiseLogin = tempMatrixClient
                             .login("m.login.password", data)
                             .then((response) => {
-                                var u = response;
+                                var u = Object.assign({}, response);
                                 if (user.is_guest) {
                                     // Copy over needed properties
                                     u = Object.assign(user, response);
                                 }
+                                u.home_server = tempMatrixClient.baseUrl; // Don't use deprecated field from response.
                                 this.$store.commit("setUser", u);
-                                return response;
+                                return u;
                             })
                     }
 
