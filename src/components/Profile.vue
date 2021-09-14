@@ -159,9 +159,11 @@ import ImageResize from "image-resize";
 const sizeOf = require("image-size");
 //const dataUriToBuffer = require("data-uri-to-buffer");
 import util from "../plugins/utils";
+import profileInfoMixin from "./profileInfoMixin";
 
 export default {
   name: "Profile",
+  mixins: [profileInfoMixin],
   components: {
     ActionRow,
     SelectLanguageDialog,
