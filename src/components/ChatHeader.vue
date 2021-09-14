@@ -104,7 +104,7 @@ export default {
 
   methods: {
     onEvent(event) {
-      if (event.getRoomId() !== this.roomId) {
+      if (!this.room || event.getRoomId() !== this.room.roomId) {
         return; // Not for this room
       }
       if (event.getType() == "m.room.member") {
