@@ -76,13 +76,13 @@ export default {
 
                 joinedRooms() {
                     return this.rooms.filter(room => {
-                        return room._selfMembership === 'join'
+                        return room.selfMembership === 'join'
                     });
                 },
 
                 invites() {
                     return this.rooms.filter(room => {
-                        return room._selfMembership === 'invite'
+                        return room.selfMembership === 'invite'
                     });
                 }
             },
@@ -348,13 +348,13 @@ export default {
                 },
 
                 onRoom(ignoredroom) {
-                    console.log("Got room: " + ignoredroom);
+                    console.log("Got room", ignoredroom);
                     this.reloadRooms();
                     this.updateNotificationCount();
                 },
 
                 onRoomMyMembership(room) {
-                    if (room._selfMembership === "invite") {
+                    if (room.selfMembership === "invite") {
                         // Invitation. Need to call "recalculate" to pick
                         // up room name, not sure why exactly.
                         room.recalculate();
@@ -394,7 +394,7 @@ export default {
                     // each time!
                     var updatedRooms = this.matrixClient.getVisibleRooms();
                     updatedRooms = updatedRooms.filter(room => {
-                        return room._selfMembership && (room._selfMembership == "invite" || room._selfMembership == "join");
+                        return room.selfMembership && (room.selfMembership == "invite" || room.selfMembership == "join");
                     });
                     updatedRooms.forEach(room => {
                         if (!room.avatar) {
@@ -438,7 +438,7 @@ export default {
                     var ids = {};
                     const ret = [];
                     for (const room of this.rooms) {
-                        if (room._selfMembership == 'join' && this.getRoomJoinRule(room) == 'invite') {
+                        if (room.selfMembership == 'join' && this.getRoomJoinRule(room) == 'invite') {
                             for (const member of room.getJoinedMembers()) {
                                 if (member.userId != this.currentUserId && !ids[member.userId]) {
                                     ids[member.userId] = member;
@@ -661,7 +661,7 @@ export default {
                  * @param {*} userId 
                  */
                 isDirectRoomWith(room, userId) {
-                    if (room._selfMembership == "join" && room.getInvitedAndJoinedMemberCount() == 2) {
+                    if (room.selfMembership == "join" && room.getInvitedAndJoinedMemberCount() == 2) {
                         // Is the other member the one we are looking for?
                         if (room.getMembersWithMembership("join").some(item => item.userId == userId)) {
                             return true;

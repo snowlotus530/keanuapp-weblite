@@ -1,13 +1,8 @@
 <template>
   <v-dialog v-model="showDialog" class="ma-0 pa-0" width="80%">
     <div class="dialog-content text-center" ref="qrContainer">
-      <div class="d-flex flex-column text-center" style="align-items:center">
-      <canvas
-        ref="qr"
-        class="qr"
-        id="qr"
-        :style="qrStyle"
-      ></canvas>
+      <div class="d-flex flex-column text-center" style="align-items: center">
+        <canvas ref="qr" class="qr" id="qr" :style="qrStyle"></canvas>
       </div>
       <div>{{ $t("room_info.scan_code") }}</div>
     </div>
@@ -30,7 +25,7 @@ export default {
     message: {
       type: String,
       default: function () {
-        return false;
+        return null;
       },
     },
   },
@@ -46,9 +41,9 @@ export default {
     qrStyle() {
       const w = document.documentElement.clientWidth;
       const h = document.documentElement.clientHeight;
-      const s = 0.6 * Math.min(w,h);
+      const s = 0.6 * Math.min(w, h);
       return "width: " + s + "px;height:" + s + "px;";
-    }
+    },
   },
   watch: {
     show: {
@@ -61,7 +56,7 @@ export default {
         this.$emit("close");
       } else {
         this.$nextTick(() => {
-        this.updateQR(this.message);
+          this.updateQR(this.message);
         });
       }
     },
@@ -76,23 +71,26 @@ export default {
     updateQR(message) {
       var canvas = this.$refs.qr;
       var canvasContainer = this.$refs.qrContainer;
-        if (message && canvas && canvasContainer) {
-          this.$nextTick(() => {
+      if (message && canvas && canvasContainer) {
+        this.$nextTick(() => {
           QRCode.toCanvas(
             canvas,
             message,
             {
               type: "image/png",
               margin: 1,
-              width: Math.min(0.7 * canvasContainer.clientWidth, 0.7 * canvasContainer.clientHeight),
+              width: Math.min(
+                0.7 * canvasContainer.clientWidth,
+                0.7 * canvasContainer.clientHeight
+              ),
             },
             function (error) {
               if (error) console.error(error);
             }
           );
-          });
-        }
-    }
+        });
+      }
+    },
   },
 };
 </script>
