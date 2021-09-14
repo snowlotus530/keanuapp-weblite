@@ -24,7 +24,7 @@
               indeterminate
               color="primary"
             ></v-progress-circular>
-            <div>{{$t('menu.loading', {appName: appName})}}</div>
+            <div>{{ $t("menu.loading", { appName: appName }) }}</div>
           </v-col>
         </v-row>
       </v-container>
@@ -90,8 +90,7 @@ export default {
         if (this.$matrix.currentRoom) {
           title +=
             " - " +
-            (this.$matrix.currentRoom.summary.info.title ||
-              this.$matrix.currentRoom.roomId);
+            (this.$matrix.currentRoom.name || this.$matrix.currentRoom.roomId);
         } else if (this.$matrix.currentRoomId) {
           title += " - " + this.$matrix.currentRoomId;
         }

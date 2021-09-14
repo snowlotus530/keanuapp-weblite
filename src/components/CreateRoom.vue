@@ -66,7 +66,11 @@
               <div class="ms-2">{{ data.item.name }}</div>
             </template>
           </v-select>
-          <v-checkbox class="mt-0" v-model="sharedComputer" :label="$t('join.shared_computer')" />
+          <v-checkbox
+            class="mt-0"
+            v-model="sharedComputer"
+            :label="$t('join.shared_computer')"
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -283,6 +287,14 @@ export default {
       }
       return true;
     },
+    sharedComputer: {
+      get: function () {
+        return !this.$store.state.useLocalStorage;
+      },
+      set: function (sharedComputer) {
+        this.$store.commit("setUseLocalStorage", !sharedComputer);
+      },
+    },
   },
 
   methods: {
@@ -352,8 +364,6 @@ export default {
       const hasUser = this.currentUser ? true : false;
       var setProfileData = false;
 
-      var uniqueAliasPromise = Promise.resolve(true);
-
       var roomId;
       this.status = this.$t("new_room.status_creating");
       var createRoomOptions = {};
@@ -372,18 +382,6 @@ export default {
             },
           ],
         };
-
-        // Promise to get a unique alias and use it in room creation options.
-        //
-        uniqueAliasPromise = util
-          .getUniqueAliasForRoomName(
-            this.$matrix.matrixClient,
-            this.roomName,
-            this.$matrix.currentUserHomeServer
-          )
-          .then((alias) => {
-            createRoomOptions.room_alias_name = alias;
-          });
       } else {
         //if (this.joinRule == "invite") {
         createRoomOptions = {
@@ -467,7 +465,21 @@ export default {
           }.bind(this)
         )
         .then(() => {
-          return uniqueAliasPromise;
+          if (this.joinRule == "public") {
+            // Promise to get a unique alias and use it in room creation options.
+            //
+            return util
+              .getUniqueAliasForRoomName(
+                this.$matrix.matrixClient,
+                this.roomName,
+                this.$matrix.currentUserHomeServer
+              )
+              .then((alias) => {
+                createRoomOptions.room_alias_name = alias;
+              });
+          } else {
+            return Promise.resolve(true);
+          }
         })
         .then(() => {
           return this.$matrix.matrixClient

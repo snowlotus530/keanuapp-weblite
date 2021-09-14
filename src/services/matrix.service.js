@@ -76,13 +76,13 @@ export default {
 
                 joinedRooms() {
                     return this.rooms.filter(room => {
-                        return room._selfMembership === 'join'
+                        return room.selfMembership === 'join'
                     });
                 },
 
                 invites() {
                     return this.rooms.filter(room => {
-                        return room._selfMembership === 'invite'
+                        return room.selfMembership === 'invite'
                     });
                 }
             },
@@ -124,10 +124,12 @@ export default {
                             })
                             .then((response) => {
                                 console.log("Response", response);
-                                response.password = pass;
-                                response.is_guest = true;
-                                this.$store.commit("setUser", response);
-                                return response;
+                                var u = Object.assign({}, response);
+                                u.home_server = tempMatrixClient.baseUrl; // Don't use deprecated field from response.
+                                u.password = pass;
+                                u.is_guest = true;
+                                this.$store.commit("setUser", u);
+                                return u;
                             })
                     } else {
                         var data = { user: User.localPart(user.user_id), password: user.password, type: "m.login.password", initial_device_display_name: config.appName };
@@ -137,13 +139,14 @@ export default {
                         promiseLogin = tempMatrixClient
                             .login("m.login.password", data)
                             .then((response) => {
-                                var u = response;
+                                var u = Object.assign({}, response);
                                 if (user.is_guest) {
                                     // Copy over needed properties
                                     u = Object.assign(user, response);
                                 }
+                                u.home_server = tempMatrixClient.baseUrl; // Don't use deprecated field from response.
                                 this.$store.commit("setUser", u);
-                                return response;
+                                return u;
                             })
                     }
 
@@ -348,13 +351,13 @@ export default {
                 },
 
                 onRoom(ignoredroom) {
-                    console.log("Got room: " + ignoredroom);
+                    console.log("Got room", ignoredroom);
                     this.reloadRooms();
                     this.updateNotificationCount();
                 },
 
                 onRoomMyMembership(room) {
-                    if (room._selfMembership === "invite") {
+                    if (room.selfMembership === "invite") {
                         // Invitation. Need to call "recalculate" to pick
                         // up room name, not sure why exactly.
                         room.recalculate();
@@ -394,7 +397,7 @@ export default {
                     // each time!
                     var updatedRooms = this.matrixClient.getVisibleRooms();
                     updatedRooms = updatedRooms.filter(room => {
-                        return room._selfMembership && (room._selfMembership == "invite" || room._selfMembership == "join");
+                        return room.selfMembership && (room.selfMembership == "invite" || room.selfMembership == "join");
                     });
                     updatedRooms.forEach(room => {
                         if (!room.avatar) {
@@ -438,7 +441,7 @@ export default {
                     var ids = {};
                     const ret = [];
                     for (const room of this.rooms) {
-                        if (room._selfMembership == 'join' && this.getRoomJoinRule(room) == 'invite') {
+                        if (room.selfMembership == 'join' && this.getRoomJoinRule(room) == 'invite') {
                             for (const member of room.getJoinedMembers()) {
                                 if (member.userId != this.currentUserId && !ids[member.userId]) {
                                     ids[member.userId] = member;
@@ -661,7 +664,7 @@ export default {
                  * @param {*} userId 
                  */
                 isDirectRoomWith(room, userId) {
-                    if (room._selfMembership == "join" && room.getInvitedAndJoinedMemberCount() == 2) {
+                    if (room.selfMembership == "join" && room.getInvitedAndJoinedMemberCount() == 2) {
                         // Is the other member the one we are looking for?
                         if (room.getMembersWithMembership("join").some(item => item.userId == userId)) {
                             return true;

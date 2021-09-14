@@ -56,7 +56,9 @@
             </div>
           </v-col>
           <v-col cols="6" v-if="ptt">
-            <div class="swipe-info">&lt;&lt; {{$t('voice_recorder.swipe_to_cancel')}}</div>
+            <div class="swipe-info">
+              &lt;&lt; {{ $t("voice_recorder.swipe_to_cancel") }}
+            </div>
           </v-col>
         </v-row>
       </v-container>
@@ -72,7 +74,9 @@
                 <v-icon color="white">delete_outline</v-icon>
               </v-col>
               <v-col cols="6">
-                <div class="swipe-info">{{$t('voice_recorder.release_to_cancel')}}</div>
+                <div class="swipe-info">
+                  {{ $t("voice_recorder.release_to_cancel") }}
+                </div>
               </v-col>
             </v-row>
           </v-container>
@@ -93,9 +97,9 @@
                 </div>
               </v-col>
               <v-col cols="3">
-                <v-btn @click.stop="cancelRecording" text class="swipe-info"
-                  >{{$t('menu.cancel')}}</v-btn
-                >
+                <v-btn @click.stop="cancelRecording" text class="swipe-info">{{
+                  $t("menu.cancel")
+                }}</v-btn>
               </v-col>
               <v-col cols="3">
                 <v-btn @click.stop="stopRecording" icon class="swipe-info"
@@ -116,7 +120,7 @@
           <v-row align="center">
             <v-col>
               <div class="swipe-info">
-                {{ errorMessage || $t('voice_recorder.failed_to_record') }}
+                {{ errorMessage || $t("voice_recorder.failed_to_record") }}
               </div>
             </v-col>
             <v-col align="right">
@@ -236,6 +240,7 @@ export default {
           this.startRecording();
         } else {
           console.log("Not PTT");
+          //eslint-disable-next-line
           this.micButtonRef.$el.style.display = "none";
         }
       } else {
@@ -250,6 +255,7 @@ export default {
         this.startCoordinateX = null;
         this.startCoordinateY = null;
         this.recordingLocked = false;
+        //eslint-disable-next-line
         this.micButtonRef.$el.style.display = "block";
       }
     },
@@ -341,7 +347,7 @@ export default {
             mimeType: "audio/webm",
             sampleRate: 16000,
             desiredSampRate: 16000,
-            numberOfAudioChannels: 1
+            numberOfAudioChannels: 1,
           });
           this.recorder.startRecording();
           this.state = State.RECORDING;

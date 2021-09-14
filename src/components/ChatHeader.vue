@@ -18,7 +18,7 @@
         @click.stop="onHeaderClicked"
       >
         <div class="d-flex flex-nowrap room-name-inline">
-          {{ room.summary.info.title }}
+          {{ room.name }}
           <!--<v-icon>expand_more</v-icon>-->
         </div>
         <div class="num-members">{{ $tc("room.members", memberCount) }}</div>
@@ -104,7 +104,7 @@ export default {
 
   methods: {
     onEvent(event) {
-      if (event.getRoomId() !== this.roomId) {
+      if (!this.room || event.getRoomId() !== this.room.roomId) {
         return; // Not for this room
       }
       if (event.getType() == "m.room.member") {

@@ -21,17 +21,23 @@
           <v-img :src="room.avatar" />
         </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title>{{
-            room.name || room.summary.info.title
-          }}</v-list-item-title>
+          <v-list-item-title>{{ room.name }}</v-list-item-title>
           <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
-          <v-btn class="filled-button" depressed color="black" @click.stop="acceptInvitation(room)"
-            >{{$t('menu.join')}}</v-btn
+          <v-btn
+            class="filled-button"
+            depressed
+            color="black"
+            @click.stop="acceptInvitation(room)"
+            >{{ $t("menu.join") }}</v-btn
           >
-          <v-btn class="filled-button" color="black" @click.stop="rejectInvitation(room)" text
-            >{{$t('menu.ignore')}}</v-btn
+          <v-btn
+            class="filled-button"
+            color="black"
+            @click.stop="rejectInvitation(room)"
+            text
+            >{{ $t("menu.ignore") }}</v-btn
           >
         </v-list-item-action>
       </v-list-item>
@@ -49,7 +55,7 @@
           {{ notificationCount(room) }}
         </div>
         <v-list-item-content>
-          <v-list-item-title>{{ room.summary.info.title }}</v-list-item-title>
+          <v-list-item-title>{{ room.name }}</v-list-item-title>
           <v-list-item-subtitle>{{ room.topic }}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -99,9 +105,9 @@ export default {
       if (items == null) {
         return [];
       }
-      return items.sort(function(a, b) {
+      return items.sort(function (a, b) {
         const titleA = a.name || a.summary.info.title;
-        const titleB = b.name || b.summary.info.title
+        const titleB = b.name || b.summary.info.title;
         if (titleA == null) {
           return 1;
         } else if (titleB == null) {

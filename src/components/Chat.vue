@@ -93,13 +93,13 @@
               :event="event"
               :nextEvent="events[index + 1]"
               :reactions="
-                timelineWindow._timelineSet.getRelationsForEvent(
+                timelineSet.getRelationsForEvent(
                   event.getId(),
                   'm.annotation',
                   'm.reaction'
                 )
               "
-              :timelineSet="timelineWindow._timelineSet"
+              :timelineSet="timelineSet"
               v-on:send-quick-reaction="sendQuickReaction"
               v-on:context-menu="showContextMenuForEvent($event)"
               v-on:own-avatar-clicked="viewProfile"
@@ -559,6 +559,7 @@ export default {
       events: [],
       currentInput: "",
       typingMembers: [],
+      timelineSet: null,
       timelineWindow: null,
 
       /** true if we are currently paginating */
@@ -824,10 +825,10 @@ export default {
       console.log("Read up to " + initialEventId);
 
       //initialEventId = null;
-
+      this.timelineSet = this.room.getUnfilteredTimelineSet();
       this.timelineWindow = new TimelineWindow(
         this.$matrix.matrixClient,
-        this.room.getUnfilteredTimelineSet(),
+        this.timelineSet,
         {}
       );
       const self = this;
@@ -903,15 +904,17 @@ export default {
       ) {
         this.loading = true;
         // Instead of paging though ALL history, just reload a timeline at the live marker...
+        var timelineSet = this.room.getUnfilteredTimelineSet();
         var timelineWindow = new TimelineWindow(
           this.$matrix.matrixClient,
-          this.room.getUnfilteredTimelineSet(),
+          timelineSet,
           {}
         );
         const self = this;
         timelineWindow
           .load(null, 20)
           .then(() => {
+            self.timelineSet = timelineSet;
             self.timelineWindow = timelineWindow;
             self.events = self.timelineWindow.getEvents();
           })
