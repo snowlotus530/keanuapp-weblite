@@ -22,4 +22,4 @@ s3-deploy:
   script:
   - aws s3 sync ./public s3://weblite-production-shared-shared-bucket --delete --only-show-errors
   only:
-  - master
+  - main
